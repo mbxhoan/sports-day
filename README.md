@@ -17,7 +17,7 @@ Copy `Publishable key` từ `supabase status` vào `NEXT_PUBLIC_SUPABASE_PUBLISH
 
 - Website: `http://127.0.0.1:3000`
 - Supabase Studio: `http://127.0.0.1:55323`
-- Admin local: `admin@petrovietnam.local` / `Petrovietnam2026!`
+- Admin local: `admin@petrovietnam.vn` / `Petrovietnam2026!`
 
 ## Kiểm tra
 

@@ -6,7 +6,7 @@ insert into auth.users (
 ) values (
   '00000000-0000-0000-0000-000000000000',
   'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-  'authenticated', 'authenticated', 'admin@petrovietnam.local',
+  'authenticated', 'authenticated', 'admin@petrovietnam.vn',
   extensions.crypt('Petrovietnam2026!', extensions.gen_salt('bf')),
   now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''
 ) on conflict (id) do update set
@@ -19,8 +19,8 @@ insert into auth.identities (
 ) values (
   'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
   'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-  'admin@petrovietnam.local',
-  '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","email":"admin@petrovietnam.local","email_verified":true}'::jsonb,
+  'admin@petrovietnam.vn',
+  '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","email":"admin@petrovietnam.vn","email_verified":true}'::jsonb,
   'email', now(), now(), now()
 ) on conflict (provider_id, provider) do update set identity_data = excluded.identity_data, updated_at = now();
 
