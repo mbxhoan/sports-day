@@ -9,18 +9,24 @@ import { SportTabs } from "./sport-tabs";
 import { copy, getSiteData, localized, rankOrganizations, type Locale, type SiteData, type Sport } from "@/lib/site";
 
 function PageTitle({ emoji, title, subtitle }: { emoji?: string; title: string; subtitle?: string }) {
-  return <div className="page-heading"><span>{emoji}</span><div><h1>{title}</h1>{subtitle && <p>{subtitle}</p>}</div></div>;
+  const mark = emoji?.startsWith("/") ? <Image className="page-heading-icon" src={emoji} alt="" width={42} height={42} /> : emoji ? <span>{emoji}</span> : null;
+  return <div className="page-heading">{mark}<div><h1>{title}</h1>{subtitle && <p>{subtitle}</p>}</div></div>;
+}
+
+function SportIcon({ value }: { value: string }) {
+  return value.startsWith("/") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} /> : <span className="sport-emoji">{value}</span>;
 }
 
 function SportCard({ locale, sport, data }: { locale: Locale; sport: Sport; data: SiteData }) {
   const prefix = locale === "en" ? "/en" : "";
-  const tournamentCount = data.tournaments.filter((item) => item.sport_id === sport.id).length;
+  const tournaments = data.tournaments.filter((item) => item.sport_id === sport.id);
   const fixtureCount = data.fixtures.filter((fixture) => data.tournaments.some((item) => item.id === fixture.tournament_id && item.sport_id === sport.id)).length;
   return <Link className="sport-card" href={`${prefix}/sports/${sport.slug}`}>
-    <span className="sport-emoji">{sport.emoji}</span>
+    <SportIcon value={sport.emoji} />
     <h3>{localized(sport,"name",locale)}</h3>
     <p>{localized(sport,"description",locale)}</p>
-    <div className="sport-meta"><span><Users size={14}/>{tournamentCount}</span><span><CircleDot size={14}/>{fixtureCount}</span></div>
+    <div className="sport-meta"><span><Users size={14}/>{tournaments.length} {copy[locale].categoryUnit}</span><span><CircleDot size={14}/>{fixtureCount} {copy[locale].fixtureUnit}</span></div>
+    <div className="sport-categories" aria-label={copy[locale].categories}>{tournaments.map((tournament) => <span key={tournament.id}>{localized(tournament, "name", locale)}</span>)}</div>
     <span className="card-cta">{copy[locale].viewDetail}</span>
   </Link>;
 }

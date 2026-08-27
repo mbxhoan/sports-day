@@ -24,6 +24,8 @@ export type Tournament = {
   category_en: string;
   format_vi: string;
   format_en: string;
+  rules_vi: string;
+  rules_en: string;
   sort_order: number;
 };
 export type Fixture = {
@@ -94,7 +96,7 @@ export const copy = {
     sportCount: "Môn thi đấu", dayCount: "Ngày thi đấu", unitCount: "Đơn vị", athleteCount: "Tổng VĐV", matchCount: "Trận đấu",
     allSports: "Các môn thể thao", viewDetail: "Xem chi tiết", updating: "Đang cập nhật", footer: "Hội thao Petrovietnam 2026",
     info: "Thông tin", teams: "Đội/VĐV", times: "Khung giờ", fixtures: "Lịch đấu", brackets: "Bảng đấu",
-    description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", competitionDay: "Ngày thi đấu",
+    description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
     filterSport: "Tất cả môn", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
     organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương",
@@ -105,7 +107,7 @@ export const copy = {
     sportCount: "Sports", dayCount: "Competition days", unitCount: "Organizations", athleteCount: "Athletes", matchCount: "Matches",
     allSports: "Sports", viewDetail: "View details", updating: "Updating", footer: "Petrovietnam Sports Day 2026",
     info: "Information", teams: "Teams/Athletes", times: "Time slots", fixtures: "Fixtures", brackets: "Brackets",
-    description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", competitionDay: "Competition day",
+    description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
     filterSport: "All sports", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
     organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals",
@@ -113,18 +115,20 @@ export const copy = {
 } as const;
 
 const sportRows: Sport[] = [
-  ["pickleball", "Pickleball", "Pickleball", "🏓", "Thi đấu đôi theo nhóm tuổi.", "Doubles competition by age group."],
-  ["bong-ban", "Bóng bàn", "Table Tennis", "🏓", "Thi đấu đôi nam, đôi nữ và đôi nam nữ.", "Men’s, women’s and mixed doubles."],
-  ["cau-long", "Cầu lông", "Badminton", "🏸", "Thi đấu đôi theo giới tính và nhóm tuổi.", "Doubles competition by gender and age group."],
-  ["boi-loi", "Bơi lội", "Swimming", "🏊", "Các cự ly tự do cá nhân và tiếp sức 4×50m.", "Individual freestyle and 4×50m relays."],
-  ["keo-co", "Kéo co", "Tug of War", "🪢", "Thi đấu đồng đội nam và nữ.", "Men’s and women’s team competition."],
-  ["dien-kinh", "Điền kinh", "Athletics", "🏃", "Các cự ly 400m, 800m, 3.000m, 5.000m và tiếp sức 4×100m.", "400m, 800m, 3,000m, 5,000m and 4×100m relay events."],
-  ["co-vua", "Cờ vua", "Chess", "♟️", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system."],
-  ["co-tuong", "Cờ tướng", "Xiangqi", "♜", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system."],
-].map(([slug, name_vi, name_en, emoji, description_vi, description_en], index) => ({
+  ["pickleball", "Pickleball", "Pickleball", "/icons/pickleball.png", "Thi đấu đôi theo nhóm tuổi.", "Doubles competition by age group.", "12 hạng mục đôi nam, đôi nữ và đôi nam nữ theo nhóm tuổi. Thi đấu theo vòng bảng và loại trực tiếp; lịch đấu, bảng đấu và kết quả cập nhật theo dữ liệu thực tế.", "12 men’s, women’s and mixed doubles age-group categories. Group and knockout stages; schedules, brackets and results follow the live competition data."],
+  ["bong-ban", "Bóng bàn", "Table Tennis", "🏓", "Thi đấu đôi nam, đôi nữ và đôi nam nữ.", "Men’s, women’s and mixed doubles.", "Thi đấu đôi nam, đôi nữ và đôi nam nữ theo các hạng mục tuổi. Vòng bảng và loại trực tiếp; đội thắng được xác định theo tỷ số trận.", "Men’s, women’s and mixed doubles by age category. Group and knockout stages; winners are determined by match score."],
+  ["cau-long", "Cầu lông", "Badminton", "🏸", "Thi đấu đôi theo giới tính và nhóm tuổi.", "Doubles competition by gender and age group.", "Thi đấu đôi theo giới tính và nhóm tuổi. Vận động viên thi đấu theo lịch và hạng mục đã đăng ký; kết quả được cập nhật sau từng trận.", "Doubles competition by gender and age group. Athletes compete in their registered category; results are updated after each match."],
+  ["boi-loi", "Bơi lội", "Swimming", "🏊", "Các cự ly tự do cá nhân và tiếp sức 4×50m.", "Individual freestyle and 4×50m relays.", "Gồm các nội dung 50m, 100m tự do và tiếp sức 4×50m. Xếp hạng theo thành tích thời gian được ghi nhận tại lượt thi.", "Includes 50m, 100m freestyle and 4×50m relay events. Ranking follows the recorded time in each heat."],
+  ["keo-co", "Kéo co", "Tug of War", "🪢", "Thi đấu đồng đội nam và nữ.", "Men’s and women’s team competition.", "Thi đấu đồng đội nam và nữ theo hạng mục. Mỗi trận gồm các đội đối đầu trực tiếp; kết quả và lịch thi đấu do Ban Tổ chức cập nhật.", "Men’s and women’s team competition. Teams face each other directly; schedules and results are updated by the Organizing Committee."],
+  ["dien-kinh", "Điền kinh", "Athletics", "🏃", "Các cự ly 400m, 800m, 3.000m, 5.000m và tiếp sức 4×100m.", "400m, 800m, 3,000m, 5,000m and 4×100m relay events.", "Gồm các nội dung chạy cá nhân và tiếp sức 4×100m. Vận động viên xuất phát theo lượt; thành tích được tính bằng thời gian hoàn thành.", "Includes individual running and 4×100m relay events. Athletes start in heats; performance is measured by finishing time."],
+  ["co-vua", "Cờ vua", "Chess", "♟️", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system.", "Thi đấu cá nhân theo hệ Thụy Sĩ. Ghép cặp và xếp hạng căn cứ vào kết quả từng ván và các tiêu chí phụ theo điều lệ giải.", "Individual Swiss-system competition. Pairings and ranking follow game results and the tie-break criteria of the event rules."],
+  ["co-tuong", "Cờ tướng", "Xiangqi", "♜", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system.", "Thi đấu cá nhân theo hệ Thụy Sĩ. Mỗi ván được ghi nhận thắng, hòa hoặc thua; bảng xếp hạng cập nhật theo kết quả thi đấu.", "Individual Swiss-system competition. Each game records a win, draw or loss; standings update from competition results."],
+].map(([slug, name_vi, name_en, emoji, description_vi, description_en, rules_vi, rules_en], index) => ({
   id: `sport-${index + 1}`, slug, name_vi, name_en, emoji, description_vi, description_en,
-  rules_vi: "Đang cập nhật", rules_en: "Updating", sort_order: index + 1,
+  rules_vi, rules_en, sort_order: index + 1,
 }));
+
+const defaultSportsBySlug = new Map(sportRows.map((sport) => [sport.slug, sport]));
 
 const tournamentNames: Record<string, Array<[string, string]>> = {
   pickleball: [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nam từ 51 tuổi","Men’s Doubles 51+"],["Đôi nữ dưới 30 tuổi","Women’s Doubles Under 30"],["Đôi nữ 31–40 tuổi","Women’s Doubles 31–40"],["Đôi nữ 41–50 tuổi","Women’s Doubles 41–50"],["Đôi nữ từ 50 tuổi","Women’s Doubles 50+"],["Đôi nam nữ dưới 30 tuổi","Mixed Doubles Under 30"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"],["Đôi nam nữ từ 51 tuổi","Mixed Doubles 51+"]],
@@ -142,6 +146,8 @@ const tournaments = sportRows.flatMap((sport) => (tournamentNames[sport.slug] ??
   name_vi: vi, name_en: en, category_vi: vi, category_en: en,
   format_vi: sport.slug.startsWith("co-") ? "Hệ Thụy Sĩ cá nhân" : "Theo hồ sơ thi đấu",
   format_en: sport.slug.startsWith("co-") ? "Individual Swiss system" : "Per competition source",
+  rules_vi: "",
+  rules_en: "",
   sort_order: index + 1,
 })));
 
@@ -181,7 +187,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").order("sort_order"),
-    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,sort_order").order("sort_order"),
+    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,sort_order").order("sort_order"),
     db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").order("full_name"),
     db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").order("name_vi"),
@@ -200,7 +206,15 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   if (event.error || sports.error || tournamentsResult.error || fixtures.error || !event.data) return fallback;
   return {
     event: event.data,
-    sports: sports.data as Sport[],
+    sports: (sports.data as Sport[]).map((sport) => {
+      const defaults = defaultSportsBySlug.get(sport.slug);
+      return {
+        ...sport,
+        emoji: sport.slug === "pickleball" ? "/icons/pickleball.png" : sport.emoji,
+        rules_vi: !sport.rules_vi || sport.rules_vi === "Đang cập nhật" ? defaults?.rules_vi ?? sport.rules_vi : sport.rules_vi,
+        rules_en: !sport.rules_en || sport.rules_en === "Updating" ? defaults?.rules_en ?? sport.rules_en : sport.rules_en,
+      };
+    }),
     tournaments: tournamentsResult.data as Tournament[],
     organizations: (organizations.data ?? []) as Organization[],
     participants: (participants.data ?? []) as Participant[],

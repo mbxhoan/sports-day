@@ -38,6 +38,8 @@ export function SportTabs({ locale, sport, tournaments, organizations, participa
   const tournamentsById = new Map(tournaments.map((item) => [item.id, item]));
   const date = (value: string | null) => value ? formatVietnamDateTime(value, locale) : t.updating;
   const entryNames = (fixtureId: string) => fixtureEntries.filter((item) => item.fixture_id === fixtureId).map((item) => entriesById.get(item.entry_id)).filter(Boolean).map((item) => localized(item!, "name", locale)).join(" — ");
+  const sportRules = localized(sport, "rules", locale);
+  const tournamentRules = tournaments.find((item) => localized(item, "rules", locale))?.[locale === "en" ? "rules_en" : "rules_vi"] ?? "";
 
   return <>
     <div className="tabs" role="tablist" aria-label={localized(sport, "name", locale)}>
@@ -46,9 +48,9 @@ export function SportTabs({ locale, sport, tournaments, organizations, participa
     {active === "info" && <div className="sport-info-layout">
       <div className="stack">
         <section className="panel"><h2>{t.description}</h2><p>{localized(sport, "description", locale)}</p></section>
-        <section className="panel prose"><h2>{t.rules}</h2><p>{localized(sport, "rules", locale) || t.updating}</p></section>
+        <section className="panel prose"><h2>{t.rules}</h2><p>{sportRules || tournamentRules || t.updating}</p></section>
       </div>
-      <aside className="stack"><section className="panel"><h2>{t.details}</h2><dl><div><dt>{t.format}</dt><dd>{tournaments[0] ? localized(tournaments[0], "format", locale) : t.updating}</dd></div><div><dt>{t.categories}</dt><dd>{tournaments.length}</dd></div></dl></section></aside>
+      <aside className="stack"><section className="panel"><h2>{t.details}</h2><dl><div><dt>{t.format}</dt><dd>{tournaments[0] ? localized(tournaments[0], "format", locale) : t.updating}</dd></div><div><dt>{t.categories}</dt><dd>{tournaments.length}</dd></div></dl><div className="detail-categories">{tournaments.map((tournament) => <span key={tournament.id}>{localized(tournament, "name", locale)}</span>)}</div></section></aside>
     </div>}
     {active === "teams" && (sportEntries.length ? <section className="panel table-scroll"><table><thead><tr><th>{t.teams}</th><th>{t.categories}</th><th>{t.organization}</th><th>{t.members}</th></tr></thead><tbody>{sportEntries.map((entry) => {
       const members = entryMembers.filter((item) => item.entry_id === entry.id).map((item) => participantsById.get(item.participant_id)?.full_name).filter(Boolean).join(", ");

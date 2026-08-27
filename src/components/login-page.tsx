@@ -2,6 +2,7 @@ import { LockKeyhole, Mail, Trophy } from "lucide-react";
 import Link from "next/link";
 import { login } from "@/app/login/actions";
 import { SiteShell } from "./site-shell";
+import { SubmitButton } from "./submit-button";
 import type { Locale } from "@/lib/site";
 
 export async function LoginPage({ locale, searchParams }: { locale: Locale; searchParams: Promise<{ error?: string }> }) {
@@ -16,7 +17,7 @@ export async function LoginPage({ locale, searchParams }: { locale: Locale; sear
       <input type="hidden" name="locale" value={locale}/>
       <label><span><Mail size={15}/>{en ? "Email" : "Email"}</span><input name="email" type="email" autoComplete="email" required/></label>
       <label><span><LockKeyhole size={15}/>{en ? "Password" : "Mật khẩu"}</span><input name="password" type="password" autoComplete="current-password" required/></label>
-      <button className="gold-button" type="submit">{en ? "Sign in" : "Đăng nhập"}</button>
+      <SubmitButton className="gold-button">{en ? "Sign in" : "Đăng nhập"}</SubmitButton>
     </form>
     <Link className="back-link" href={en ? "/en" : "/"}>← {en ? "Back to website" : "Về trang chủ"}</Link>
   </section></div></SiteShell>;

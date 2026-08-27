@@ -17,3 +17,7 @@ Sau khi hoàn tất hãy chạy test cú pháp, cấu trúc, lập trình an to�
 7. [QUAN TRỌNG] Sau khi đã hoàn thiện kiến trúc rồi thì đọc vào trong các file (.pdf đa số) trong `/assets/sports` là file danh sách môn, đội thi của môn, hạng mục thi của môn, vận động viên từng đội, các cặp đấu, thể thức thi của môn, cách tính tỉ số, vị trí sân thi của giải, bảng đấu của giải,... tất tần tật, và tôi cần bạn đọc quét qua một cách chính xác và đầy đủ rồi bạn tạo seeding data để đưa tất tần tật một cách chính xác và đầy đủ vào trong phần mềm xài được ngay luôn. Fill vô đầy đủ thông tin của bộ môn luôn, như hiện tại ví dụ như môn "Pickleball" đã có thông tin đầy đủ rồi trong `/assets/sports` nhưng chưa có thông tin môn, đội/vđv đấu, khung giờ đấu, lịch đấu hay bảng đấu @issue3.png.
 #### => Hãy đặt câu hỏi cho tôi khi nếu có điểm nào chưa rõ cho đến khi bạn tự tin 100% hiểu rõ về yêu cầu này. Nếu bất kì rủi ro nào thì cũng nên cho tôi biết, nếu bạn có đề xuất giải pháp xử lý an toàn thì cũng cho tôi biết để xử lý.
 ---
+1. style nên có chút màu xanh lá sáng giống phía trên của @theme.png giúp tôi. 
+2. tôi cần thể hiện các hạng mục trên ô môn thể thao ở grid lưới danh sách môn thể thao giống như @sports.png
+3. tôi cần thông tin chi tiết, mô tả, thể lệ chi tiết theo chi tiết thông tin môn thể thao như là @sports-detail.png
+---
