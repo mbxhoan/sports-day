@@ -1,0 +1,16 @@
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  webpack(config) {
+    // ponytail: Next 16.3 filesystem cache corrupts consecutive builds; re-enable after upstream fix.
+    config.cache = false;
+    return config;
+  },
+  images: {
+    remotePatterns: process.env.NEXT_PUBLIC_SUPABASE_URL
+      ? [new URL("/storage/v1/object/public/event-media/**", process.env.NEXT_PUBLIC_SUPABASE_URL)]
+      : [],
+  },
+};
+
+export default nextConfig;
