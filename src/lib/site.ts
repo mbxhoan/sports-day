@@ -50,7 +50,7 @@ export type GroupEntry = { id: string; group_id: string; entry_id: string; seed_
 export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; score: string | null; rank: number | null };
 export type Standing = { id: string; tournament_id: string; group_id: string | null; entry_id: string; played: number; won: number; drawn: number; lost: number; points: number; rank: number | null };
 export type Award = { id: string; organization_id: string | null; entry_id: string | null; participant_id: string | null; medal: "gold" | "silver" | "bronze" | "special"; title_vi: string; title_en: string };
-export type Media = { id: string; storage_path: string; public_url: string; title_vi: string; title_en: string; alt_vi: string; alt_en: string; filter_tag: string; sort_order: number };
+export type Media = { id: string; storage_path: string; public_url: string; sport_id: string | null; title_vi: string; title_en: string; alt_vi: string; alt_en: string; filter_tag: string; album_vi: string; album_en: string; sort_order: number };
 export type Contact = { id: string; label_vi: string; label_en: string; value: string; href: string; sort_order: number };
 export type FooterLink = { id: string; label_vi: string; label_en: string; href: string; sort_order: number };
 export type LeaderboardRow = { organization: Organization; gold: number; silver: number; bronze: number; special: number; total: number };
@@ -65,6 +65,7 @@ export type SiteData = {
     venue_vi: string;
     venue_en: string;
     hero_path: string;
+    hero_mobile_path: string;
     start_at: string;
     end_at: string;
   };
@@ -150,7 +151,7 @@ const fallback: SiteData = {
     subtitle_vi: "Khu vực phía Nam", subtitle_en: "Southern Region",
     about_vi: "Sân chơi thể thao gắn kết người lao động Petrovietnam khu vực phía Nam.",
     about_en: "A sports festival connecting Petrovietnam employees in the Southern Region.",
-    venue_vi: "", venue_en: "", hero_path: "/kv.png",
+    venue_vi: "", venue_en: "", hero_path: "/kv.png", hero_mobile_path: "/kv-mobile.png",
     start_at: "2026-09-04T00:00:00.000Z", end_at: "2026-09-06T11:00:00.000Z",
   },
   sports: sportRows,
@@ -178,7 +179,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
 
   const db = createClient(url, key, { auth: { persistSession: false } });
   const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
-    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,start_at,end_at").eq("singleton_key", "main").maybeSingle(),
+    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,sort_order").order("sort_order"),
     db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").order("sort_order"),
@@ -191,7 +192,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,score,rank").order("seed_order"),
     db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").order("rank"),
     db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").order("sort_order"),
-    db.from("media").select("id,storage_path,title_vi,title_en,alt_vi,alt_en,filter_tag,sort_order").eq("kind", "gallery").order("sort_order"),
+    db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("kind", "gallery").order("sort_order"),
     db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").order("sort_order"),
     db.from("footer_links").select("id,label_vi,label_en,href,sort_order").order("sort_order"),
   ]);

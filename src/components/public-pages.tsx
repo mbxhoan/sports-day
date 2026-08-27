@@ -36,7 +36,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
     [Users, data.counts.participants, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale}>
-    <section className="hero"><Image src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" /></section>
+    <section className="hero"><Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" /><Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" /></section>
     <Countdown target={data.event.start_at} locale={locale}/>
     <div className="container home-content">
       <section className="stats-grid">
