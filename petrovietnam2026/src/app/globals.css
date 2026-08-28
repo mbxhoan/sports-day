@@ -186,9 +186,19 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .admin-layout aside a:hover { background: var(--secondary); color: #fff; }
 .admin-main { min-width: 0; padding: 28px; }
 .admin-sport-main { width: min(1480px, 100%); margin-inline: auto; }
-.admin-sport-nav { display: flex; gap: 8px; margin: 0 0 18px; overflow-x: auto; }
+.admin-sport-workspace { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: start; }
+.admin-sport-nav { position: sticky; top: 78px; display: grid; gap: 4px; align-self: start; padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: #07527f; }
+.admin-sport-nav > b { padding: 2px 8px; color: var(--primary); font-size: 14px; }
+.admin-sport-nav > small { padding: 0 8px 9px; color: #9eabc0; font-size: 10px; }
 .admin-sport-nav a, .admin-sport-grid a { border: 1px solid #2f6681; border-radius: 6px; background: #07527f; color: #e9ffff; }
-.admin-sport-nav a { min-height: 36px; padding: 8px 11px; white-space: nowrap; font-size: 12px; }
+.admin-sport-nav a { min-height: 38px; padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px; white-space: nowrap; font-size: 12px; }
+.admin-sport-nav a small { min-width: 22px; padding: 2px 5px; border-radius: 999px; background: #102b55; color: #b8c9e4; text-align: center; font-size: 10px; }
+.admin-sport-nav a:target, .admin-sport-nav a:hover { border-color: var(--primary); background: #0874a6; }
+.admin-sport-panels { min-width: 0; }
+.admin-sport-panels > section { display: none; scroll-margin-top: 78px; }
+.admin-sport-panels > section:first-child { display: block; }
+.admin-sport-panels:has(> section:target) > section:first-child { display: none; }
+.admin-sport-panels > section:target { display: block; }
 .admin-sport-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .admin-sport-grid a { min-width: 0; min-height: 88px; padding: 14px; display: grid; align-content: center; gap: 5px; }
 .admin-sport-grid a:hover, .admin-sport-nav a:hover { border-color: var(--primary); background: #0874a6; }
@@ -216,6 +226,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .upload-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .upload-form input[type="file"], .upload-form button { grid-column: 1 / -1; }
 .upload-form input[type="file"] { padding: 9px; }
+.upload-help { margin: -8px 0 16px; color: var(--muted-foreground); font-size: 11px; }
 .section-label { margin: 28px 0 12px; font-size: 17px; }
 .admin-section > summary { min-height: 52px; padding: 0 17px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; }
 .admin-section > summary::-webkit-details-marker, .record-form > summary::-webkit-details-marker, .record > summary::-webkit-details-marker { display: none; }
@@ -224,6 +235,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .record-form, .record { margin-top: 10px; border: 1px solid #2f9fc3; border-radius: 6px; background: #064a78; }
 .record-form > summary, .record > summary { min-height: 44px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
 .record-form form, .record form { padding: 12px; border-top: 1px solid #2f9fc3; }
+.admin-section-body > .record-list, .admin-card > .record-list { max-height: min(68vh, 760px); overflow-y: auto; padding-right: 4px; }
 .record > summary em { padding: 2px 7px; border-radius: 999px; background: #3f1d1d; color: #fca5a5; font-size: 10px; font-style: normal; }
 .record.archived { opacity: .7; }
 .archive-button { min-height: 36px; padding: 0 10px; display: flex; align-items: center; gap: 6px; border: 1px solid #633; border-radius: 5px; background: transparent; color: #fca5a5; }
@@ -257,6 +269,10 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .segmented { margin-left: 0; }
   .admin-layout { grid-template-columns: 1fr; }
   .admin-sport-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-sport-workspace { grid-template-columns: 1fr; }
+  .admin-sport-nav { position: static; display: flex; overflow-x: auto; padding: 8px; }
+  .admin-sport-nav > b, .admin-sport-nav > small { display: none; }
+  .admin-sport-nav a { flex: 0 0 auto; }
   .admin-layout aside { position: static; height: auto; display: flex; overflow-x: auto; border-right: 0; border-bottom: 1px solid #203150; }
   .admin-layout aside a { white-space: nowrap; }
 }

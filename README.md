@@ -32,3 +32,5 @@ Tạo hai Vercel Project cùng trỏ repo này:
 - PTSC: Root Directory `ptsc2026`
 
 Trong mỗi project khai báo URL/key của cùng Supabase project và slug tenant tương ứng. Migration/seed chỉ chạy một lần từ `supabase/` ở root.
+
+Production admin cần dùng user trong Supabase Auth và có bản ghi tương ứng trong `public.admin_users` của tenant. `040_local_admin.sql` chỉ dành cho local; sau khi tạo user production, thêm quyền bằng SQL Editor rồi redeploy Vercel nếu đổi biến môi trường. PVN phải dùng root directory `petrovietnam2026` và `NEXT_PUBLIC_TENANT_SLUG=petrovietnam2026`.

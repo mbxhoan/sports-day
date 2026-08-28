@@ -5,7 +5,7 @@ import test from "node:test";
 import { rankOrganizations } from "../src/lib/site.ts";
 import { formatVietnamDateTime, fromVietnamLocalInput, toVietnamLocalInput } from "../src/lib/datetime.ts";
 import { formValue } from "../src/lib/admin-form.ts";
-import { heroStoragePath } from "../src/lib/admin-media.ts";
+import { assertImageFile, heroStoragePath } from "../src/lib/admin-media.ts";
 import { eventFieldNames } from "../src/lib/admin-event.ts";
 import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
@@ -60,6 +60,7 @@ test("database supports mobile heroes, sport albums, and ungrouped standings", (
   assert.match(migrations, /unique nulls not distinct \(tournament_id, group_id, entry_id\)/);
   assert.match(migrations, /create or replace function public\.save_fixture_result/);
   assert.match(migrations, /security invoker/);
+  assert.match(migrations, /file_size_limit = 2097152/);
 });
 
 test("home renders separate desktop and mobile KV sources", () => {
@@ -71,6 +72,13 @@ test("hero upload paths keep desktop and mobile files separate", () => {
   assert.equal(heroStoragePath("desktop", "image/png", "fixed"), "hero/desktop/fixed.png");
   assert.equal(heroStoragePath("mobile", "image/webp", "fixed"), "hero/mobile/fixed.webp");
   assert.throws(() => heroStoragePath("wide", "image/png", "fixed"), /Hero không hợp lệ/);
+});
+
+test("sport gallery accepts multiple images but rejects images over 2MB", () => {
+  const gallery = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.match(gallery, /type="file" name="file"[^>]*multiple/);
+  assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024)], "ok.png", { type: "image/png" }), 2 * 1024 * 1024));
+  assert.throws(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024 + 1)], "large.png", { type: "image/png" }), 2 * 1024 * 1024), /tối đa 2MB/);
 });
 
 test("event content save never overwrites uploaded KV paths", () => {

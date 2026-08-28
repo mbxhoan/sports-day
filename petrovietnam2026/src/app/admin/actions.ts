@@ -69,27 +69,37 @@ export async function setArchived(formData: FormData) {
 }
 
 export async function uploadMedia(formData: FormData) {
-  const file = formData.get("file");
-  if (!(file instanceof File) || !file.size) throw new Error("Chưa chọn ảnh");
+  const files = formData.getAll("file");
+  const imageFiles = files.filter((file): file is File => file instanceof File && file.size > 0);
+  if (!imageFiles.length || imageFiles.length !== files.length) throw new Error("Chưa chọn ảnh");
+  imageFiles.forEach((file) => assertImageFile(file, 2 * 1024 * 1024));
   const { supabase, tenantId } = await adminClient();
-  const extension = assertImageFile(file);
   const requestedTag = String(formData.get("filter_tag") ?? "all").trim();
   let sportId = String(formData.get("sport_id") ?? "").trim() || null;
   let filterTag = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(requestedTag) ? requestedTag : "all";
+  let sportSlug = "";
   if (sportId) {
     const { data: sport, error: sportError } = await supabase.from("sports").select("id,slug").eq("tenant_id", tenantId).eq("id", sportId).is("archived_at", null).maybeSingle();
     if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
     sportId = sport.id;
     filterTag = sport.slug;
+    sportSlug = sport.slug;
   }
-  const path = `${tenantSlug}/gallery/${randomUUID()}.${extension}`;
-  const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
-  if (uploadError) throw new Error(uploadError.message);
-  const { error } = await supabase.from("media").insert({ tenant_id: tenantId, storage_path: path, kind: "gallery", sport_id: sportId, filter_tag: filterTag, album_vi: String(formData.get("album_vi") ?? "").trim(), album_en: String(formData.get("album_en") ?? "").trim(), title_vi: String(formData.get("title_vi") ?? "").trim(), title_en: String(formData.get("title_en") ?? "").trim(), alt_vi: String(formData.get("alt_vi") ?? "").trim(), alt_en: String(formData.get("alt_en") ?? "").trim() });
+  const metadata = { tenant_id: tenantId, kind: "gallery", sport_id: sportId, filter_tag: filterTag, album_vi: String(formData.get("album_vi") ?? "").trim(), album_en: String(formData.get("album_en") ?? "").trim(), title_vi: String(formData.get("title_vi") ?? "").trim(), title_en: String(formData.get("title_en") ?? "").trim(), alt_vi: String(formData.get("alt_vi") ?? "").trim(), alt_en: String(formData.get("alt_en") ?? "").trim() };
+  const mediaRows = [];
+  for (const file of imageFiles) {
+    const extension = assertImageFile(file, 2 * 1024 * 1024);
+    const path = `${tenantSlug}/gallery/${randomUUID()}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
+    if (uploadError) throw new Error(uploadError.message);
+    mediaRows.push({ ...metadata, storage_path: path });
+  }
+  const { error } = await supabase.from("media").insert(mediaRows);
   if (error) throw new Error(error.message);
   revalidatePath("/gallery");
   revalidatePath("/en/gallery");
   revalidatePath("/admin");
+  if (sportSlug) revalidatePath(`/admin/sports/${sportSlug}`);
 }
 
 export async function uploadHero(formData: FormData) {
