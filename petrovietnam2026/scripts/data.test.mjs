@@ -21,6 +21,7 @@ const individualSportsSeed = readFileSync(new URL("seeds/048_individual_sports.s
 const workbookSources = readFileSync(new URL("seeds/050_xlsx_sources.sql", supabaseRoot), "utf8");
 const publicPages = readFileSync(new URL("../src/components/public-pages.tsx", import.meta.url), "utf8");
 const galleryGrid = readFileSync(new URL("../src/components/gallery-grid.tsx", import.meta.url), "utf8");
+const sportTabs = readFileSync(new URL("../src/components/sport-tabs.tsx", import.meta.url), "utf8");
 const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
   .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
@@ -66,6 +67,12 @@ test("database supports mobile heroes, sport albums, and ungrouped standings", (
 test("home renders separate desktop and mobile KV sources", () => {
   assert.match(publicPages, /hero-mobile/);
   assert.match(publicPages, /hero_mobile_path/);
+});
+
+test("sport detail tabs work without client state and keep untimed fixtures", () => {
+  assert.doesNotMatch(sportTabs, /useState/);
+  assert.match(sportTabs, /\?tab=\$\{key\}/);
+  assert.match(sportTabs, /sortedFixtures = \[\.\.\.sportFixtures\]/);
 });
 
 test("hero upload paths keep desktop and mobile files separate", () => {

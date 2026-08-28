@@ -101,6 +101,7 @@ export const copy = {
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
     filterSport: "Tất cả môn", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
     organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương",
+    venue: "Địa điểm", time: "Giờ", match: "Trận đấu", round: "Vòng", result: "Kết quả",
   },
   en: {
     home: "Home", leaderboard: "Leaderboard", gallery: "Gallery", sports: "Sports", schedule: "Schedule", login: "Sign in",
@@ -112,6 +113,7 @@ export const copy = {
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
     filterSport: "All sports", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
     organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals",
+    venue: "Venue", time: "Time", match: "Match", round: "Round", result: "Result",
   },
 } as const;
 
