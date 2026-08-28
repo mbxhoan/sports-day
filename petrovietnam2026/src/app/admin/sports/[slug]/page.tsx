@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Archive, ArrowLeft, RotateCcw, Save } from "lucide-react";
+import { Archive, ArrowLeft, RotateCcw, Save, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
+import { ConfirmedMediaDeleteForm } from "@/components/confirmed-media-delete-form";
 import { MarkdownInput } from "@/components/markdown-input";
 import { MediaUploadForm } from "@/components/media-upload-form";
 import { adminEntities, type AdminEntity, type AdminField } from "@/lib/admin-config";
@@ -40,13 +41,14 @@ function MediaGrid({ rows, allRows, editTarget, publicUrl }: { rows: Row[]; allR
   const config = adminEntities.media;
   return <>
     <details className="record-form"><summary>＋ Thêm / Add</summary><form action={saveRecord}><input type="hidden" name="entity" value="media"/><Fields fields={config.fields} rows={allRows}/><button className="gold-button"><Save size={15}/>Lưu / Save</button></form></details>
+    <ConfirmedMediaDeleteForm action={deleteMedia}/>
     <div className="admin-media-grid">{rows.map((row) => {
       const target = `media:${row.id}`;
       const path = String(row.storage_path ?? "");
       return <article className={`admin-media-card ${row.archived_at ? "archived" : ""}`} key={row.id}>
-        <div className="admin-media-thumb">{path && <Image src={publicUrl(path)} alt={String(row.alt_vi ?? row.title_vi ?? "Gallery image")} fill sizes="(max-width: 820px) 50vw, 220px"/>}</div>
+        <div className="admin-media-thumb">{!row.archived_at && <><input className="media-select" type="checkbox" form="media-delete" name="id" value={row.id} aria-label={`Chọn ${summary(row)} để xoá`}/><button className="media-trash-button" type="submit" form="media-delete" name="single_id" value={row.id} aria-label={`Xoá ${summary(row)}`} title="Xoá vĩnh viễn"><Trash2 size={15}/></button></>}{path && <Image src={publicUrl(path)} alt={String(row.alt_vi ?? row.title_vi ?? "Gallery image")} fill sizes="(max-width: 820px) 50vw, 220px"/>}</div>
         <div className="admin-media-meta"><b>{summary(row)}</b><small>{String(row.album_vi ?? "") || "Gallery"}</small></div>
-        <details className="admin-media-edit" open={editTarget === target}><summary>Chỉnh / Edit</summary><form action={saveRecord}><input type="hidden" name="entity" value="media"/><input type="hidden" name="id" value={row.id}/><Fields fields={config.fields} row={row} rows={allRows}/><button className="gold-button"><Save size={15}/>Lưu / Save</button></form>{!row.archived_at && <form action={deleteMedia}><input type="hidden" name="id" value={row.id}/><button className="delete-button" type="submit">Xoá ảnh / Delete image</button></form>}<form action={setArchived}><input type="hidden" name="entity" value="media"/><input type="hidden" name="id" value={row.id}/><input type="hidden" name="archived" value={row.archived_at ? "false" : "true"}/><button className="archive-button">{row.archived_at ? <RotateCcw size={15}/> : <Archive size={15}/>} {row.archived_at ? "Khôi phục / Restore" : "Lưu trữ / Archive"}</button></form></details>
+        <details className="admin-media-edit" open={editTarget === target}><summary>Chỉnh / Edit</summary><form action={saveRecord}><input type="hidden" name="entity" value="media"/><input type="hidden" name="id" value={row.id}/><Fields fields={config.fields} row={row} rows={allRows}/><button className="gold-button"><Save size={15}/>Lưu / Save</button></form><form action={setArchived}><input type="hidden" name="entity" value="media"/><input type="hidden" name="id" value={row.id}/><input type="hidden" name="archived" value={row.archived_at ? "false" : "true"}/><button className="archive-button">{row.archived_at ? <RotateCcw size={15}/> : <Archive size={15}/>} {row.archived_at ? "Khôi phục / Restore" : "Lưu trữ / Archive"}</button></form></details>
       </article>;
     })}</div>
   </>;

@@ -7,6 +7,7 @@ import * as site from "../src/lib/site.ts";
 import { formatVietnamDateTime, fromVietnamLocalInput, toVietnamLocalInput } from "../src/lib/datetime.ts";
 import { formValue } from "../src/lib/admin-form.ts";
 import { assertImageFile, heroStoragePath } from "../src/lib/admin-media.ts";
+import * as adminMedia from "../src/lib/admin-media.ts";
 import { eventFieldNames } from "../src/lib/admin-event.ts";
 import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
@@ -107,6 +108,17 @@ test("sport gallery accepts multiple images but rejects images over 10MB", () =>
   assert.throws(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024 + 1)], "too-large.png", { type: "image/png" }), 10 * 1024 * 1024), /tối đa 10MB/);
 });
 
+test("media deletion uses the trash target alone or every selected image", () => {
+  assert.equal(typeof adminMedia.mediaDeletionIds, "function");
+  const selected = new FormData();
+  selected.append("id", "image-1");
+  selected.append("id", "image-2");
+  selected.append("id", "image-1");
+  assert.deepEqual(adminMedia.mediaDeletionIds(selected), ["image-1", "image-2"]);
+  selected.set("single_id", "image-3");
+  assert.deepEqual(adminMedia.mediaDeletionIds(selected), ["image-3"]);
+});
+
 test("server actions allow multipart gallery payloads above the 1MB default", () => {
   assert.match(nextConfig, /bodySizeLimit:\s*["']12mb["']/);
 });
@@ -121,8 +133,13 @@ test("gallery upload queues files and supports admin deletion", () => {
   assert.match(mediaUploadForm, /upload-queue/);
   assert.match(mediaUploadForm, /await action\(payload\)/);
   assert.match(adminActions, /export async function deleteMedia/);
-  assert.match(adminActions, /storage[\s\S]*remove\(\[media\.storage_path\]\)/);
+  assert.match(adminActions, /mediaDeletionIds/);
+  assert.match(adminActions, /storage[\s\S]*remove\(paths\)/);
+  assert.match(adminActions, /from\("media"\)\.delete\(\)/);
   assert.match(migrations, /event_media_admin_delete/);
+  assert.match(migrations, /media_admin_delete/);
+  assert.match(adminSportPage, /ConfirmedMediaDeleteForm/);
+  assert.match(adminSportPage, /single_id/);
 });
 
 test("event content save never overwrites uploaded KV paths", () => {

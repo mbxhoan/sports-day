@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { adminEntities, type AdminEntity } from "@/lib/admin-config";
 import { formValue as valueOf } from "@/lib/admin-form";
 import { eventFieldNames } from "@/lib/admin-event";
-import { assertImageFile, heroStoragePath } from "@/lib/admin-media";
+import { assertImageFile, heroStoragePath, mediaDeletionIds } from "@/lib/admin-media";
 import { relationEntity } from "@/lib/admin-relations";
 import { deriveStandings, headToHeadRule } from "@/lib/standings";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -71,16 +71,17 @@ export async function setArchived(formData: FormData) {
 }
 
 export async function deleteMedia(formData: FormData) {
-  const id = String(formData.get("id") ?? "").trim();
-  if (!id) throw new Error("Yêu cầu không hợp lệ");
+  const ids = mediaDeletionIds(formData);
+  if (!ids.length) throw new Error("Chọn ít nhất một ảnh");
   const { supabase, tenantId } = await adminClient();
-  const { data: media, error: mediaError } = await supabase.from("media").select("id,storage_path").eq("tenant_id", tenantId).eq("id", id).is("archived_at", null).maybeSingle();
-  if (mediaError || !media) throw new Error("Không tìm thấy ảnh");
-  if (media.storage_path) {
-    const { error: storageError } = await supabase.storage.from("event-media").remove([media.storage_path]);
+  const { data: media, error: mediaError } = await supabase.from("media").select("id,storage_path").eq("tenant_id", tenantId).in("id", ids).is("archived_at", null);
+  if (mediaError || !media || media.length !== ids.length) throw new Error("Không tìm thấy ảnh");
+  const paths = media.map((item) => item.storage_path).filter(Boolean);
+  if (paths.length) {
+    const { error: storageError } = await supabase.storage.from("event-media").remove(paths);
     if (storageError && !/not found/i.test(storageError.message)) throw new Error(storageError.message);
   }
-  const { error } = await supabase.from("media").update({ archived_at: new Date().toISOString() }).eq("tenant_id", tenantId).eq("id", id);
+  const { error } = await supabase.from("media").delete().eq("tenant_id", tenantId).in("id", ids);
   if (error) throw new Error(error.message);
   revalidatePath("/", "layout");
   revalidatePath("/admin");
