@@ -275,3 +275,7 @@ export function rankOrganizations(awards: Award[], organizations: Organization[]
 export function localized(row: Record<string, unknown>, field: string, locale: Locale): string {
   return String(row[`${field}_${locale}`] ?? row[`${field}_vi`] ?? "");
 }
+
+export function isKnockoutFixture(fixture: Pick<Fixture, "group_id" | "bracket_position" | "round_order">) {
+  return fixture.bracket_position !== null || (!fixture.group_id && fixture.round_order !== null);
+}

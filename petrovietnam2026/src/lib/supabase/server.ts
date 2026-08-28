@@ -12,7 +12,8 @@ export async function createSupabaseServerClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) throw new Error("Supabase chưa được cấu hình");
   return createServerClient(url, key, {
-    global: { headers: tenantHeaders() },
+    // Bound cold/failed Supabase requests so App Router never stays on loading.tsx forever.
+    global: { headers: tenantHeaders(), fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10_000) }) },
     cookies: {
       getAll: () => cookieStore.getAll(),
       setAll: (items) => {

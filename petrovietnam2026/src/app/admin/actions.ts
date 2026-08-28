@@ -11,11 +11,13 @@ import { relationEntity } from "@/lib/admin-relations";
 import { deriveStandings, headToHeadRule } from "@/lib/standings";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
+import { withTimeout } from "@/lib/auth-timeout";
 
 async function adminClient() {
   const supabase = await createSupabaseServerClient();
   const tenantId = await getTenantId(supabase);
-  const { data } = await supabase.auth.getClaims();
+  let data;
+  try { ({ data } = await withTimeout(() => supabase.auth.getClaims())); } catch { redirect("/login?error=session"); }
   const userId = data?.claims?.sub;
   if (!userId) redirect("/login?error=session");
   const { data: admin } = await supabase.from("admin_users").select("user_id").eq("tenant_id", tenantId).eq("user_id", userId).maybeSingle();

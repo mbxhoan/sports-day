@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, Clock3, GitBranch, Info, MapPin, Trophy, Users } from "lucide-react";
 import {
-  copy, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry,
+  copy, isKnockoutFixture, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry,
   type Group, type GroupEntry, type Locale, type Organization, type Participant,
   type Sport, type Standing, type Tournament, type Venue, type Court,
 } from "@/lib/site";
@@ -75,6 +75,11 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
       <span><Users size={15}/>{sportEntries.length} {t.teams.toLocaleLowerCase()}</span>
       <span><CalendarDays size={15}/>{summaryDates || t.updating}</span>
     </div>
+    {active === "brackets" && <div className="bracket-overview" aria-label={`${t.fixtures} / ${t.categories}`}>
+      <Link className="bracket-schedule-link" href={`${hrefBase}?tab=fixtures`}><CalendarDays size={15}/>{t.fixtures}</Link>
+      <span className="bracket-overview-label">{t.categories}</span>
+      <div className="bracket-category-pills">{tournaments.map((tournament) => <a key={tournament.id} href={`#tournament-${tournament.id}`}>{localized(tournament, "name", locale)}</a>)}</div>
+    </div>}
     <div className="tabs sport-tabs" role="tablist" aria-label={localized(sport, "name", locale)}>
       {tabs.map(([key,label,Icon]) => <Link key={key} href={key === "info" ? hrefBase : `${hrefBase}?tab=${key}`} className={active === key ? "active" : ""} role="tab" aria-selected={active === key} scroll={false}><Icon size={16}/>{label}</Link>)}
     </div>
@@ -117,18 +122,18 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
 
     {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} fixtures={fixtures} fixtureEntries={fixtureEntries} venues={venues} courts={courts} defaultVenue={venue}/>}
 
-    {active === "brackets" && (sportGroups.length || sportFixtures.some((item) => item.bracket_position !== null || (!item.group_id && item.round_order !== null)) ? <div className="tournament-stack">{tournaments.map((tournament) => {
+    {active === "brackets" && (sportGroups.length || sportFixtures.some(isKnockoutFixture) ? <div className="tournament-stack">{tournaments.map((tournament) => {
       const tournamentGroups = sportGroups.filter((group) => group.tournament_id === tournament.id);
-      const knockout = sportFixtures.filter((fixture) => fixture.tournament_id === tournament.id && (fixture.bracket_position !== null || (!fixture.group_id && fixture.round_order !== null))).sort((a, b) => (a.round_order ?? 999) - (b.round_order ?? 999));
+      const knockout = sportFixtures.filter((fixture) => fixture.tournament_id === tournament.id && isKnockoutFixture(fixture)).sort((a, b) => (a.round_order ?? 999) - (b.round_order ?? 999));
       if (!tournamentGroups.length && !knockout.length) return null;
       const rounds = Map.groupBy(knockout, (fixture) => fixture.round_order ?? localized(fixture, "round", locale));
-      return <section className="tournament-block" key={tournament.id}>
+      return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id}>
         <h2>{localized(tournament,"name",locale)}</h2>
         {knockout.length > 0 && <div className="bracket-scroll"><div className="bracket-columns">{[...rounds].map(([round, roundFixtures]) => <div className="bracket-round" key={String(round)}><h3>{localized(roundFixtures[0],"round",locale) || t.round}</h3>{roundFixtures.map((fixture) => {
           const rows = fixtureRows(fixture.id);
           return <article className="bracket-match" key={fixture.id}><small>{date(fixture.starts_at)}</small><div className="bracket-teams">{[0, 1].map((index) => {
             const row = rows[index];
-            return <div className={`bracket-team${row?.entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.item.id ?? index}><span>{row?.entry ? localized(row.entry, "name", locale) : t.teamsNotAssigned}</span><b>{row?.item.score ?? "—"}</b></div>;
+            return <div className={`bracket-team${row?.entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.item.id ?? index}><span>{row?.entry ? localized(row.entry, "name", locale) : "?"}</span><b>{row?.item.score ?? "—"}</b></div>;
           })}</div>{localized(fixture,"result_summary",locale) && <span>{localized(fixture,"result_summary",locale)}</span>}</article>;
         })}</div>)}</div></div>}
         {tournamentGroups.length > 0 && <div className="group-grid">{tournamentGroups.map((group) => {

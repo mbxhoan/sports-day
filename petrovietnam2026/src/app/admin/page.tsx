@@ -10,6 +10,7 @@ import { relationEntity } from "@/lib/admin-relations";
 import { SubmitButton } from "@/components/submit-button";
 import { MediaUploadForm } from "@/components/media-upload-form";
 import { getTenantId } from "@/lib/tenant";
+import { withTimeout } from "@/lib/auth-timeout";
 import { logout, saveEvent, saveRecord, setArchived, uploadHero, uploadMedia } from "./actions";
 
 type Row = Record<string, string | number | null> & { id: string; archived_at: string | null };
@@ -38,7 +39,8 @@ export default async function AdminPage() {
   if (!hasSupabaseConfig()) return <div className="admin-unavailable"><Settings/><h1>Supabase chưa cấu hình</h1><p>Copy `.env.example` thành `.env.local`, điền key từ `supabase status`, rồi chạy lại.</p></div>;
   const supabase = await createSupabaseServerClient();
   const tenantId = await getTenantId(supabase);
-  const { data: claims } = await supabase.auth.getClaims();
+  let claims;
+  try { ({ data: claims } = await withTimeout(() => supabase.auth.getClaims())); } catch { redirect("/login?error=session"); }
   const userId = claims?.claims?.sub;
   if (!userId) redirect("/login");
   const { data: admin } = await supabase.from("admin_users").select("display_name").eq("tenant_id", tenantId).eq("user_id", userId).maybeSingle();

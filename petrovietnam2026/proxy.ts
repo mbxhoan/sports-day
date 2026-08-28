@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { tenantHeaders } from "@/lib/tenant";
+import { withTimeout } from "@/lib/auth-timeout";
 
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -9,7 +10,7 @@ export async function proxy(request: NextRequest) {
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, key, {
-    global: { headers: tenantHeaders() },
+    global: { headers: tenantHeaders(), fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10_000) }) },
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (items) => {
@@ -19,7 +20,7 @@ export async function proxy(request: NextRequest) {
       },
     },
   });
-  await supabase.auth.getClaims();
+  try { await withTimeout(() => supabase.auth.getClaims(), 3_000); } catch { /* page guard handles failed auth */ }
   return response;
 }
 

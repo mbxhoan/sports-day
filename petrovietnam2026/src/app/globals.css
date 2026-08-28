@@ -180,6 +180,12 @@ tbody tr:last-child td { border: 0; }
 .sport-summary { min-height: 32px; margin: 0 0 22px 57px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 18px; color: var(--muted-foreground); font-size: 12px; }
 .sport-summary span { display: inline-flex; align-items: center; gap: 6px; }
 .sport-summary span + span::before { content: ""; width: 1px; height: 14px; margin-right: 10px; background: var(--border); }
+.bracket-overview { margin: 0 0 14px; padding: 10px 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: #062b5d; }
+.bracket-schedule-link { min-height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border-radius: 5px; background: var(--primary); color: var(--primary-foreground); font-size: 11px; font-weight: 700; }
+.bracket-overview-label { margin-left: 4px; color: var(--primary); font-size: 11px; font-weight: 700; }
+.bracket-category-pills { display: flex; min-width: 0; flex: 1; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+.bracket-category-pills a { padding: 5px 9px; border: 1px solid #2a6195; border-radius: 999px; background: #0a3c76; color: #dce8ff; font-size: 10px; white-space: nowrap; }
+.bracket-category-pills a:hover { border-color: var(--primary); color: var(--primary); }
 .sport-tabs { position: sticky; top: 76px; z-index: 12; box-shadow: 0 7px 22px #00325f99; }
 .sport-tabs a.active { color: var(--primary); }
 .sport-description { min-height: 126px; }
@@ -222,6 +228,7 @@ tbody tr:last-child td { border: 0; }
 .status.postponed, .status.cancelled { background: #723b16; color: #ffe0a8; }
 
 .tournament-stack { display: grid; gap: 44px; }
+.tournament-block { scroll-margin-top: 142px; }
 .tournament-block > h2 { margin: 0 0 18px; color: var(--primary); font-size: 18px; }
 .bracket-columns { width: max-content; min-width: 100%; padding: 3px 0 22px; display: flex; align-items: flex-start; gap: 26px; }
 .bracket-round { width: 250px; display: grid; gap: 10px; }

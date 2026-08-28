@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import test from "node:test";
 import { rankOrganizations } from "../src/lib/site.ts";
+import * as site from "../src/lib/site.ts";
 import { formatVietnamDateTime, fromVietnamLocalInput, toVietnamLocalInput } from "../src/lib/datetime.ts";
 import { formValue } from "../src/lib/admin-form.ts";
 import { assertImageFile, heroStoragePath } from "../src/lib/admin-media.ts";
@@ -31,6 +32,7 @@ const appLayout = readFileSync(new URL("../src/app/layout.tsx", import.meta.url)
 const adminSportPage = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
 const adminActions = readFileSync(new URL("../src/app/admin/actions.ts", import.meta.url), "utf8");
 const adminCss = readFileSync(new URL("../src/app/globals.css", import.meta.url), "utf8");
+const authTimeout = readFileSync(new URL("../src/lib/auth-timeout.ts", import.meta.url), "utf8");
 const tugIcon = new URL("../public/icons/tug-of-war.png", import.meta.url);
 const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
@@ -172,6 +174,12 @@ test("route loading clears after query-only navigation", () => {
   assert.match(appLayout, /Suspense/);
 });
 
+test("admin auth has a bounded wait instead of an infinite loading shell", async () => {
+  assert.match(authTimeout, /Promise\.race/);
+  assert.match(adminSportPage, /results-error/);
+  await assert.rejects(() => import("../src/lib/auth-timeout.ts").then(({ withTimeout }) => withTimeout(() => new Promise(() => {}), 5)), /timeout/);
+});
+
 test("schedule uses grouped match rows for the global page and each sport", () => {
   assert.match(scheduleView, /schedule-day/);
   assert.match(scheduleView, /venue_id/);
@@ -185,10 +193,20 @@ test("schedule uses grouped match rows for the global page and each sport", () =
 test("schedule labels unassigned teams clearly and renders inferred knockout rounds", () => {
   assert.match(scheduleView, /teamsNotAssigned/);
   assert.match(siteLib, /teamsNotAssigned: "Chưa xếp đội"/);
-  assert.match(sportTabs, /!item\.group_id && item\.round_order !== null/);
+  assert.match(siteLib, /isKnockoutFixture/);
+  assert.match(scheduleView, /schedule-brackets/);
   assert.match(sportTabs, /bracket-team/);
+  assert.match(sportTabs, /bracket-overview/);
+  assert.match(sportTabs, /: "\?"/);
   assert.match(publicPages, /schedule-page/);
   assert.match(adminCss, /\.schedule-page/);
+});
+
+test("knockout brackets include explicit bracket matches and ungrouped ordered rounds", () => {
+  assert.equal(typeof site.isKnockoutFixture, "function");
+  assert.equal(site.isKnockoutFixture({ group_id: "group-a", bracket_position: null, round_order: 1 }), false);
+  assert.equal(site.isKnockoutFixture({ group_id: null, bracket_position: null, round_order: 2 }), true);
+  assert.equal(site.isKnockoutFixture({ group_id: "group-a", bracket_position: 4, round_order: null }), true);
 });
 
 test("head-to-head scoring derives ranked standings without guessing unknown rules", () => {
