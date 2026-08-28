@@ -22,6 +22,9 @@ const workbookSources = readFileSync(new URL("seeds/050_xlsx_sources.sql", supab
 const publicPages = readFileSync(new URL("../src/components/public-pages.tsx", import.meta.url), "utf8");
 const galleryGrid = readFileSync(new URL("../src/components/gallery-grid.tsx", import.meta.url), "utf8");
 const sportTabs = readFileSync(new URL("../src/components/sport-tabs.tsx", import.meta.url), "utf8");
+const nextConfig = readFileSync(new URL("../next.config.ts", import.meta.url), "utf8");
+const mediaUploadForm = readFileSync(new URL("../src/components/media-upload-form.tsx", import.meta.url), "utf8");
+const loadingFeedback = readFileSync(new URL("../src/components/loading-feedback.tsx", import.meta.url), "utf8");
 const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
   .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
@@ -83,9 +86,19 @@ test("hero upload paths keep desktop and mobile files separate", () => {
 
 test("sport gallery accepts multiple images but rejects images over 2MB", () => {
   const gallery = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
-  assert.match(gallery, /type="file" name="file"[^>]*multiple/);
+  assert.match(gallery, /MediaUploadForm[\s\S]*multiple/);
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024)], "ok.png", { type: "image/png" }), 2 * 1024 * 1024));
   assert.throws(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024 + 1)], "large.png", { type: "image/png" }), 2 * 1024 * 1024), /tối đa 2MB/);
+});
+
+test("server actions allow multipart gallery payloads above the 1MB default", () => {
+  assert.match(nextConfig, /bodySizeLimit:\s*["']10mb["']/);
+});
+
+test("gallery upload blocks oversized files before submitting", () => {
+  assert.match(mediaUploadForm, /2 \* 1024 \* 1024/);
+  assert.match(mediaUploadForm, /event\.preventDefault\(\)/);
+  assert.match(loadingFeedback, /const handleSubmit[\s\S]*event\.defaultPrevented/);
 });
 
 test("event content save never overwrites uploaded KV paths", () => {

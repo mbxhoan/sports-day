@@ -20,6 +20,7 @@ export function LoadingFeedback() {
       document.documentElement.dataset.routeLoading = "true";
     };
     const handleSubmit = (event: SubmitEvent) => {
+      if (event.defaultPrevented) return;
       const form = event.target instanceof HTMLFormElement ? event.target : null;
       const button = event.submitter instanceof HTMLButtonElement ? event.submitter : form?.querySelector<HTMLButtonElement>("button[type=submit], button:not([type])");
       if (!form || !button) return;
