@@ -68,11 +68,29 @@ export async function setArchived(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function deleteMedia(formData: FormData) {
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) throw new Error("Yêu cầu không hợp lệ");
+  const { supabase, tenantId } = await adminClient();
+  const { data: media, error: mediaError } = await supabase.from("media").select("id,storage_path").eq("tenant_id", tenantId).eq("id", id).is("archived_at", null).maybeSingle();
+  if (mediaError || !media) throw new Error("Không tìm thấy ảnh");
+  if (media.storage_path) {
+    const { error: storageError } = await supabase.storage.from("event-media").remove([media.storage_path]);
+    if (storageError && !/not found/i.test(storageError.message)) throw new Error(storageError.message);
+  }
+  const { error } = await supabase.from("media").update({ archived_at: new Date().toISOString() }).eq("tenant_id", tenantId).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
+  revalidatePath("/admin");
+  revalidatePath("/gallery");
+  revalidatePath("/en/gallery");
+}
+
 export async function uploadMedia(formData: FormData) {
   const files = formData.getAll("file");
   const imageFiles = files.filter((file): file is File => file instanceof File && file.size > 0);
   if (!imageFiles.length || imageFiles.length !== files.length) throw new Error("Chưa chọn ảnh");
-  imageFiles.forEach((file) => assertImageFile(file, 2 * 1024 * 1024));
+  imageFiles.forEach((file) => assertImageFile(file, 10 * 1024 * 1024));
   const { supabase, tenantId } = await adminClient();
   const requestedTag = String(formData.get("filter_tag") ?? "all").trim();
   let sportId = String(formData.get("sport_id") ?? "").trim() || null;
@@ -88,7 +106,7 @@ export async function uploadMedia(formData: FormData) {
   const metadata = { tenant_id: tenantId, kind: "gallery", sport_id: sportId, filter_tag: filterTag, album_vi: String(formData.get("album_vi") ?? "").trim(), album_en: String(formData.get("album_en") ?? "").trim(), title_vi: String(formData.get("title_vi") ?? "").trim(), title_en: String(formData.get("title_en") ?? "").trim(), alt_vi: String(formData.get("alt_vi") ?? "").trim(), alt_en: String(formData.get("alt_en") ?? "").trim() };
   const mediaRows = [];
   for (const file of imageFiles) {
-    const extension = assertImageFile(file, 2 * 1024 * 1024);
+    const extension = assertImageFile(file, 10 * 1024 * 1024);
     const path = `${tenantSlug}/gallery/${randomUUID()}.${extension}`;
     const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
     if (uploadError) throw new Error(uploadError.message);

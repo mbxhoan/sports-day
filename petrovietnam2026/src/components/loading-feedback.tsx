@@ -1,14 +1,16 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export function LoadingFeedback() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchKey = searchParams.toString();
 
   useEffect(() => {
     delete document.documentElement.dataset.routeLoading;
-  }, [pathname]);
+  }, [pathname, searchKey]);
 
   useEffect(() => {
     const handleLinkClick = (event: MouseEvent) => {

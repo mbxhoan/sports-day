@@ -22,9 +22,16 @@ const workbookSources = readFileSync(new URL("seeds/050_xlsx_sources.sql", supab
 const publicPages = readFileSync(new URL("../src/components/public-pages.tsx", import.meta.url), "utf8");
 const galleryGrid = readFileSync(new URL("../src/components/gallery-grid.tsx", import.meta.url), "utf8");
 const sportTabs = readFileSync(new URL("../src/components/sport-tabs.tsx", import.meta.url), "utf8");
+const scheduleView = readFileSync(new URL("../src/components/schedule-view.tsx", import.meta.url), "utf8");
+const siteLib = readFileSync(new URL("../src/lib/site.ts", import.meta.url), "utf8");
 const nextConfig = readFileSync(new URL("../next.config.ts", import.meta.url), "utf8");
 const mediaUploadForm = readFileSync(new URL("../src/components/media-upload-form.tsx", import.meta.url), "utf8");
 const loadingFeedback = readFileSync(new URL("../src/components/loading-feedback.tsx", import.meta.url), "utf8");
+const appLayout = readFileSync(new URL("../src/app/layout.tsx", import.meta.url), "utf8");
+const adminSportPage = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
+const adminActions = readFileSync(new URL("../src/app/admin/actions.ts", import.meta.url), "utf8");
+const adminCss = readFileSync(new URL("../src/app/globals.css", import.meta.url), "utf8");
+const tugIcon = new URL("../public/icons/tug-of-war.png", import.meta.url);
 const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
   .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
@@ -33,6 +40,12 @@ const migrations = readdirSync(new URL("migrations/", supabaseRoot))
 test("seed keeps the approved eight sports", () => {
   for (const slug of ["pickleball","bong-ban","cau-long","boi-loi","keo-co","dien-kinh","co-vua","co-tuong"]) assert.match(competition, new RegExp(`'${slug}'`));
   assert.equal((competition.match(/'10000000-0000-0000-0000-00000000000[1-8]'/g) ?? []).length, 8);
+});
+
+test("tug of war uses a dedicated image icon", () => {
+  assert.equal(existsSync(tugIcon), true);
+  assert.match(competition, /'keo-co',[^\n]*'\/icons\/tug-of-war\.png'/);
+  assert.match(migrations, /tug-of-war\.png/);
 });
 
 test("source manifest tracks both supplied master schedules", () => {
@@ -64,7 +77,7 @@ test("database supports mobile heroes, sport albums, and ungrouped standings", (
   assert.match(migrations, /unique nulls not distinct \(tournament_id, group_id, entry_id\)/);
   assert.match(migrations, /create or replace function public\.save_fixture_result/);
   assert.match(migrations, /security invoker/);
-  assert.match(migrations, /file_size_limit = 2097152/);
+  assert.match(migrations, /file_size_limit = 10485760/);
 });
 
 test("home renders separate desktop and mobile KV sources", () => {
@@ -75,7 +88,7 @@ test("home renders separate desktop and mobile KV sources", () => {
 test("sport detail tabs work without client state and keep untimed fixtures", () => {
   assert.doesNotMatch(sportTabs, /useState/);
   assert.match(sportTabs, /\?tab=\$\{key\}/);
-  assert.match(sportTabs, /sortedFixtures = \[\.\.\.sportFixtures\]/);
+  assert.match(sportTabs, /ScheduleView/);
 });
 
 test("hero upload paths keep desktop and mobile files separate", () => {
@@ -84,21 +97,30 @@ test("hero upload paths keep desktop and mobile files separate", () => {
   assert.throws(() => heroStoragePath("wide", "image/png", "fixed"), /Hero không hợp lệ/);
 });
 
-test("sport gallery accepts multiple images but rejects images over 2MB", () => {
+test("sport gallery accepts multiple images but rejects images over 10MB", () => {
   const gallery = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
   assert.match(gallery, /MediaUploadForm[\s\S]*multiple/);
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024)], "ok.png", { type: "image/png" }), 2 * 1024 * 1024));
-  assert.throws(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024 + 1)], "large.png", { type: "image/png" }), 2 * 1024 * 1024), /tối đa 2MB/);
+  assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024)], "large.png", { type: "image/png" }), 10 * 1024 * 1024));
+  assert.throws(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024 + 1)], "too-large.png", { type: "image/png" }), 10 * 1024 * 1024), /tối đa 10MB/);
 });
 
 test("server actions allow multipart gallery payloads above the 1MB default", () => {
-  assert.match(nextConfig, /bodySizeLimit:\s*["']10mb["']/);
+  assert.match(nextConfig, /bodySizeLimit:\s*["']12mb["']/);
 });
 
 test("gallery upload blocks oversized files before submitting", () => {
-  assert.match(mediaUploadForm, /2 \* 1024 \* 1024/);
+  assert.match(mediaUploadForm, /10 \* 1024 \* 1024/);
   assert.match(mediaUploadForm, /event\.preventDefault\(\)/);
   assert.match(loadingFeedback, /const handleSubmit[\s\S]*event\.defaultPrevented/);
+});
+
+test("gallery upload queues files and supports admin deletion", () => {
+  assert.match(mediaUploadForm, /upload-queue/);
+  assert.match(mediaUploadForm, /await action\(payload\)/);
+  assert.match(adminActions, /export async function deleteMedia/);
+  assert.match(adminActions, /storage[\s\S]*remove\(\[media\.storage_path\]\)/);
+  assert.match(migrations, /event_media_admin_delete/);
 });
 
 test("event content save never overwrites uploaded KV paths", () => {
@@ -127,6 +149,46 @@ test("public gallery supports album filtering and native lightbox download", () 
   assert.match(galleryGrid, /"album"/);
   assert.match(galleryGrid, /<dialog/);
   assert.match(galleryGrid, /download/);
+});
+
+test("sport admin gallery renders as a media grid and highlights the active section", () => {
+  assert.match(adminSportPage, /admin-media-grid/);
+  assert.match(adminSportPage, /SportNavLink/);
+  assert.match(adminSportPage, /aria-current=\{active \? "page"/);
+  assert.match(adminCss, /\.admin-media-grid\s*\{/);
+  assert.match(adminCss, /\.admin-sport-nav a\.active/);
+});
+
+test("sport admin results show readable match cards that open their editor", () => {
+  assert.match(adminSportPage, /result-match-summary/);
+  assert.match(adminSportPage, /resultTeam\(/);
+  assert.match(adminSportPage, /form action=\{saveFixtureResult\}/);
+  assert.doesNotMatch(adminSportPage, /editTarget === target && <form action=\{saveFixtureResult\}/);
+});
+
+test("route loading clears after query-only navigation", () => {
+  assert.match(loadingFeedback, /useSearchParams/);
+  assert.match(loadingFeedback, /searchParams\.toString\(\)/);
+  assert.match(appLayout, /Suspense/);
+});
+
+test("schedule uses grouped match rows for the global page and each sport", () => {
+  assert.match(scheduleView, /schedule-day/);
+  assert.match(scheduleView, /venue_id/);
+  assert.match(scheduleView, /court_id/);
+  assert.match(scheduleView, /Theo lịch|calendar/);
+  assert.match(sportTabs, /ScheduleView/);
+  assert.match(siteLib, /venues: Venue\[\]/);
+  assert.match(siteLib, /courts: Court\[\]/);
+});
+
+test("schedule labels unassigned teams clearly and renders inferred knockout rounds", () => {
+  assert.match(scheduleView, /teamsNotAssigned/);
+  assert.match(siteLib, /teamsNotAssigned: "Chưa xếp đội"/);
+  assert.match(sportTabs, /!item\.group_id && item\.round_order !== null/);
+  assert.match(sportTabs, /bracket-team/);
+  assert.match(publicPages, /schedule-page/);
+  assert.match(adminCss, /\.schedule-page/);
 });
 
 test("head-to-head scoring derives ranked standings without guessing unknown rules", () => {

@@ -67,12 +67,12 @@ export async function SportPage({ locale, slug, tab = "info" }: { locale: Locale
   const tournaments = data.tournaments.filter((item) => item.sport_id === sport.id);
   const active = (["info","teams","times","fixtures","brackets"] as TabKey[]).includes(tab as TabKey) ? tab as TabKey : "info";
   const hrefBase = `${locale === "en" ? "/en" : ""}/sports/${sport.slug}`;
-  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} standings={data.standings}/></div></SiteShell>;
+  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
 }
 
 export async function SchedulePage({ locale }: { locale: Locale }) {
   const data = await getSiteData();
-  return <SiteShell locale={locale}><div className="container page-container"><PageTitle emoji="📅" title={copy[locale].schedule}/><ScheduleView locale={locale} sports={data.sports} tournaments={data.tournaments} entries={data.entries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries}/></div></SiteShell>;
+  return <SiteShell locale={locale}><div className="container page-container schedule-page"><PageTitle emoji="📅" title={copy[locale].schedule}/><ScheduleView locale={locale} sports={data.sports} tournaments={data.tournaments} entries={data.entries} groups={data.groups} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} venues={data.venues} courts={data.courts} defaultVenue={localized(data.event,"venue",locale)}/></div></SiteShell>;
 }
 
 export async function LeaderboardPage({ locale }: { locale: Locale }) {

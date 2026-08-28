@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { LoadingFeedback } from "@/components/loading-feedback";
 import "@fontsource-variable/lexend";
 import "./globals.css";
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="vi"><body><LoadingFeedback />{children}</body></html>;
+  return <html lang="vi"><body><Suspense fallback={null}><LoadingFeedback /></Suspense>{children}</body></html>;
 }

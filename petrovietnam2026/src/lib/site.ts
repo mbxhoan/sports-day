@@ -33,7 +33,10 @@ export type Fixture = {
   id: string;
   tournament_id: string;
   group_id: string | null;
+  venue_id: string | null;
+  court_id: string | null;
   starts_at: string | null;
+  ends_at: string | null;
   status: string;
   round_vi: string;
   round_en: string;
@@ -50,6 +53,8 @@ export type Entry = { id: string; tournament_id: string; organization_id: string
 export type EntryMember = { id: string; entry_id: string; participant_id: string; role_vi: string; role_en: string; sort_order: number };
 export type Group = { id: string; tournament_id: string; name_vi: string; name_en: string; sort_order: number };
 export type GroupEntry = { id: string; group_id: string; entry_id: string; seed_order: number | null };
+export type Venue = { id: string; name_vi: string; name_en: string; address_vi: string; address_en: string; sort_order: number };
+export type Court = { id: string; venue_id: string; name_vi: string; name_en: string; sort_order: number };
 export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; score: string | null; rank: number | null };
 export type Standing = { id: string; tournament_id: string; group_id: string | null; entry_id: string; played: number; won: number; drawn: number; lost: number; points: number; rank: number | null };
 export type Award = { id: string; organization_id: string | null; entry_id: string | null; participant_id: string | null; medal: "gold" | "silver" | "bronze" | "special"; title_vi: string; title_en: string };
@@ -80,6 +85,8 @@ export type SiteData = {
   entryMembers: EntryMember[];
   groups: Group[];
   groupEntries: GroupEntry[];
+  venues: Venue[];
+  courts: Court[];
   fixtures: Fixture[];
   fixtureEntries: FixtureEntry[];
   standings: Standing[];
@@ -95,25 +102,25 @@ export const copy = {
     home: "Trang chủ", leaderboard: "Bảng xếp hạng", gallery: "Thư viện ảnh", sports: "Môn thể thao", schedule: "Lịch thi đấu", login: "Đăng nhập",
     countdown: "ĐẾM NGƯỢC ĐẾN NGÀY THI ĐẤU", days: "Ngày", hours: "Giờ", minutes: "Phút", seconds: "Giây",
     sportCount: "Môn thi đấu", dayCount: "Ngày thi đấu", unitCount: "Đơn vị", athleteCount: "Tổng VĐV", matchCount: "Trận đấu",
-    allSports: "Các môn thể thao", viewDetail: "Xem chi tiết", updating: "Đang cập nhật", footer: "Hội thao Petrovietnam 2026",
+    allSports: "Các môn thể thao", viewDetail: "Xem chi tiết", updating: "Đang cập nhật", teamsNotAssigned: "Chưa xếp đội", footer: "Hội thao Petrovietnam 2026",
     info: "Thông tin", teams: "Đội/VĐV", times: "Khung giờ", fixtures: "Lịch đấu", brackets: "Bảng đấu",
     description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
-    filterSport: "Tất cả môn", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
+    filterSport: "Tất cả môn", filterCategory: "Tất cả hạng mục", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
     organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương",
-    venue: "Địa điểm", time: "Giờ", match: "Trận đấu", round: "Vòng", result: "Kết quả",
+    venue: "Địa điểm", court: "Sân / làn", time: "Giờ", match: "Trận đấu", round: "Vòng", result: "Kết quả",
   },
   en: {
     home: "Home", leaderboard: "Leaderboard", gallery: "Gallery", sports: "Sports", schedule: "Schedule", login: "Sign in",
     countdown: "COUNTDOWN TO COMPETITION DAY", days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
     sportCount: "Sports", dayCount: "Competition days", unitCount: "Organizations", athleteCount: "Athletes", matchCount: "Matches",
-    allSports: "Sports", viewDetail: "View details", updating: "Updating", footer: "Petrovietnam Sports Day 2026",
+    allSports: "Sports", viewDetail: "View details", updating: "Updating", teamsNotAssigned: "Teams TBD", footer: "Petrovietnam Sports Day 2026",
     info: "Information", teams: "Teams/Athletes", times: "Time slots", fixtures: "Fixtures", brackets: "Brackets",
     description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
-    filterSport: "All sports", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
+    filterSport: "All sports", filterCategory: "All categories", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
     organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals",
-    venue: "Venue", time: "Time", match: "Match", round: "Round", result: "Result",
+    venue: "Venue", court: "Court / lane", time: "Time", match: "Match", round: "Round", result: "Result",
   },
 } as const;
 
@@ -122,7 +129,7 @@ const sportRows: Sport[] = [
   ["bong-ban", "Bóng bàn", "Table Tennis", "🏓", "Thi đấu đôi nam, đôi nữ và đôi nam nữ.", "Men’s, women’s and mixed doubles.", "Thi đấu đôi nam, đôi nữ và đôi nam nữ theo các hạng mục tuổi. Vòng bảng và loại trực tiếp; đội thắng được xác định theo tỷ số trận.", "Men’s, women’s and mixed doubles by age category. Group and knockout stages; winners are determined by match score."],
   ["cau-long", "Cầu lông", "Badminton", "🏸", "Thi đấu đôi theo giới tính và nhóm tuổi.", "Doubles competition by gender and age group.", "Thi đấu đôi theo giới tính và nhóm tuổi. Vận động viên thi đấu theo lịch và hạng mục đã đăng ký; kết quả được cập nhật sau từng trận.", "Doubles competition by gender and age group. Athletes compete in their registered category; results are updated after each match."],
   ["boi-loi", "Bơi lội", "Swimming", "🏊", "Các cự ly tự do cá nhân và tiếp sức 4×50m.", "Individual freestyle and 4×50m relays.", "Gồm các nội dung 50m, 100m tự do và tiếp sức 4×50m. Xếp hạng theo thành tích thời gian được ghi nhận tại lượt thi.", "Includes 50m, 100m freestyle and 4×50m relay events. Ranking follows the recorded time in each heat."],
-  ["keo-co", "Kéo co", "Tug of War", "🪢", "Thi đấu đồng đội nam và nữ.", "Men’s and women’s team competition.", "Thi đấu đồng đội nam và nữ theo hạng mục. Mỗi trận gồm các đội đối đầu trực tiếp; kết quả và lịch thi đấu do Ban Tổ chức cập nhật.", "Men’s and women’s team competition. Teams face each other directly; schedules and results are updated by the Organizing Committee."],
+  ["keo-co", "Kéo co", "Tug of War", "/icons/tug-of-war.png", "Thi đấu đồng đội nam và nữ.", "Men’s and women’s team competition.", "Thi đấu đồng đội nam và nữ theo hạng mục. Mỗi trận gồm các đội đối đầu trực tiếp; kết quả và lịch thi đấu do Ban Tổ chức cập nhật.", "Men’s and women’s team competition. Teams face each other directly; schedules and results are updated by the Organizing Committee."],
   ["dien-kinh", "Điền kinh", "Athletics", "🏃", "Các cự ly 400m, 800m, 3.000m, 5.000m và tiếp sức 4×100m.", "400m, 800m, 3,000m, 5,000m and 4×100m relay events.", "Gồm các nội dung chạy cá nhân và tiếp sức 4×100m. Vận động viên xuất phát theo lượt; thành tích được tính bằng thời gian hoàn thành.", "Includes individual running and 4×100m relay events. Athletes start in heats; performance is measured by finishing time."],
   ["co-vua", "Cờ vua", "Chess", "♟️", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system.", "Thi đấu cá nhân theo hệ Thụy Sĩ. Ghép cặp và xếp hạng căn cứ vào kết quả từng ván và các tiêu chí phụ theo điều lệ giải.", "Individual Swiss-system competition. Pairings and ranking follow game results and the tie-break criteria of the event rules."],
   ["co-tuong", "Cờ tướng", "Xiangqi", "♜", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system.", "Thi đấu cá nhân theo hệ Thụy Sĩ. Mỗi ván được ghi nhận thắng, hòa hoặc thua; bảng xếp hạng cập nhật theo kết quả thi đấu.", "Individual Swiss-system competition. Each game records a win, draw or loss; standings update from competition results."],
@@ -171,6 +178,8 @@ const fallback: SiteData = {
   entryMembers: [],
   groups: [],
   groupEntries: [],
+  venues: [],
+  courts: [],
   fixtures: [],
   fixtureEntries: [],
   standings: [],
@@ -190,7 +199,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   const { data: tenant, error: tenantError } = await db.from("tenants").select("id").eq("slug", tenantSlug).maybeSingle();
   if (tenantError || !tenant) return fallback;
   const tenantId = tenant.id;
-  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
+  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
@@ -200,7 +209,9 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("group_entries").select("id,group_id,entry_id,seed_order").eq("tenant_id", tenantId).order("seed_order"),
-    db.from("fixtures").select("id,tournament_id,group_id,starts_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id").eq("tenant_id", tenantId).order("starts_at"),
+    db.from("venues").select("id,name_vi,name_en,address_vi,address_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("courts").select("id,venue_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("fixtures").select("id,tournament_id,group_id,venue_id,court_id,starts_at,ends_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id").eq("tenant_id", tenantId).order("starts_at"),
     db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,score,rank").eq("tenant_id", tenantId).order("seed_order"),
     db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").eq("tenant_id", tenantId).order("rank"),
     db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).order("sort_order"),
@@ -228,6 +239,8 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     entryMembers: (entryMembers.data ?? []) as EntryMember[],
     groups: (groups.data ?? []) as Group[],
     groupEntries: (groupEntries.data ?? []) as GroupEntry[],
+    venues: (venues.data ?? []) as Venue[],
+    courts: (courts.data ?? []) as Court[],
     fixtures: fixtures.data as Fixture[],
     fixtureEntries: (fixtureEntries.data ?? []) as FixtureEntry[],
     standings: (standings.data ?? []) as Standing[],
