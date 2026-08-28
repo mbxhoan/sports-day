@@ -15,6 +15,10 @@ const supabaseRoot = new URL("../../supabase/", import.meta.url);
 const competition = readFileSync(new URL("seeds/020_competition.sql", supabaseRoot), "utf8");
 const sources = readFileSync(new URL("seeds/030_sources.sql", supabaseRoot), "utf8");
 const pickleballSeed = readFileSync(new URL("seeds/035_pickleball_source.sql", supabaseRoot), "utf8");
+const pairSportsSeed = readFileSync(new URL("seeds/045_pdf_pair_sports.sql", supabaseRoot), "utf8");
+const scheduleBlocks = readFileSync(new URL("seeds/046_schedule_blocks.sql", supabaseRoot), "utf8");
+const individualSportsSeed = readFileSync(new URL("seeds/048_individual_sports.sql", supabaseRoot), "utf8");
+const workbookSources = readFileSync(new URL("seeds/050_xlsx_sources.sql", supabaseRoot), "utf8");
 const publicPages = readFileSync(new URL("../src/components/public-pages.tsx", import.meta.url), "utf8");
 const galleryGrid = readFileSync(new URL("../src/components/gallery-grid.tsx", import.meta.url), "utf8");
 const migrations = readdirSync(new URL("migrations/", supabaseRoot))
@@ -27,8 +31,9 @@ test("seed keeps the approved eight sports", () => {
   assert.equal((competition.match(/'10000000-0000-0000-0000-00000000000[1-8]'/g) ?? []).length, 8);
 });
 
-test("old PTSC schedule is tracked but excluded", () => {
-  assert.match(sources, /Schedule_All_Sports_2026-08-27\.pdf'[\s\S]*?null,false,'Loại khỏi seed/);
+test("source manifest tracks both supplied master schedules", () => {
+  assert.match(sources, /'schedules\.pdf'[\s\S]*?null,true/);
+  assert.match(sources, /'schedules-2\.pdf'[\s\S]*?null,true/);
 });
 
 test("seed includes source-explicit gender categories and relay events", () => {
@@ -115,7 +120,7 @@ test("scoring rule accepts valid point values and keeps unknown formats manual",
   assert.throws(() => headToHeadRule("head-to-head", "bad", "1", "0"), /Điểm tính không hợp lệ/);
 });
 
-test("PDF inventory tracks every source and excludes only old schedule", () => {
+test("PDF inventory tracks current source set", () => {
   const inventory = JSON.parse(execFileSync("python3", ["scripts/extract_sports_pdf.py", "--inventory"], { cwd: new URL("..", import.meta.url), encoding: "utf8" }));
   assert.equal(inventory.length, 23);
   assert.equal(inventory.filter((item) => item.included).length, 23);
@@ -143,6 +148,30 @@ test("pickleball seed keeps reviewed pairs, groups, and untimed fixtures", () =>
   assert.match(pickleballSeed, /insert into public\.groups/);
   assert.match(pickleballSeed, /insert into public\.fixture_entries/);
   assert.match(pickleballSeed, /omit time\/court/);
+});
+
+test("PDF pair seed keeps source-explicit table-tennis and badminton pairs", () => {
+  assert.match(pairSportsSeed, /'bong-ban'/);
+  assert.match(pairSportsSeed, /'cau-long'/);
+  assert.match(pairSportsSeed, /insert into public\.fixture_entries/);
+  assert.ok(!pairSportsSeed.includes("home_name = away_name"));
+});
+
+test("master schedule seeds pickleball and chess blocks", () => {
+  for (const row of ["('co-vua','nu'", "('co-tuong','nam-duoi-45'", "('pickleball','doi-nam-duoi-30'", "('pickleball','doi-nam-nu-41-50'"]) assert.ok(scheduleBlocks.includes(row), row);
+  assert.match(scheduleBlocks, /2026-09-06 13:30:00\+07/);
+});
+
+test("PDF individual seed keeps source-explicit swimming and athletics rosters", () => {
+  for (const row of ["('boi-loi','50m-nam'", "('boi-loi','100m-nu'", "('dien-kinh','800m-nam'", "('dien-kinh','5000m-nam'"]) assert.ok(individualSportsSeed.includes(row), row);
+  assert.match(individualSportsSeed, /insert into public\.entry_members/);
+  assert.doesNotMatch(individualSportsSeed, /insert into public\.fixture_entries/);
+});
+
+test("workbook source manifest covers every supplied XLSX", () => {
+  assert.equal((workbookSources.match(/\.xlsx'/g) ?? []).length, 21);
+  assert.match(workbookSources, /'B Bàn pn 26\.xlsx'/);
+  assert.match(workbookSources, /'DIEN_KINH_CAP_NHAT_27_8_PVN_2026\.xlsx'/);
 });
 
 test("leaderboard ranks medal totals and resolves organization from entry", () => {
