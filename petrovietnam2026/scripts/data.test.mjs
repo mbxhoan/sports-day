@@ -11,14 +11,15 @@ import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
 
-const competition = readFileSync(new URL("../supabase/seeds/020_competition.sql", import.meta.url), "utf8");
-const sources = readFileSync(new URL("../supabase/seeds/030_sources.sql", import.meta.url), "utf8");
-const pickleballSeed = readFileSync(new URL("../supabase/seeds/035_pickleball_source.sql", import.meta.url), "utf8");
+const supabaseRoot = new URL("../../supabase/", import.meta.url);
+const competition = readFileSync(new URL("seeds/020_competition.sql", supabaseRoot), "utf8");
+const sources = readFileSync(new URL("seeds/030_sources.sql", supabaseRoot), "utf8");
+const pickleballSeed = readFileSync(new URL("seeds/035_pickleball_source.sql", supabaseRoot), "utf8");
 const publicPages = readFileSync(new URL("../src/components/public-pages.tsx", import.meta.url), "utf8");
 const galleryGrid = readFileSync(new URL("../src/components/gallery-grid.tsx", import.meta.url), "utf8");
-const migrations = readdirSync(new URL("../supabase/migrations/", import.meta.url))
+const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
-  .map((file) => readFileSync(new URL(`../supabase/migrations/${file}`, import.meta.url), "utf8"))
+  .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
   .join("\n");
 
 test("seed keeps the approved eight sports", () => {
@@ -116,15 +117,15 @@ test("scoring rule accepts valid point values and keeps unknown formats manual",
 
 test("PDF inventory tracks every source and excludes only old schedule", () => {
   const inventory = JSON.parse(execFileSync("python3", ["scripts/extract_sports_pdf.py", "--inventory"], { cwd: new URL("..", import.meta.url), encoding: "utf8" }));
-  assert.equal(inventory.length, 22);
-  assert.equal(inventory.filter((item) => item.included).length, 21);
-  assert.equal(inventory.some((item) => item.filename === "Schedule_All_Sports_2026-08-27.pdf" && !item.included), true);
+  assert.equal(inventory.length, 23);
+  assert.equal(inventory.filter((item) => item.included).length, 23);
+  assert.equal(inventory.some((item) => item.filename === "Schedule_All_Sports_2026-08-27.pdf" && !item.included), false);
 });
 
 test("PDF review renders evidence for every included source page", () => {
   const review = JSON.parse(execFileSync("python3", ["scripts/extract_sports_pdf.py", "--review"], { cwd: new URL("..", import.meta.url), encoding: "utf8" }));
-  assert.equal(review.sources, 21);
-  assert.equal(review.pages, 121);
+  assert.equal(review.sources, 23);
+  assert.equal(review.pages, 125);
   assert.equal(review.table_pages > 0, true);
 });
 

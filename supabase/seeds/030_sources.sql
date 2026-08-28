@@ -1,3 +1,5 @@
+set app.tenant_slug = 'petrovietnam2026';
+
 insert into public.source_documents (raw_filename, sha256, page_count, sport_slug, imported, notes, reviewed_at) values
   ('cl p nam2026 (1).pdf','467cdc0f60c31015f7373777c02e8ed3f0544c0b35ce0f9a5593e1fec69e576e',13,'cau-long',true,'Lịch và bảng đấu; một số ô kết quả để trống trong nguồn.',now()),
   ('cờ tướng bảng nam trên 45t.pdf','7663b049432edc860f652da6a1eaf12165b3e25972c360161b0762f3e908e5ba',1,'co-tuong',true,'Danh sách ban đầu từ Chess-Results.',now()),
@@ -21,7 +23,6 @@ insert into public.source_documents (raw_filename, sha256, page_count, sport_slu
   ('ĐKinh pvn 2026.pdf','33984d8e0f8c344a2f72e989437d5f9f87e30988d43f9d05f431b01facda4911',12,'dien-kinh',true,'Lịch và danh sách vận động viên.',now()),
   ('Boi pn 2026.pdf','c8bfddec94a95c677bac105f5907ccfcd1615e4e2bddf33d557c44a14a323d98',8,'boi-loi',true,'Lịch và danh sách vận động viên; KV quyết định năm sự kiện.',now()),
   ('ĐK KEO CO pvn 2026 (1) (1).pdf','f660b49d442e37655387e89fbeacf9cd9e972f96939eb2a5addb317e82f2c754',3,'keo-co',true,'Lịch và bảng đấu; không suy đoán kết quả trống.',now())
-on conflict (raw_filename) do update set
+on conflict (tenant_id, raw_filename) do update set
   sha256 = excluded.sha256, page_count = excluded.page_count, sport_slug = excluded.sport_slug,
   imported = excluded.imported, notes = excluded.notes, reviewed_at = excluded.reviewed_at, archived_at = null;
-

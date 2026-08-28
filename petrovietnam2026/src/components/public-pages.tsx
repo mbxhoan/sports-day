@@ -34,7 +34,7 @@ function SportCard({ locale, sport, data }: { locale: Locale; sport: Sport; data
 export async function HomePage({ locale }: { locale: Locale }) {
   const data = await getSiteData();
   const t = copy[locale];
-  const dayCount = Math.max(1, Math.ceil((Date.parse(data.event.end_at) - Date.parse(data.event.start_at)) / 86_400_000));
+  const dayCount = data.event.start_at && data.event.end_at ? Math.max(1, Math.ceil((Date.parse(data.event.end_at) - Date.parse(data.event.start_at)) / 86_400_000)) : 0;
   const stats = [
     [Trophy, data.counts.sports, t.sportCount],
     [CalendarDays, dayCount, t.dayCount],
@@ -42,8 +42,8 @@ export async function HomePage({ locale }: { locale: Locale }) {
     [Users, data.counts.participants, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale}>
-    <section className="hero"><Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" /><Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" /></section>
-    <Countdown target={data.event.start_at} locale={locale}/>
+    {(data.event.hero_path || data.event.hero_mobile_path) && <section className="hero">{data.event.hero_path && <Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" />}{data.event.hero_mobile_path && <Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" />}</section>}
+    {data.event.start_at && <Countdown target={data.event.start_at} locale={locale}/>}
     <div className="container home-content">
       <section className="stats-grid">
         {stats.map(([Icon,value,label]) => <article className="stat-card" key={label}><Icon/><b>{value}</b><span>{label}</span></article>)}

@@ -8,6 +8,7 @@ import { MarkdownInput } from "@/components/markdown-input";
 import { toVietnamLocalInput } from "@/lib/datetime";
 import { relationEntity } from "@/lib/admin-relations";
 import { SubmitButton } from "@/components/submit-button";
+import { getTenantId } from "@/lib/tenant";
 import { logout, saveEvent, saveRecord, setArchived, uploadHero, uploadMedia } from "./actions";
 
 type Row = Record<string, string | number | null> & { id: string; archived_at: string | null };
@@ -35,16 +36,17 @@ function CrudSection({ entity, rows, allRows }: { entity: AdminEntity; rows: Row
 export default async function AdminPage() {
   if (!hasSupabaseConfig()) return <div className="admin-unavailable"><Settings/><h1>Supabase chưa cấu hình</h1><p>Copy `.env.example` thành `.env.local`, điền key từ `supabase status`, rồi chạy lại.</p></div>;
   const supabase = await createSupabaseServerClient();
+  const tenantId = await getTenantId(supabase);
   const { data: claims } = await supabase.auth.getClaims();
   const userId = claims?.claims?.sub;
   if (!userId) redirect("/login");
-  const { data: admin } = await supabase.from("admin_users").select("display_name").eq("user_id", userId).maybeSingle();
+  const { data: admin } = await supabase.from("admin_users").select("display_name").eq("tenant_id", tenantId).eq("user_id", userId).maybeSingle();
   if (!admin) redirect("/login?error=forbidden");
 
   const entityNames = Object.keys(adminEntities) as AdminEntity[];
   const [eventResult, ...rowResults] = await Promise.all([
-    supabase.from("event_settings").select("*").eq("singleton_key", "main").single(),
-    ...entityNames.map((entity) => supabase.from(entity).select("*").order("archived_at", { ascending: true, nullsFirst: true }).limit(100)),
+    supabase.from("event_settings").select("*").eq("tenant_id", tenantId).eq("singleton_key", "main").single(),
+    ...entityNames.map((entity) => supabase.from(entity).select("*").eq("tenant_id", tenantId).order("archived_at", { ascending: true, nullsFirst: true }).limit(100)),
   ]);
   const event = eventResult.data as Row;
   const rows = Object.fromEntries(entityNames.map((entity, index) => [entity, (rowResults[index].data ?? []) as Row[]])) as Record<AdminEntity, Row[]>;

@@ -1,3 +1,5 @@
+set app.tenant_slug = 'petrovietnam2026';
+
 create temporary table seed_roster (
   sport_slug text, tournament_slug text, full_name text, org_code text
 ) on commit drop;

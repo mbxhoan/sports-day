@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { cache } from "react";
+import { tenantHeaders, tenantSlug } from "./tenant.ts";
 
 export type Locale = "vi" | "en";
 export type Sport = {
@@ -68,8 +69,8 @@ export type SiteData = {
     venue_en: string;
     hero_path: string;
     hero_mobile_path: string;
-    start_at: string;
-    end_at: string;
+    start_at: string | null;
+    end_at: string | null;
   };
   sports: Sport[];
   tournaments: Tournament[];
@@ -181,26 +182,29 @@ const fallback: SiteData = {
 export const getSiteData = cache(async function getSiteData(): Promise<SiteData> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) return fallback;
+  if (!url || !key || !tenantSlug) return fallback;
 
-  const db = createClient(url, key, { auth: { persistSession: false } });
+  const db = createClient(url, key, { auth: { persistSession: false }, global: { headers: tenantHeaders() } });
+  const { data: tenant, error: tenantError } = await db.from("tenants").select("id").eq("slug", tenantSlug).maybeSingle();
+  if (tenantError || !tenant) return fallback;
+  const tenantId = tenant.id;
   const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
-    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("singleton_key", "main").maybeSingle(),
-    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").order("sort_order"),
-    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,sort_order").order("sort_order"),
-    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").order("sort_order"),
-    db.from("participants").select("id,organization_id,full_name,full_name_en").order("full_name"),
-    db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").order("name_vi"),
-    db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order").order("sort_order"),
-    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order").order("sort_order"),
-    db.from("group_entries").select("id,group_id,entry_id,seed_order").order("seed_order"),
-    db.from("fixtures").select("id,tournament_id,group_id,starts_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id").order("starts_at"),
-    db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,score,rank").order("seed_order"),
-    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").order("rank"),
-    db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").order("sort_order"),
-    db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("kind", "gallery").order("sort_order"),
-    db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").order("sort_order"),
-    db.from("footer_links").select("id,label_vi,label_en,href,sort_order").order("sort_order"),
+    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
+    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).order("full_name"),
+    db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).order("name_vi"),
+    db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("group_entries").select("id,group_id,entry_id,seed_order").eq("tenant_id", tenantId).order("seed_order"),
+    db.from("fixtures").select("id,tournament_id,group_id,starts_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id").eq("tenant_id", tenantId).order("starts_at"),
+    db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,score,rank").eq("tenant_id", tenantId).order("seed_order"),
+    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").eq("tenant_id", tenantId).order("rank"),
+    db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("tenant_id", tenantId).eq("kind", "gallery").order("sort_order"),
+    db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("footer_links").select("id,label_vi,label_en,href,sort_order").eq("tenant_id", tenantId).order("sort_order"),
   ]);
 
   if (event.error || sports.error || tournamentsResult.error || fixtures.error || !event.data) return fallback;

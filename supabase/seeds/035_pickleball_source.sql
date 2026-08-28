@@ -1,3 +1,5 @@
+set app.tenant_slug = 'petrovietnam2026';
+
 -- Generated from reviewed PICKLEBAL PDFs. Unseparated source labels remain pair-only rather than guessed.
 create temporary table seed_pickleball_pairs (tournament_slug text, group_name text, pair_name text, source_page integer, organization_code text, member_one text, member_two text) on commit drop;
 insert into seed_pickleball_pairs values
@@ -252,7 +254,7 @@ insert into seed_pickleball_pairs values
   ('doi-nu-tren-50','Bảng A','Nguyễn Thị Oanh / Tạ Thị Thu Hiền-VSP',1,'VSP','Nguyễn Thị Oanh','Tạ Thị Thu Hiền');
 insert into public.organizations (code, name_vi, name_en)
 select distinct organization_code, organization_code, organization_code from seed_pickleball_pairs where organization_code is not null
-on conflict (code) do update set archived_at = null;
+on conflict (tenant_id, code) do update set archived_at = null;
 insert into public.participants (organization_id, full_name)
 select o.id, names.full_name from seed_pickleball_pairs p join public.organizations o on o.code = p.organization_code
 cross join lateral (values (p.member_one), (p.member_two)) names(full_name) where names.full_name is not null
@@ -638,4 +640,3 @@ join public.fixtures f on f.tournament_id = t.id and f.group_id = g.id and f.rou
 cross join lateral (values (p.home_name, 'home'), (p.away_name, 'away')) x(pair_name, side)
 join public.entries e on e.tournament_id = t.id and e.name_vi = x.pair_name
 on conflict (fixture_id, entry_id) do update set archived_at = null;
-

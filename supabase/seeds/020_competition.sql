@@ -1,3 +1,5 @@
+set app.tenant_slug = 'petrovietnam2026';
+
 insert into public.sports (id, slug, name_vi, name_en, emoji, description_vi, description_en, rules_vi, rules_en, sort_order) values
   ('10000000-0000-0000-0000-000000000001', 'pickleball', 'Pickleball', 'Pickleball', '/icons/pickleball.png', 'Thi đấu đôi theo nhóm tuổi.', 'Doubles competition by age group.', '12 hạng mục đôi nam, đôi nữ và đôi nam nữ theo nhóm tuổi. Thi đấu theo vòng bảng và loại trực tiếp; lịch đấu, bảng đấu và kết quả cập nhật theo dữ liệu thực tế.', '12 men’s, women’s and mixed doubles age-group categories. Group and knockout stages; schedules, brackets and results follow the live competition data.', 1),
   ('10000000-0000-0000-0000-000000000002', 'bong-ban', 'Bóng bàn', 'Table Tennis', '🏓', 'Thi đấu đôi nam, đôi nữ và đôi nam nữ.', 'Men’s, women’s and mixed doubles.', 'Thi đấu đôi nam, đôi nữ và đôi nam nữ theo các hạng mục tuổi. Vòng bảng và loại trực tiếp; đội thắng được xác định theo tỷ số trận.', 'Men’s, women’s and mixed doubles by age category. Group and knockout stages; winners are determined by match score.', 2),
@@ -7,7 +9,7 @@ insert into public.sports (id, slug, name_vi, name_en, emoji, description_vi, de
   ('10000000-0000-0000-0000-000000000006', 'dien-kinh', 'Điền kinh', 'Athletics', '🏃', 'Các cự ly 400m, 800m, 3.000m, 5.000m và tiếp sức 4×100m.', '400m, 800m, 3,000m, 5,000m and 4×100m relay events.', 'Gồm các nội dung chạy cá nhân và tiếp sức 4×100m. Vận động viên xuất phát theo lượt; thành tích được tính bằng thời gian hoàn thành.', 'Includes individual running and 4×100m relay events. Athletes start in heats; performance is measured by finishing time.', 6),
   ('10000000-0000-0000-0000-000000000007', 'co-vua', 'Cờ vua', 'Chess', '♟️', 'Hệ Thụy Sĩ cá nhân.', 'Individual Swiss system.', 'Thi đấu cá nhân theo hệ Thụy Sĩ. Ghép cặp và xếp hạng căn cứ vào kết quả từng ván và các tiêu chí phụ theo điều lệ giải.', 'Individual Swiss-system competition. Pairings and ranking follow game results and the tie-break criteria of the event rules.', 7),
   ('10000000-0000-0000-0000-000000000008', 'co-tuong', 'Cờ tướng', 'Xiangqi', '♜', 'Hệ Thụy Sĩ cá nhân.', 'Individual Swiss system.', 'Thi đấu cá nhân theo hệ Thụy Sĩ. Mỗi ván được ghi nhận thắng, hòa hoặc thua; bảng xếp hạng cập nhật theo kết quả thi đấu.', 'Individual Swiss-system competition. Each game records a win, draw or loss; standings update from competition results.', 8)
-on conflict (slug) do update set
+on conflict (tenant_id, slug) do update set
   name_vi = excluded.name_vi, name_en = excluded.name_en, emoji = excluded.emoji,
   description_vi = excluded.description_vi, description_en = excluded.description_en,
   rules_vi = excluded.rules_vi, rules_en = excluded.rules_en,
@@ -65,7 +67,8 @@ join (values
   ('co-tuong','nam-tren-45','Cờ tướng nam trên 45 tuổi','Men’s Xiangqi Over 45','Trên 45 tuổi','Over 45','male','Hệ Thụy Sĩ cá nhân','Individual Swiss system',2)
 ) as v(sport_slug, slug, name_vi, name_en, category_vi, category_en, gender, format_vi, format_en, sort_order)
   on s.slug = v.sport_slug
-on conflict (sport_id, slug) do update set
+where s.tenant_id = private.seed_tenant_id()
+on conflict (tenant_id, sport_id, slug) do update set
   name_vi = excluded.name_vi, name_en = excluded.name_en,
   category_vi = excluded.category_vi, category_en = excluded.category_en,
   gender = excluded.gender, format_vi = excluded.format_vi, format_en = excluded.format_en,
@@ -79,7 +82,7 @@ insert into public.organizations (code, name_vi, name_en, sort_order) values
   ('PVE','PVE','PVE',12), ('PVEP','PVEP','PVEP',13), ('PVFCCO','PVFCCo','PVFCCo',14),
   ('PV GAS','PV GAS','PV GAS',15), ('PVMR','PVMR','PVMR',16), ('PVOIL','PVOIL','PVOIL',17),
   ('PVPMB','PVPMB','PVPMB',18), ('PVTRANS','PVTrans','PVTrans',19), ('SWPOC','SWPOC','SWPOC',20), ('VSP','Vietsovpetro','Vietsovpetro',21)
-on conflict (code) do update set name_vi = excluded.name_vi, name_en = excluded.name_en, sort_order = excluded.sort_order, archived_at = null;
+on conflict (tenant_id, code) do update set name_vi = excluded.name_vi, name_en = excluded.name_en, sort_order = excluded.sort_order, archived_at = null;
 
 insert into public.venues (id, name_vi, name_en, address_vi, address_en, sort_order) values
   ('30000000-0000-0000-0000-000000000001','Địa điểm đang cập nhật','Venue to be confirmed','','',1)

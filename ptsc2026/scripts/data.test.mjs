@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const root = new URL("..", import.meta.url);
-const content = readFileSync(new URL("supabase/seeds/010_content.sql", root), "utf8");
-const competition = readFileSync(new URL("supabase/seeds/020_competition.sql", root), "utf8");
+const root = new URL("../", import.meta.url);
+const supabaseRoot = new URL("../../supabase/", import.meta.url);
+const content = readFileSync(new URL("seeds/015_ptsc_base.sql", supabaseRoot), "utf8");
+const competition = readFileSync(new URL("seeds/015_ptsc_base.sql", supabaseRoot), "utf8");
 const publicPages = readFileSync(new URL("src/components/public-pages.tsx", root), "utf8");
 
 test("PTSC clone keeps event identity and empty hero", () => {

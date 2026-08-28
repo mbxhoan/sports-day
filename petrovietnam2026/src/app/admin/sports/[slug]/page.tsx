@@ -5,6 +5,7 @@ import { MarkdownInput } from "@/components/markdown-input";
 import { adminEntities, type AdminEntity, type AdminField } from "@/lib/admin-config";
 import { relationEntity } from "@/lib/admin-relations";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTenantId } from "@/lib/tenant";
 import { saveFixtureResult, saveRecord, saveScoringRule, setArchived, uploadMedia } from "../../actions";
 
 type Row = Record<string, unknown> & { id: string; archived_at: string | null };
@@ -31,13 +32,14 @@ function CrudSection({ entity, rows, allRows }: { entity: AdminEntity; rows: Row
 export default async function SportAdminPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createSupabaseServerClient();
+  const tenantId = await getTenantId(supabase);
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims?.claims?.sub) redirect("/login");
-  const { data: admin } = await supabase.from("admin_users").select("user_id").eq("user_id", claims.claims.sub).maybeSingle();
+  const { data: admin } = await supabase.from("admin_users").select("user_id").eq("tenant_id", tenantId).eq("user_id", claims.claims.sub).maybeSingle();
   if (!admin) redirect("/login?error=forbidden");
 
   const entityNames = Object.keys(adminEntities) as AdminEntity[];
-  const results = await Promise.all(entityNames.map((entity) => supabase.from(entity).select("*").order("archived_at", { ascending: true, nullsFirst: true }).limit(2000)));
+  const results = await Promise.all(entityNames.map((entity) => supabase.from(entity).select("*").eq("tenant_id", tenantId).order("archived_at", { ascending: true, nullsFirst: true }).limit(2000)));
   const rows = Object.fromEntries(entityNames.map((entity, index) => [entity, (results[index].data ?? []) as Row[]])) as Record<AdminEntity, Row[]>;
   const sport = rows.sports.find((item) => item.slug === slug);
   if (!sport) notFound();

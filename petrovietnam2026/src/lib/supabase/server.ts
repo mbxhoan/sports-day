@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { tenantHeaders, tenantSlug } from "@/lib/tenant";
 
 export function hasSupabaseConfig() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY && tenantSlug);
 }
 
 export async function createSupabaseServerClient() {
@@ -11,6 +12,7 @@ export async function createSupabaseServerClient() {
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) throw new Error("Supabase chưa được cấu hình");
   return createServerClient(url, key, {
+    global: { headers: tenantHeaders() },
     cookies: {
       getAll: () => cookieStore.getAll(),
       setAll: (items) => {

@@ -1,1 +1,0 @@
--- PTSC clone: teams, athletes, groups, fixtures intentionally empty.

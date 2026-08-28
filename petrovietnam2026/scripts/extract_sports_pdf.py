@@ -27,6 +27,10 @@ PICKLEBALL_TOURNAMENTS = {
 }
 
 
+def is_pickleball(item: dict[str, object]) -> bool:
+    return "PICKLEBALL" in str(item["path"]).upper()
+
+
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -73,7 +77,7 @@ def review_sources() -> dict[str, int]:
 def pickleball_pairs() -> list[dict[str, object]]:
     rows = []
     for item in inventory():
-        if item["folder"] != "PICKLEBAL":
+        if not is_pickleball(item):
             continue
         pairs = []
         seen = set()
@@ -118,7 +122,7 @@ def pickleball_seed() -> str:
     groups = []
     fixtures = []
     for item in inventory():
-        if item["folder"] != "PICKLEBAL":
+        if not is_pickleball(item):
             continue
         tournament_slug = PICKLEBALL_TOURNAMENTS[str(item["filename"])]
         seen_pairs = set()
