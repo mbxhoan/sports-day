@@ -39,6 +39,16 @@ const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
   .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
   .join("\n");
+const bracketMigration = readFileSync(new URL("migrations/20260828170000_source_driven_brackets.sql", supabaseRoot), "utf8");
+
+test("database models source-driven competition slots", () => {
+  assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
+  assert.match(bracketMigration, /create table public\.fixture_slots/);
+  assert.match(bracketMigration, /unique \(fixture_id, side\)/);
+  assert.match(bracketMigration, /source_kind in \('entry', 'group_rank', 'fixture_winner', 'fixture_loser', 'bye'\)/);
+  assert.match(bracketMigration, /result_status text/);
+  assert.match(bracketMigration, /fixture_slots_public_read/);
+});
 
 test("seed keeps the approved eight sports", () => {
   for (const slug of ["pickleball","bong-ban","cau-long","boi-loi","keo-co","dien-kinh","co-vua","co-tuong"]) assert.match(competition, new RegExp(`'${slug}'`));
