@@ -50,6 +50,13 @@ test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /fixture_slots_public_read/);
 });
 
+test("result RPC propagates and previews dependent reset", () => {
+  assert.match(bracketMigration, /private\.sync_fixture_slots/);
+  assert.match(bracketMigration, /create or replace function public\.reset_fixture_dependents/);
+  assert.match(bracketMigration, /for update/);
+  assert.match(bracketMigration, /Trận phụ thuộc đã có kết quả/);
+});
+
 test("seed keeps the approved eight sports", () => {
   for (const slug of ["pickleball","bong-ban","cau-long","boi-loi","keo-co","dien-kinh","co-vua","co-tuong"]) assert.match(competition, new RegExp(`'${slug}'`));
   assert.equal((competition.match(/'10000000-0000-0000-0000-00000000000[1-8]'/g) ?? []).length, 8);
