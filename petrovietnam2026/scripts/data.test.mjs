@@ -119,6 +119,14 @@ test("media deletion uses the trash target alone or every selected image", () =>
   assert.deepEqual(adminMedia.mediaDeletionIds(selected), ["image-3"]);
 });
 
+test("media selection toggles every visible image", () => {
+  const inputs = [{ checked: false }, { checked: false }];
+  adminMedia.setMediaSelection(inputs, true);
+  assert.deepEqual(inputs, [{ checked: true }, { checked: true }]);
+  adminMedia.setMediaSelection(inputs, false);
+  assert.deepEqual(inputs, [{ checked: false }, { checked: false }]);
+});
+
 test("server actions allow multipart gallery payloads above the 1MB default", () => {
   assert.match(nextConfig, /bodySizeLimit:\s*["']12mb["']/);
 });

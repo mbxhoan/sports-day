@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { Trash2 } from "lucide-react";
+import { setMediaSelection } from "@/lib/admin-media";
 
 type DeleteAction = (formData: FormData) => void | Promise<void>;
 
 export function ConfirmedMediaDeleteForm({ action }: { action: DeleteAction }) {
+  const [allSelected, setAllSelected] = useState(false);
+
   function confirmDelete(event: FormEvent<HTMLFormElement>) {
     const form = event.currentTarget;
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
@@ -20,7 +24,13 @@ export function ConfirmedMediaDeleteForm({ action }: { action: DeleteAction }) {
     if (!window.confirm(message)) event.preventDefault();
   }
 
+  function toggleAll(checked: boolean) {
+    setMediaSelection(document.querySelectorAll<HTMLInputElement>(".media-select[form='media-delete']"), checked);
+    setAllSelected(checked);
+  }
+
   return <form id="media-delete" action={action} className="media-delete-toolbar" onSubmit={confirmDelete}>
+    <label className="media-select-all"><input type="checkbox" checked={allSelected} onChange={(event) => toggleAll(event.target.checked)}/>{allSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}</label>
     <button className="delete-button" type="submit"><Trash2 size={15}/>Xoá ảnh đã chọn</button>
   </form>;
 }

@@ -16,3 +16,7 @@ export function mediaDeletionIds(formData: FormData) {
   const ids = singleId ? [singleId] : formData.getAll("id").map((value) => String(value).trim()).filter(Boolean);
   return [...new Set(ids)];
 }
+
+export function setMediaSelection(inputs: Iterable<{ checked: boolean }>, checked: boolean) {
+  for (const input of inputs) input.checked = checked;
+}
