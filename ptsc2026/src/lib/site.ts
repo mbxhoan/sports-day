@@ -1,0 +1,237 @@
+import { createClient } from "@supabase/supabase-js";
+import { cache } from "react";
+
+export type Locale = "vi" | "en";
+export type Sport = {
+  id: string;
+  slug: string;
+  name_vi: string;
+  name_en: string;
+  emoji: string;
+  description_vi: string;
+  description_en: string;
+  rules_vi: string;
+  rules_en: string;
+  sort_order: number;
+};
+export type Tournament = {
+  id: string;
+  sport_id: string;
+  slug: string;
+  name_vi: string;
+  name_en: string;
+  category_vi: string;
+  category_en: string;
+  format_vi: string;
+  format_en: string;
+  rules_vi: string;
+  rules_en: string;
+  sort_order: number;
+};
+export type Fixture = {
+  id: string;
+  tournament_id: string;
+  group_id: string | null;
+  starts_at: string | null;
+  status: string;
+  round_vi: string;
+  round_en: string;
+  result_summary_vi: string;
+  result_summary_en: string;
+  round_order: number | null;
+  bracket_position: number | null;
+  next_fixture_id: string | null;
+  winner_entry_id: string | null;
+};
+export type Organization = { id: string; code: string; name_vi: string; name_en: string; logo_path: string | null; sort_order: number };
+export type Participant = { id: string; organization_id: string | null; full_name: string; full_name_en: string | null };
+export type Entry = { id: string; tournament_id: string; organization_id: string | null; kind: string; name_vi: string; name_en: string };
+export type EntryMember = { id: string; entry_id: string; participant_id: string; role_vi: string; role_en: string; sort_order: number };
+export type Group = { id: string; tournament_id: string; name_vi: string; name_en: string; sort_order: number };
+export type GroupEntry = { id: string; group_id: string; entry_id: string; seed_order: number | null };
+export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; score: string | null; rank: number | null };
+export type Standing = { id: string; tournament_id: string; group_id: string | null; entry_id: string; played: number; won: number; drawn: number; lost: number; points: number; rank: number | null };
+export type Award = { id: string; organization_id: string | null; entry_id: string | null; participant_id: string | null; medal: "gold" | "silver" | "bronze" | "special"; title_vi: string; title_en: string };
+export type Media = { id: string; storage_path: string; public_url: string; sport_id: string | null; title_vi: string; title_en: string; alt_vi: string; alt_en: string; filter_tag: string; album_vi: string; album_en: string; sort_order: number };
+export type Contact = { id: string; label_vi: string; label_en: string; value: string; href: string; sort_order: number };
+export type FooterLink = { id: string; label_vi: string; label_en: string; href: string; sort_order: number };
+export type LeaderboardRow = { organization: Organization; gold: number; silver: number; bronze: number; special: number; total: number };
+export type SiteData = {
+  event: {
+    event_name_vi: string;
+    event_name_en: string;
+    subtitle_vi: string;
+    subtitle_en: string;
+    about_vi: string;
+    about_en: string;
+    venue_vi: string;
+    venue_en: string;
+    hero_path: string;
+    hero_mobile_path: string;
+    start_at: string | null;
+    end_at: string | null;
+  };
+  sports: Sport[];
+  tournaments: Tournament[];
+  organizations: Organization[];
+  participants: Participant[];
+  entries: Entry[];
+  entryMembers: EntryMember[];
+  groups: Group[];
+  groupEntries: GroupEntry[];
+  fixtures: Fixture[];
+  fixtureEntries: FixtureEntry[];
+  standings: Standing[];
+  awards: Award[];
+  media: Media[];
+  contacts: Contact[];
+  footerLinks: FooterLink[];
+  counts: { sports: number; organizations: number; participants: number; fixtures: number };
+};
+
+export const copy = {
+  vi: {
+    home: "Trang chủ", leaderboard: "Bảng xếp hạng", gallery: "Thư viện ảnh", sports: "Môn thể thao", schedule: "Lịch thi đấu", login: "Đăng nhập",
+    countdown: "ĐẾM NGƯỢC ĐẾN NGÀY THI ĐẤU", days: "Ngày", hours: "Giờ", minutes: "Phút", seconds: "Giây",
+    sportCount: "Môn thi đấu", dayCount: "Ngày thi đấu", unitCount: "Đơn vị", athleteCount: "Tổng VĐV", matchCount: "Trận đấu",
+    allSports: "Các môn thể thao", viewDetail: "Xem chi tiết", updating: "Đang cập nhật", footer: "Hội thao PTSC lần thứ 15",
+    info: "Thông tin", teams: "Đội/VĐV", times: "Khung giờ", fixtures: "Lịch đấu", brackets: "Bảng đấu",
+    description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
+    empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
+    filterSport: "Tất cả môn", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
+    organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương",
+  },
+  en: {
+    home: "Home", leaderboard: "Leaderboard", gallery: "Gallery", sports: "Sports", schedule: "Schedule", login: "Sign in",
+    countdown: "COUNTDOWN TO COMPETITION DAY", days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
+    sportCount: "Sports", dayCount: "Competition days", unitCount: "Organizations", athleteCount: "Athletes", matchCount: "Matches",
+    allSports: "Sports", viewDetail: "View details", updating: "Updating", footer: "PTSC 15th Sports Festival",
+    info: "Information", teams: "Teams/Athletes", times: "Time slots", fixtures: "Fixtures", brackets: "Brackets",
+    description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
+    empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
+    filterSport: "All sports", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
+    organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals",
+  },
+} as const;
+
+const sportRows: Sport[] = [
+  ["pickleball", "Pickleball", "Pickleball", "/icons/pickleball.png", "", "", "", ""],
+  ["bong-ban", "Bóng bàn", "Table Tennis", "🏓", "", "", "", ""],
+  ["cau-long", "Cầu lông", "Badminton", "🏸", "", "", "", ""],
+  ["boi-loi", "Bơi lội", "Swimming", "🏊", "", "", "", ""],
+  ["keo-co", "Kéo co", "Tug of War", "🪢", "", "", "", ""],
+  ["dien-kinh", "Điền kinh", "Athletics", "🏃", "", "", "", ""],
+  ["co-vua", "Cờ vua", "Chess", "♟️", "", "", "", ""],
+  ["co-tuong", "Cờ tướng", "Xiangqi", "♜", "", "", "", ""],
+].map(([slug, name_vi, name_en, emoji, description_vi, description_en, rules_vi, rules_en], index) => ({
+  id: `sport-${index + 1}`, slug, name_vi, name_en, emoji, description_vi, description_en,
+  rules_vi, rules_en, sort_order: index + 1,
+}));
+
+const defaultSportsBySlug = new Map(sportRows.map((sport) => [sport.slug, sport]));
+
+const fallback: SiteData = {
+  event: {
+    event_name_vi: "Hội Thao Tổng Công Ty Cổ Phần Dịch Vụ Kỹ Thuật Dầu Khí Việt Nam Lần Thứ 15",
+    event_name_en: "PTSC 15th Sports Festival",
+    subtitle_vi: "", subtitle_en: "",
+    about_vi: "", about_en: "",
+    venue_vi: "", venue_en: "", hero_path: "", hero_mobile_path: "",
+    start_at: null, end_at: null,
+  },
+  sports: sportRows,
+  tournaments: [],
+  organizations: [],
+  participants: [],
+  entries: [],
+  entryMembers: [],
+  groups: [],
+  groupEntries: [],
+  fixtures: [],
+  fixtureEntries: [],
+  standings: [],
+  awards: [],
+  media: [],
+  contacts: [],
+  footerLinks: [],
+  counts: { sports: 8, organizations: 0, participants: 0, fixtures: 0 },
+};
+
+export const getSiteData = cache(async function getSiteData(): Promise<SiteData> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return fallback;
+
+  const db = createClient(url, key, { auth: { persistSession: false } });
+  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
+    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("singleton_key", "main").maybeSingle(),
+    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").order("sort_order"),
+    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,sort_order").order("sort_order"),
+    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").order("sort_order"),
+    db.from("participants").select("id,organization_id,full_name,full_name_en").order("full_name"),
+    db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").order("name_vi"),
+    db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order").order("sort_order"),
+    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order").order("sort_order"),
+    db.from("group_entries").select("id,group_id,entry_id,seed_order").order("seed_order"),
+    db.from("fixtures").select("id,tournament_id,group_id,starts_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id").order("starts_at"),
+    db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,score,rank").order("seed_order"),
+    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").order("rank"),
+    db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").order("sort_order"),
+    db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("kind", "gallery").order("sort_order"),
+    db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").order("sort_order"),
+    db.from("footer_links").select("id,label_vi,label_en,href,sort_order").order("sort_order"),
+  ]);
+
+  if (event.error || sports.error || tournamentsResult.error || fixtures.error || !event.data) return fallback;
+  return {
+    event: event.data,
+    sports: (sports.data as Sport[]).map((sport) => {
+      const defaults = defaultSportsBySlug.get(sport.slug);
+      return {
+        ...sport,
+        emoji: sport.slug === "pickleball" ? "/icons/pickleball.png" : sport.emoji,
+        rules_vi: !sport.rules_vi || sport.rules_vi === "Đang cập nhật" ? defaults?.rules_vi ?? sport.rules_vi : sport.rules_vi,
+        rules_en: !sport.rules_en || sport.rules_en === "Updating" ? defaults?.rules_en ?? sport.rules_en : sport.rules_en,
+      };
+    }),
+    tournaments: tournamentsResult.data as Tournament[],
+    organizations: (organizations.data ?? []) as Organization[],
+    participants: (participants.data ?? []) as Participant[],
+    entries: (entries.data ?? []) as Entry[],
+    entryMembers: (entryMembers.data ?? []) as EntryMember[],
+    groups: (groups.data ?? []) as Group[],
+    groupEntries: (groupEntries.data ?? []) as GroupEntry[],
+    fixtures: fixtures.data as Fixture[],
+    fixtureEntries: (fixtureEntries.data ?? []) as FixtureEntry[],
+    standings: (standings.data ?? []) as Standing[],
+    awards: (awards.data ?? []) as Award[],
+    media: ((media.data ?? []) as Omit<Media, "public_url">[]).map((item) => ({ ...item, public_url: db.storage.from("event-media").getPublicUrl(item.storage_path).data.publicUrl })),
+    contacts: (contacts.data ?? []) as Contact[],
+    footerLinks: (footerLinks.data ?? []) as FooterLink[],
+    counts: {
+      sports: sports.data.length,
+      organizations: organizations.data?.length ?? 0,
+      participants: participants.data?.length ?? 0,
+      fixtures: fixtures.data.length,
+    },
+  };
+});
+
+export function rankOrganizations(awards: Award[], organizations: Organization[], entries: Entry[], participants: Participant[] = []): LeaderboardRow[] {
+  const entriesById = new Map(entries.map((entry) => [entry.id, entry.organization_id]));
+  const participantsById = new Map(participants.map((participant) => [participant.id, participant.organization_id]));
+  const rows = new Map(organizations.map((organization) => [organization.id, { organization, gold: 0, silver: 0, bronze: 0, special: 0 }]));
+  for (const award of awards) {
+    const organizationId = award.organization_id ?? entriesById.get(award.entry_id ?? "") ?? participantsById.get(award.participant_id ?? "");
+    const row = organizationId ? rows.get(organizationId) : undefined;
+    if (row) row[award.medal] += 1;
+  }
+  return [...rows.values()]
+    .map((row) => ({ ...row, total: row.gold + row.silver + row.bronze + row.special }))
+    .filter((row) => row.total > 0)
+    .sort((a, b) => b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || b.total - a.total || a.organization.sort_order - b.organization.sort_order);
+}
+
+export function localized(row: Record<string, unknown>, field: string, locale: Locale): string {
+  return String(row[`${field}_${locale}`] ?? row[`${field}_vi`] ?? "");
+}

@@ -1,0 +1,1 @@
+-- PTSC clone: participant and entry data intentionally empty.

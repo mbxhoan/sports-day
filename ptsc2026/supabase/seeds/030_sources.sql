@@ -1,0 +1,1 @@
+-- PTSC clone: source manifest intentionally empty.
