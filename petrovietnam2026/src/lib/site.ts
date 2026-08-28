@@ -3,6 +3,7 @@ import { cache } from "react";
 import { tenantHeaders, tenantSlug } from "./tenant.ts";
 
 export type Locale = "vi" | "en";
+export type CompetitionMode = "knockout" | "group_knockout" | "round_robin" | "swiss" | "race";
 export type Sport = {
   id: string;
   slug: string;
@@ -27,6 +28,7 @@ export type Tournament = {
   format_en: string;
   rules_vi: string;
   rules_en: string;
+  competition_mode: CompetitionMode;
   sort_order: number;
 };
 export type Fixture = {
@@ -55,7 +57,8 @@ export type Group = { id: string; tournament_id: string; name_vi: string; name_e
 export type GroupEntry = { id: string; group_id: string; entry_id: string; seed_order: number | null };
 export type Venue = { id: string; name_vi: string; name_en: string; address_vi: string; address_en: string; sort_order: number };
 export type Court = { id: string; venue_id: string; name_vi: string; name_en: string; sort_order: number };
-export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; score: string | null; rank: number | null };
+export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; seed_order: number | null; score: string | null; score_numeric: number | null; rank: number | null; result_status: string | null };
+export type FixtureSlot = { id: string; fixture_id: string; side: "home" | "away"; source_kind: "entry" | "group_rank" | "fixture_winner" | "fixture_loser" | "bye"; source_entry_id: string | null; source_group_id: string | null; source_fixture_id: string | null; source_rank: number | null; label_vi: string; label_en: string };
 export type Standing = { id: string; tournament_id: string; group_id: string | null; entry_id: string; played: number; won: number; drawn: number; lost: number; points: number; rank: number | null };
 export type Award = { id: string; organization_id: string | null; entry_id: string | null; participant_id: string | null; medal: "gold" | "silver" | "bronze" | "special"; title_vi: string; title_en: string };
 export type Media = { id: string; storage_path: string; public_url: string; sport_id: string | null; title_vi: string; title_en: string; alt_vi: string; alt_en: string; filter_tag: string; album_vi: string; album_en: string; sort_order: number };
@@ -89,6 +92,7 @@ export type SiteData = {
   courts: Court[];
   fixtures: Fixture[];
   fixtureEntries: FixtureEntry[];
+  fixtureSlots: FixtureSlot[];
   standings: Standing[];
   awards: Award[];
   media: Media[];
@@ -151,13 +155,14 @@ const tournamentNames: Record<string, Array<[string, string]>> = {
   "co-tuong": [["Cờ tướng nam dưới 45 tuổi","Men’s Xiangqi Under 45"],["Cờ tướng nam trên 45 tuổi","Men’s Xiangqi Over 45"]],
 };
 
-const tournaments = sportRows.flatMap((sport) => (tournamentNames[sport.slug] ?? []).map(([vi, en], index) => ({
+const tournaments: Tournament[] = sportRows.flatMap((sport) => (tournamentNames[sport.slug] ?? []).map(([vi, en], index) => ({
   id: `${sport.slug}-${index + 1}`, sport_id: sport.id, slug: `${sport.slug}-${index + 1}`,
   name_vi: vi, name_en: en, category_vi: vi, category_en: en,
   format_vi: sport.slug.startsWith("co-") ? "Hệ Thụy Sĩ cá nhân" : "Theo hồ sơ thi đấu",
   format_en: sport.slug.startsWith("co-") ? "Individual Swiss system" : "Per competition source",
   rules_vi: "",
   rules_en: "",
+  competition_mode: sport.slug.startsWith("co-") ? "swiss" : sport.slug === "boi-loi" || sport.slug === "dien-kinh" ? "race" : "round_robin",
   sort_order: index + 1,
 })));
 
@@ -182,6 +187,7 @@ const fallback: SiteData = {
   courts: [],
   fixtures: [],
   fixtureEntries: [],
+  fixtureSlots: [],
   standings: [],
   awards: [],
   media: [],
@@ -199,10 +205,10 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   const { data: tenant, error: tenantError } = await db.from("tenants").select("id").eq("slug", tenantSlug).maybeSingle();
   if (tenantError || !tenant) return fallback;
   const tenantId = tenant.id;
-  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, standings, awards, media, contacts, footerLinks] = await Promise.all([
+  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).order("full_name"),
     db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).order("name_vi"),
@@ -212,7 +218,8 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     db.from("venues").select("id,name_vi,name_en,address_vi,address_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("courts").select("id,venue_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("fixtures").select("id,tournament_id,group_id,venue_id,court_id,starts_at,ends_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id").eq("tenant_id", tenantId).order("starts_at"),
-    db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,score,rank").eq("tenant_id", tenantId).order("seed_order"),
+    db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,seed_order,score,score_numeric,rank,result_status").eq("tenant_id", tenantId).order("seed_order"),
+    db.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en").eq("tenant_id", tenantId),
     db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").eq("tenant_id", tenantId).order("rank"),
     db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).order("sort_order"),
     db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("tenant_id", tenantId).eq("kind", "gallery").order("sort_order"),
@@ -243,6 +250,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     courts: (courts.data ?? []) as Court[],
     fixtures: fixtures.data as Fixture[],
     fixtureEntries: (fixtureEntries.data ?? []) as FixtureEntry[],
+    fixtureSlots: (fixtureSlots.data ?? []) as FixtureSlot[],
     standings: (standings.data ?? []) as Standing[],
     awards: (awards.data ?? []) as Award[],
     media: ((media.data ?? []) as Omit<Media, "public_url">[]).map((item) => ({ ...item, public_url: db.storage.from("event-media").getPublicUrl(item.storage_path).data.publicUrl })),
