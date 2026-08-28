@@ -1,0 +1,6990 @@
+{
+  "version": 1,
+  "tournaments": [
+    {
+      "sport_slug": "boi-loi",
+      "tournament_slug": "100m-nam",
+      "competition_mode": "race",
+      "source": {
+        "file": "BƠI LỘI/Boi pn 2026.pdf",
+        "page_or_sheet": 5,
+        "warnings": [],
+        "supporting_file": "BƠI LỘI/Boi pn 2026.xlsx",
+        "supporting_sheet": "Trang 5"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "boi-loi",
+      "tournament_slug": "100m-nu",
+      "competition_mode": "race",
+      "source": {
+        "file": "BƠI LỘI/Boi pn 2026.pdf",
+        "page_or_sheet": 2,
+        "warnings": [],
+        "supporting_file": "BƠI LỘI/Boi pn 2026.xlsx",
+        "supporting_sheet": "Trang 2"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "boi-loi",
+      "tournament_slug": "4x50m-nam",
+      "competition_mode": "race",
+      "source": {
+        "file": "BƠI LỘI/Boi pn 2026.pdf",
+        "page_or_sheet": 7,
+        "warnings": [],
+        "supporting_file": "BƠI LỘI/Boi pn 2026.xlsx",
+        "supporting_sheet": "Trang 7"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "boi-loi",
+      "tournament_slug": "4x50m-nu",
+      "competition_mode": "race",
+      "source": {
+        "file": "BƠI LỘI/Boi pn 2026.pdf",
+        "page_or_sheet": 7,
+        "warnings": [],
+        "supporting_file": "BƠI LỘI/Boi pn 2026.xlsx",
+        "supporting_sheet": "Trang 7"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "boi-loi",
+      "tournament_slug": "50m-nam",
+      "competition_mode": "race",
+      "source": {
+        "file": "BƠI LỘI/Boi pn 2026.pdf",
+        "page_or_sheet": 3,
+        "warnings": [],
+        "supporting_file": "BƠI LỘI/Boi pn 2026.xlsx",
+        "supporting_sheet": "Trang 3"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "boi-loi",
+      "tournament_slug": "50m-nu",
+      "competition_mode": "race",
+      "source": {
+        "file": "BƠI LỘI/Boi pn 2026.pdf",
+        "page_or_sheet": 6,
+        "warnings": [],
+        "supporting_file": "BƠI LỘI/Boi pn 2026.xlsx",
+        "supporting_sheet": "Trang 6"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "bong-ban",
+      "tournament_slug": "doi-nam-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "BÓNG BÀN/B Bàn pn 26 (1).pdf",
+        "page_or_sheet": 7,
+        "warnings": [],
+        "supporting_file": "BÓNG BÀN/B Bàn pn 26.xlsx",
+        "supporting_sheet": "Trang 7"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "bong-ban",
+      "tournament_slug": "doi-nam-41-50",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "BÓNG BÀN/B Bàn pn 26 (1).pdf",
+        "page_or_sheet": 13,
+        "warnings": [],
+        "supporting_file": "BÓNG BÀN/B Bàn pn 26.xlsx",
+        "supporting_sheet": "Trang 13"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "bong-ban",
+      "tournament_slug": "doi-nam-duoi-30",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "BÓNG BÀN/B Bàn pn 26 (1).pdf",
+        "page_or_sheet": 4,
+        "warnings": [],
+        "supporting_file": "BÓNG BÀN/B Bàn pn 26.xlsx",
+        "supporting_sheet": "Trang 4"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "bong-ban",
+      "tournament_slug": "doi-nam-nu-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "BÓNG BÀN/B Bàn pn 26 (1).pdf",
+        "page_or_sheet": 18,
+        "warnings": [],
+        "supporting_file": "BÓNG BÀN/B Bàn pn 26.xlsx",
+        "supporting_sheet": "Trang 18"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "bong-ban",
+      "tournament_slug": "doi-nam-nu-41-50",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "BÓNG BÀN/B Bàn pn 26 (1).pdf",
+        "page_or_sheet": 20,
+        "warnings": [],
+        "supporting_file": "BÓNG BÀN/B Bàn pn 26.xlsx",
+        "supporting_sheet": "Trang 20"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "bong-ban",
+      "tournament_slug": "doi-nu",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "BÓNG BÀN/B Bàn pn 26 (1).pdf",
+        "page_or_sheet": 16,
+        "warnings": [],
+        "supporting_file": "BÓNG BÀN/B Bàn pn 26.xlsx",
+        "supporting_sheet": "Trang 16"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-31-40",
+      "competition_mode": "knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 2,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 2"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Đoàn Văn Đặng / Nguyễn Hoàng Nam-PVCOM",
+              "label_vi": "Đoàn Văn Đặng / Nguyễn Hoàng Nam-PVCOM",
+              "label_en": "Đoàn Văn Đặng / Nguyễn Hoàng Nam-PVCOM"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Bùi Thái Sơn / Lê Tuấn Anh-VSP",
+              "label_vi": "Bùi Thái Sơn / Lê Tuấn Anh-VSP",
+              "label_en": "Bùi Thái Sơn / Lê Tuấn Anh-VSP"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Dương Trí Quả / Trịnh Văn Thành",
+              "label_vi": "Dương Trí Quả / Trịnh Văn Thành",
+              "label_en": "Dương Trí Quả / Trịnh Văn Thành"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL",
+              "label_vi": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL",
+              "label_en": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Đình Toàn / Võ Quang Khải-PVG",
+              "label_vi": "Nguyễn Đình Toàn / Võ Quang Khải-PVG",
+              "label_en": "Nguyễn Đình Toàn / Võ Quang Khải-PVG"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC",
+              "label_vi": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC",
+              "label_en": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Đặng Vũ Khởi / Hồ Tuấn Anh-BMĐH",
+              "label_vi": "Đặng Vũ Khởi / Hồ Tuấn Anh-BMĐH",
+              "label_en": "Đặng Vũ Khởi / Hồ Tuấn Anh-BMĐH"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI",
+              "label_vi": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI",
+              "label_en": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Đào Quốc Dũng / Võ Văn Thịnh-PVG",
+              "label_vi": "Đào Quốc Dũng / Võ Văn Thịnh-PVG",
+              "label_en": "Đào Quốc Dũng / Võ Văn Thịnh-PVG"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Đỗ Đức Thọ / Nguyễn Việt Thắng-PVD",
+              "label_vi": "Đỗ Đức Thọ / Nguyễn Việt Thắng-PVD",
+              "label_en": "Đỗ Đức Thọ / Nguyễn Việt Thắng-PVD"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo",
+              "label_vi": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo",
+              "label_en": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-41-50",
+      "competition_mode": "knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 4,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 4"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Đào Công Thiện / Trần Xuân Ngọc",
+              "label_vi": "Đào Công Thiện / Trần Xuân Ngọc",
+              "label_en": "Đào Công Thiện / Trần Xuân Ngọc"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Chí Trung / Nguyễn Văn Mười",
+              "label_vi": "Nguyễn Chí Trung / Nguyễn Văn Mười",
+              "label_en": "Nguyễn Chí Trung / Nguyễn Văn Mười"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Trung Hải / Tất Phi Hải",
+              "label_vi": "Nguyễn Trung Hải / Tất Phi Hải",
+              "label_en": "Nguyễn Trung Hải / Tất Phi Hải"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Đỗ Văn Toàn / Trần Quốc Huy",
+              "label_vi": "Đỗ Văn Toàn / Trần Quốc Huy",
+              "label_en": "Đỗ Văn Toàn / Trần Quốc Huy"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Phạm Văn Hiệu / Vũ Văn Dũng",
+              "label_vi": "Phạm Văn Hiệu / Vũ Văn Dũng",
+              "label_en": "Phạm Văn Hiệu / Vũ Văn Dũng"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Hoàng Quang Chính / Ng Công Anh Anh",
+              "label_vi": "Hoàng Quang Chính / Ng Công Anh Anh",
+              "label_en": "Hoàng Quang Chính / Ng Công Anh Anh"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Bùi Anh Võ / Hồ Ngọc Hưng",
+              "label_vi": "Bùi Anh Võ / Hồ Ngọc Hưng",
+              "label_en": "Bùi Anh Võ / Hồ Ngọc Hưng"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa",
+              "label_vi": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa",
+              "label_en": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh",
+              "label_vi": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh",
+              "label_en": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Đặng Đình Bình / Nguyễn Hải Long",
+              "label_vi": "Đặng Đình Bình / Nguyễn Hải Long",
+              "label_en": "Đặng Đình Bình / Nguyễn Hải Long"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Hồ Viết Tập / Phạm Tất Lộc",
+              "label_vi": "Hồ Viết Tập / Phạm Tất Lộc",
+              "label_en": "Hồ Viết Tập / Phạm Tất Lộc"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-duoi-30",
+      "competition_mode": "knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 3,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 3"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Bùi Hoàng Đức / Nguyễn Hiếu Trung",
+              "label_vi": "Bùi Hoàng Đức / Nguyễn Hiếu Trung",
+              "label_en": "Bùi Hoàng Đức / Nguyễn Hiếu Trung"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Dương Hữu Chính / Lương Thế Vinh",
+              "label_vi": "Dương Hữu Chính / Lương Thế Vinh",
+              "label_en": "Dương Hữu Chính / Lương Thế Vinh"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Ng Thanh Điền / Nguyễn Võ Xuân Huy",
+              "label_vi": "Ng Thanh Điền / Nguyễn Võ Xuân Huy",
+              "label_en": "Ng Thanh Điền / Nguyễn Võ Xuân Huy"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Hoàng Minh Trí / Nguyễn Thế Anh",
+              "label_vi": "Hoàng Minh Trí / Nguyễn Thế Anh",
+              "label_en": "Hoàng Minh Trí / Nguyễn Thế Anh"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Mai Thế Thắng / Nguyễn Hồ Anh Sơn",
+              "label_vi": "Mai Thế Thắng / Nguyễn Hồ Anh Sơn",
+              "label_en": "Mai Thế Thắng / Nguyễn Hồ Anh Sơn"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Minh Tuấn / Phạm Văn Định",
+              "label_vi": "Nguyễn Minh Tuấn / Phạm Văn Định",
+              "label_en": "Nguyễn Minh Tuấn / Phạm Văn Định"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Anh Dũng / Phạm Ngọc Hải",
+              "label_vi": "Nguyễn Anh Dũng / Phạm Ngọc Hải",
+              "label_en": "Nguyễn Anh Dũng / Phạm Ngọc Hải"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Hoàng Khang / Phan Trí Lâm",
+              "label_vi": "Nguyễn Hoàng Khang / Phan Trí Lâm",
+              "label_en": "Nguyễn Hoàng Khang / Phan Trí Lâm"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Phạm Hồng Thái / Trần Đức Thuận",
+              "label_vi": "Phạm Hồng Thái / Trần Đức Thuận",
+              "label_en": "Phạm Hồng Thái / Trần Đức Thuận"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Bá Phong / Trần Đức Minh",
+              "label_vi": "Nguyễn Bá Phong / Trần Đức Minh",
+              "label_en": "Nguyễn Bá Phong / Trần Đức Minh"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Đỗ Tam Quốc / Hồ Vũ Hùng",
+              "label_vi": "Đỗ Tam Quốc / Hồ Vũ Hùng",
+              "label_en": "Đỗ Tam Quốc / Hồ Vũ Hùng"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Đức Mẫn / Nguyễn Minh Đạt",
+              "label_vi": "Nguyễn Đức Mẫn / Nguyễn Minh Đạt",
+              "label_en": "Nguyễn Đức Mẫn / Nguyễn Minh Đạt"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 1,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Mai Văn Tiến Thức / Vũ Đức Anh",
+              "label_vi": "Mai Văn Tiến Thức / Vũ Đức Anh",
+              "label_en": "Mai Văn Tiến Thức / Vũ Đức Anh"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Đào Quốc Anh / Hồ Nguyễn Thành Trung",
+              "label_vi": "Đào Quốc Anh / Hồ Nguyễn Thành Trung",
+              "label_en": "Đào Quốc Anh / Hồ Nguyễn Thành Trung"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 1,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Trần Hải Đăng / Trần Hoàng Chương",
+              "label_vi": "Trần Hải Đăng / Trần Hoàng Chương",
+              "label_en": "Trần Hải Đăng / Trần Hoàng Chương"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Xuân Cương / Trần Đăng Kết",
+              "label_vi": "Nguyễn Xuân Cương / Trần Đăng Kết",
+              "label_en": "Nguyễn Xuân Cương / Trần Đăng Kết"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-nu-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 8,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 8"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-nu-41-50",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 10,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 10"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-nu-duoi-30",
+      "competition_mode": "knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 6,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 6"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Hoàng Minh Hiếu / Võ Châu Yên",
+              "label_vi": "Hoàng Minh Hiếu / Võ Châu Yên",
+              "label_en": "Hoàng Minh Hiếu / Võ Châu Yên"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Duy Đông / Trịnh Thị Minh Anh",
+              "label_vi": "Nguyễn Duy Đông / Trịnh Thị Minh Anh",
+              "label_en": "Nguyễn Duy Đông / Trịnh Thị Minh Anh"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Hoàng Anh Thư / Trịnh Quang Huy",
+              "label_vi": "Nguyễn Hoàng Anh Thư / Trịnh Quang Huy",
+              "label_en": "Nguyễn Hoàng Anh Thư / Trịnh Quang Huy"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Đoàn Việt Bách / Nguyễn Thị Ngọc Duyên",
+              "label_vi": "Đoàn Việt Bách / Nguyễn Thị Ngọc Duyên",
+              "label_en": "Đoàn Việt Bách / Nguyễn Thị Ngọc Duyên"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Bùi Minh Thảo / Ngô Ngọc Mỹ Duyên",
+              "label_vi": "Bùi Minh Thảo / Ngô Ngọc Mỹ Duyên",
+              "label_en": "Bùi Minh Thảo / Ngô Ngọc Mỹ Duyên"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Lê Thành Công / Trịnh Ngọc Dung",
+              "label_vi": "Lê Thành Công / Trịnh Ngọc Dung",
+              "label_en": "Lê Thành Công / Trịnh Ngọc Dung"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm",
+              "label_vi": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm",
+              "label_en": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Huỳnh Thu Hiền / Phạm Khắc Đạt",
+              "label_vi": "Huỳnh Thu Hiền / Phạm Khắc Đạt",
+              "label_en": "Huỳnh Thu Hiền / Phạm Khắc Đạt"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Hà Thị Thanh Hương / Trần Quốc Hòa",
+              "label_vi": "Hà Thị Thanh Hương / Trần Quốc Hòa",
+              "label_en": "Hà Thị Thanh Hương / Trần Quốc Hòa"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải",
+              "label_vi": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải",
+              "label_en": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc",
+              "label_vi": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc",
+              "label_en": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương",
+              "label_vi": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương",
+              "label_en": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Thị Tuyết / Nguyễn Trung Hiếu",
+              "label_vi": "Nguyễn Thị Tuyết / Nguyễn Trung Hiếu",
+              "label_en": "Nguyễn Thị Tuyết / Nguyễn Trung Hiếu"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng",
+              "label_vi": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng",
+              "label_en": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nam-tren-51",
+      "competition_mode": "round_robin",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 5,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 5"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nu-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 13,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 13"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-1",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-2",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "cau-long",
+      "tournament_slug": "doi-nu-duoi-30",
+      "competition_mode": "round_robin",
+      "source": {
+        "file": "CẦU LÔNG/CẦU LÔNG PN 2026.pdf",
+        "page_or_sheet": 11,
+        "warnings": [],
+        "supporting_file": "CẦU LÔNG/CẦU LÔNG PN 2026.xlsx",
+        "supporting_sheet": "Trang 11"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "co-tuong",
+      "tournament_slug": "nam-duoi-45",
+      "competition_mode": "swiss",
+      "source": {
+        "file": "CỜ TƯỚNG/cờ tướng bảng nam dưới 45t.pdf",
+        "page_or_sheet": 1,
+        "warnings": [],
+        "supporting_file": "CỜ TƯỚNG/CỜ TƯỚNG NAM TRÊN 45T.xlsx",
+        "supporting_sheet": "Trang 1"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "co-tuong",
+      "tournament_slug": "nam-tren-45",
+      "competition_mode": "swiss",
+      "source": {
+        "file": "CỜ TƯỚNG/cờ tướng bảng nam trên 45t.pdf",
+        "page_or_sheet": 1,
+        "warnings": [],
+        "supporting_file": "CỜ TƯỚNG/CỜ TƯỚNG NAM TRÊN 45T.xlsx",
+        "supporting_sheet": "Trang 1"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "co-vua",
+      "tournament_slug": "nam-duoi-45",
+      "competition_mode": "swiss",
+      "source": {
+        "file": "CỜ VUA/cờ vua bảng nam dưới 45t.pdf",
+        "page_or_sheet": 1,
+        "warnings": [],
+        "supporting_file": "CỜ VUA/CO_VUA_BANG_NU.xlsx",
+        "supporting_sheet": "Trang 1"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "co-vua",
+      "tournament_slug": "nam-tren-45",
+      "competition_mode": "swiss",
+      "source": {
+        "file": "CỜ VUA/cờ vua bảng nam trên 45t.pdf",
+        "page_or_sheet": 1,
+        "warnings": [],
+        "supporting_file": "CỜ VUA/CO_VUA_BANG_NU.xlsx",
+        "supporting_sheet": "Trang 1"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "co-vua",
+      "tournament_slug": "nu",
+      "competition_mode": "swiss",
+      "source": {
+        "file": "CỜ VUA/cờ vua bảng nữ.pdf",
+        "page_or_sheet": 1,
+        "warnings": [],
+        "supporting_file": "CỜ VUA/CO_VUA_BANG_NU.xlsx",
+        "supporting_sheet": "Trang 1"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "dien-kinh",
+      "tournament_slug": "3000m-nu",
+      "competition_mode": "race",
+      "source": {
+        "file": "ĐIỀN KINH/ĐKinh cap nhat 27.8 pvn 2026.pdf",
+        "page_or_sheet": 8,
+        "warnings": [],
+        "supporting_file": "ĐIỀN KINH/DIEN_KINH_CAP_NHAT_27_8_PVN_2026.xlsx",
+        "supporting_sheet": "Trang 8"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "dien-kinh",
+      "tournament_slug": "400m-nu",
+      "competition_mode": "race",
+      "source": {
+        "file": "ĐIỀN KINH/ĐKinh cap nhat 27.8 pvn 2026.pdf",
+        "page_or_sheet": 5,
+        "warnings": [
+          "Tiêu đề PDF ghi năm 2027; giữ nội dung theo bộ hồ sơ Hội thao 2026."
+        ],
+        "supporting_file": "ĐIỀN KINH/DIEN_KINH_CAP_NHAT_27_8_PVN_2026.xlsx",
+        "supporting_sheet": "Trang 5"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "dien-kinh",
+      "tournament_slug": "4x100m-nam",
+      "competition_mode": "race",
+      "source": {
+        "file": "ĐIỀN KINH/ĐKinh cap nhat 27.8 pvn 2026.pdf",
+        "page_or_sheet": 2,
+        "warnings": [],
+        "supporting_file": "ĐIỀN KINH/DIEN_KINH_CAP_NHAT_27_8_PVN_2026.xlsx",
+        "supporting_sheet": "Trang 2"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "dien-kinh",
+      "tournament_slug": "4x100m-nu",
+      "competition_mode": "race",
+      "source": {
+        "file": "ĐIỀN KINH/ĐKinh cap nhat 27.8 pvn 2026.pdf",
+        "page_or_sheet": 4,
+        "warnings": [],
+        "supporting_file": "ĐIỀN KINH/DIEN_KINH_CAP_NHAT_27_8_PVN_2026.xlsx",
+        "supporting_sheet": "Trang 4"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "dien-kinh",
+      "tournament_slug": "5000m-nam",
+      "competition_mode": "race",
+      "source": {
+        "file": "ĐIỀN KINH/ĐKinh cap nhat 27.8 pvn 2026.pdf",
+        "page_or_sheet": 10,
+        "warnings": [],
+        "supporting_file": "ĐIỀN KINH/DIEN_KINH_CAP_NHAT_27_8_PVN_2026.xlsx",
+        "supporting_sheet": "Trang 10"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "dien-kinh",
+      "tournament_slug": "800m-nam",
+      "competition_mode": "race",
+      "source": {
+        "file": "ĐIỀN KINH/ĐKinh cap nhat 27.8 pvn 2026.pdf",
+        "page_or_sheet": 6,
+        "warnings": [],
+        "supporting_file": "ĐIỀN KINH/DIEN_KINH_CAP_NHAT_27_8_PVN_2026.xlsx",
+        "supporting_sheet": "Trang 6"
+      },
+      "fixtures": []
+    },
+    {
+      "sport_slug": "keo-co",
+      "tournament_slug": "nam",
+      "competition_mode": "knockout",
+      "source": {
+        "file": "KÉO CO/ĐK KEO CO pvn 2026.pdf",
+        "page_or_sheet": 3,
+        "warnings": [],
+        "supporting_file": "KÉO CO/KEO CO PVN 2026.xlsx",
+        "supporting_sheet": "Trang 3"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PETROSETCO",
+              "label_vi": "PETROSETCO",
+              "label_en": "PETROSETCO"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PCTRANS",
+              "label_vi": "PCTRANS",
+              "label_en": "PCTRANS"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVFCCo",
+              "label_vi": "PVFCCo",
+              "label_en": "PVFCCo"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PTSC",
+              "label_vi": "PTSC",
+              "label_en": "PTSC"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVGAS",
+              "label_vi": "PVGAS",
+              "label_en": "PVGAS"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVOIL",
+              "label_vi": "PVOIL",
+              "label_en": "PVOIL"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVPMB",
+              "label_vi": "PVPMB",
+              "label_en": "PVPMB"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVMR",
+              "label_vi": "PVMR",
+              "label_en": "PVMR"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVCHEM",
+              "label_vi": "PVCHEM",
+              "label_en": "PVCHEM"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVI",
+              "label_vi": "PVI",
+              "label_en": "PVI"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVD",
+              "label_vi": "PVD",
+              "label_en": "PVD"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "SWPOC",
+              "label_vi": "SWPOC",
+              "label_en": "SWPOC"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "NCKH",
+              "label_vi": "NCKH",
+              "label_en": "NCKH"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVCOMBANK",
+              "label_vi": "PVCOMBANK",
+              "label_en": "PVCOMBANK"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PQPOC",
+              "label_vi": "PQPOC",
+              "label_en": "PQPOC"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "BỘ MÁY QL&ĐH PETROVN",
+              "label_vi": "BỘ MÁY QL&ĐH PETROVN",
+              "label_en": "BỘ MÁY QL&ĐH PETROVN"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "VSP",
+              "label_vi": "VSP",
+              "label_en": "VSP"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 3,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 3,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 4,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            }
+          ]
+        },
+        {
+          "key": "match-16",
+          "round_order": 5,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-15",
+              "label_vi": "Thắng 15",
+              "label_en": "Winner 15"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "keo-co",
+      "tournament_slug": "nu",
+      "competition_mode": "knockout",
+      "source": {
+        "file": "KÉO CO/ĐK KEO CO pvn 2026.pdf",
+        "page_or_sheet": 2,
+        "warnings": [],
+        "supporting_file": "KÉO CO/KEO CO PVN 2026.xlsx",
+        "supporting_sheet": "Trang 2"
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "VSP",
+              "label_vi": "VSP",
+              "label_en": "VSP"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVI",
+              "label_vi": "PVI",
+              "label_en": "PVI"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVOIL",
+              "label_vi": "PVOIL",
+              "label_en": "PVOIL"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVMR",
+              "label_vi": "PVMR",
+              "label_en": "PVMR"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PTSC",
+              "label_vi": "PTSC",
+              "label_en": "PTSC"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVCOMBANK",
+              "label_vi": "PVCOMBANK",
+              "label_en": "PVCOMBANK"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVPMB",
+              "label_vi": "PVPMB",
+              "label_en": "PVPMB"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PETROSETCO",
+              "label_vi": "PETROSETCO",
+              "label_en": "PETROSETCO"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVCHEM",
+              "label_vi": "PVCHEM",
+              "label_en": "PVCHEM"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "NCKH",
+              "label_vi": "NCKH",
+              "label_en": "NCKH"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVTRANS",
+              "label_vi": "PVTRANS",
+              "label_en": "PVTRANS"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PETROCONs",
+              "label_vi": "PETROCONs",
+              "label_en": "PETROCONs"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM 31-40T 37 (1).pdf",
+        "page_or_sheet": 7,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng L",
+              "rank": 2,
+              "label_vi": "2L",
+              "label_en": "2L"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng K",
+              "rank": 2,
+              "label_vi": "2K",
+              "label_en": "2K"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 2,
+              "label_vi": "2J",
+              "label_en": "2J"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 2,
+              "label_vi": "2I",
+              "label_en": "2I"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 1,
+              "label_vi": "1I",
+              "label_en": "1I"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 1,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng K",
+              "rank": 1,
+              "label_vi": "1K",
+              "label_en": "1K"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 1,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng L",
+              "rank": 1,
+              "label_vi": "1L",
+              "label_en": "1L"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 2,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 2,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 2,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 1,
+              "label_vi": "1J",
+              "label_en": "1J"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            }
+          ]
+        },
+        {
+          "key": "match-16",
+          "round_order": 2,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-17",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-18",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-19",
+          "round_order": 3,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        },
+        {
+          "key": "match-20",
+          "round_order": 3,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-15",
+              "label_vi": "Thắng 15",
+              "label_en": "Winner 15"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-16",
+              "label_vi": "Thắng 16",
+              "label_en": "Winner 16"
+            }
+          ]
+        },
+        {
+          "key": "match-21",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-17",
+              "label_vi": "Thắng 17",
+              "label_en": "Winner 17"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-18",
+              "label_vi": "Thắng 18",
+              "label_en": "Winner 18"
+            }
+          ]
+        },
+        {
+          "key": "match-22",
+          "round_order": 4,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-19",
+              "label_vi": "Thắng 19",
+              "label_en": "Winner 19"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-20",
+              "label_vi": "Thắng 20",
+              "label_en": "Winner 20"
+            }
+          ]
+        },
+        {
+          "key": "match-23",
+          "round_order": 5,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-21",
+              "label_vi": "Thắng 21",
+              "label_en": "Winner 21"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-22",
+              "label_vi": "Thắng 22",
+              "label_en": "Winner 22"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-41-50",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM 41-50T-40.pdf",
+        "page_or_sheet": 12,
+        "warnings": [
+          "PDF in nhãn 1J hai lần; giữ nguyên PDF để admin đối soát."
+        ]
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 1,
+              "label_vi": "1J",
+              "label_en": "1J"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 1,
+              "label_vi": "1J",
+              "label_en": "1J"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 2,
+              "label_vi": "2I",
+              "label_en": "2I"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 1,
+              "label_vi": "1I",
+              "label_en": "1I"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 3,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-16",
+          "round_order": 3,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-17",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        },
+        {
+          "key": "match-18",
+          "round_order": 4,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-15",
+              "label_vi": "Thắng 15",
+              "label_en": "Winner 15"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-16",
+              "label_vi": "Thắng 16",
+              "label_en": "Winner 16"
+            }
+          ]
+        },
+        {
+          "key": "match-19",
+          "round_order": 5,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-17",
+              "label_vi": "Thắng 17",
+              "label_en": "Winner 17"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-18",
+              "label_vi": "Thắng 18",
+              "label_en": "Winner 18"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-duoi-30",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM d30t-32.pdf",
+        "page_or_sheet": 7,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng K",
+              "rank": 2,
+              "label_vi": "2K",
+              "label_en": "2K"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 2,
+              "label_vi": "2J",
+              "label_en": "2J"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 1,
+              "label_vi": "1I",
+              "label_en": "1I"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng K",
+              "rank": 1,
+              "label_vi": "1K",
+              "label_en": "1K"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 2,
+              "label_vi": "2I",
+              "label_en": "2I"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 2,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 2,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 1,
+              "label_vi": "1J",
+              "label_en": "1J"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-16",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-17",
+          "round_order": 3,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-18",
+          "round_order": 3,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        },
+        {
+          "key": "match-19",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-15",
+              "label_vi": "Thắng 15",
+              "label_en": "Winner 15"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-16",
+              "label_vi": "Thắng 16",
+              "label_en": "Winner 16"
+            }
+          ]
+        },
+        {
+          "key": "match-20",
+          "round_order": 4,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-17",
+              "label_vi": "Thắng 17",
+              "label_en": "Winner 17"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-18",
+              "label_vi": "Thắng 18",
+              "label_en": "Winner 18"
+            }
+          ]
+        },
+        {
+          "key": "match-21",
+          "round_order": 5,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-19",
+              "label_vi": "Thắng 19",
+              "label_en": "Winner 19"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-20",
+              "label_vi": "Thắng 20",
+              "label_en": "Winner 20"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-nu-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM NỮ 31-40T-31.pdf",
+        "page_or_sheet": 5,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 1,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 1,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-nu-41-50",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM NỮ 41-50T-21.pdf",
+        "page_or_sheet": 5,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-nu-duoi-30",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM NƯ D30T-22.pdf",
+        "page_or_sheet": 6,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-nu-tren-51",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/ĐÔI NAM NỮ 51-10.pdf",
+        "page_or_sheet": 3,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Tranh hạng ba",
+          "round_en": "Bronze medal match",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_loser",
+              "fixture": "match-3",
+              "label_vi": "Thua bán kết 1",
+              "label_en": "Loser semifinal 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_loser",
+              "fixture": "match-4",
+              "label_vi": "Thua bán kết 2",
+              "label_en": "Loser semifinal 2"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nam-tren-51",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NAM 51T-26.pdf",
+        "page_or_sheet": 6,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 1,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 1,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nu-31-40",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NỮ 31-40T-18.pdf",
+        "page_or_sheet": 4,
+        "warnings": []
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nu-41-50",
+      "competition_mode": "group_knockout",
+      "source": {
+        "file": "PICKLEBALL/PDF/DÔI NỮ 41-50.pdf",
+        "page_or_sheet": 4,
+        "warnings": [
+          "Tiêu đề trang bracket ghi nhầm Đôi nam dưới 30T; hạng mục theo tên file và các trang trước."
+        ]
+      },
+      "fixtures": [
+        {
+          "key": "match-1",
+          "round_order": 1,
+          "bracket_position": 1,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
+            }
+          ]
+        },
+        {
+          "key": "match-2",
+          "round_order": 1,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "round_order": 1,
+          "bracket_position": 5,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "round_order": 1,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "round_order": 1,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "round_order": 1,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "round_order": 2,
+          "bracket_position": 1,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-1",
+              "label_vi": "Thắng 1",
+              "label_en": "Winner 1"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-2",
+              "label_vi": "Thắng 2",
+              "label_en": "Winner 2"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-3",
+              "label_vi": "Thắng 3",
+              "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-4",
+              "label_vi": "Thắng 4",
+              "label_en": "Winner 4"
+            }
+          ]
+        },
+        {
+          "key": "match-11",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-6",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
+            }
+          ]
+        },
+        {
+          "key": "match-12",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-7",
+              "label_vi": "Thắng 7",
+              "label_en": "Winner 7"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-8",
+              "label_vi": "Thắng 8",
+              "label_en": "Winner 8"
+            }
+          ]
+        },
+        {
+          "key": "match-13",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-9",
+              "label_vi": "Thắng 9",
+              "label_en": "Winner 9"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-10",
+              "label_vi": "Thắng 10",
+              "label_en": "Winner 10"
+            }
+          ]
+        },
+        {
+          "key": "match-14",
+          "round_order": 3,
+          "bracket_position": 2,
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-11",
+              "label_vi": "Thắng 11",
+              "label_en": "Winner 11"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-12",
+              "label_vi": "Thắng 12",
+              "label_en": "Winner 12"
+            }
+          ]
+        },
+        {
+          "key": "match-15",
+          "round_order": 4,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "fixture_winner",
+              "fixture": "match-13",
+              "label_vi": "Thắng 13",
+              "label_en": "Winner 13"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sport_slug": "pickleball",
+      "tournament_slug": "doi-nu-tren-50",
+      "competition_mode": "round_robin",
+      "source": {
+        "file": "PICKLEBALL/PDF/ĐÔI NỮ 50T.pdf",
+        "page_or_sheet": 1,
+        "warnings": []
+      },
+      "fixtures": []
+    }
+  ]
+}

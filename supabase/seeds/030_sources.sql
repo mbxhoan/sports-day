@@ -1,5 +1,7 @@
 set app.tenant_slug = 'petrovietnam2026';
 
+-- Bracket topology uses the PDF page as authority; paired workbooks only supplement unreadable cells.
+
 insert into public.source_documents (raw_filename, sha256, page_count, sport_slug, imported, notes, reviewed_at) values
   ('B Bàn pn 26 (1).pdf','702bdc80e411a14b4ce7ded0f7103905b90409528b3adcc06cb1a9257cc70081',20,'bong-ban',true,'Nguồn PDF đã rà soát; chỉ seed dữ liệu thể hiện rõ trong tài liệu.',now()),
   ('Boi pn 2026.pdf','c8bfddec94a95c677bac105f5907ccfcd1615e4e2bddf33d557c44a14a323d98',8,'boi-loi',true,'Nguồn PDF đã rà soát; chỉ seed dữ liệu thể hiện rõ trong tài liệu.',now()),

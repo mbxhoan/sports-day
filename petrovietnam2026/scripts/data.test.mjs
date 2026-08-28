@@ -57,6 +57,13 @@ test("result RPC propagates and previews dependent reset", () => {
   assert.match(bracketMigration, /Trận phụ thuộc đã có kết quả/);
 });
 
+test("source topology covers every supplied category", () => {
+  const manifest = JSON.parse(readFileSync(new URL("../data/source-brackets.json", import.meta.url), "utf8"));
+  assert.deepEqual(new Set(manifest.tournaments.map((row) => row.competition_mode)), new Set(["knockout", "group_knockout", "round_robin", "swiss", "race"]));
+  assert.equal(manifest.tournaments.every((row) => row.source.file && Number.isInteger(row.source.page_or_sheet)), true);
+  assert.equal(manifest.tournaments.flatMap((row) => row.fixtures ?? []).every((fixture) => fixture.slots?.length === 2), true);
+});
+
 test("seed keeps the approved eight sports", () => {
   for (const slug of ["pickleball","bong-ban","cau-long","boi-loi","keo-co","dien-kinh","co-vua","co-tuong"]) assert.match(competition, new RegExp(`'${slug}'`));
   assert.equal((competition.match(/'10000000-0000-0000-0000-00000000000[1-8]'/g) ?? []).length, 8);
