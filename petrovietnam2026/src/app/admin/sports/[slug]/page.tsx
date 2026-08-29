@@ -85,6 +85,10 @@ export default async function SportAdminPage({ params, searchParams }: { params:
   const tournamentIds = tournamentRows.map((item) => item.id);
   const tournamentIdSet = new Set(tournamentIds);
   const all = (entity: AdminEntity) => supabase.from(entity).select(selectColumns(entity)).eq("tenant_id", tenantId).order("archived_at", { ascending: true, nullsFirst: true }).limit(2000);
+  const scoped = (entity: AdminEntity, column: string, ids: string[]) => {
+    const query = all(entity);
+    return ids.length ? query.in(column, ids) : query.limit(0);
+  };
   const entityNames = Object.keys(adminEntities) as AdminEntity[];
   const rows = Object.fromEntries(entityNames.map((entity) => [entity, [] as Row[]])) as Record<AdminEntity, Row[]>;
   let resultsLoadError = false;
@@ -123,26 +127,30 @@ export default async function SportAdminPage({ params, searchParams }: { params:
     rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIds.has(String(item.fixture_id)));
   } else if (section === "results") {
     try {
-      const [entriesResult, fixturesResult, fixtureEntriesResult, standingsResult, awardsResult, groupsResult, groupEntriesResult, fixtureSlotsResult] = await withTimeout(() => Promise.all([
-        all("entries"),
-        all("fixtures"),
-        all("fixture_entries"),
-        all("standings"),
-        all("awards"),
-        all("groups"),
-        all("group_entries"),
-        supabase.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en,archived_at").eq("tenant_id", tenantId).is("archived_at", null),
+      const [entriesResult, fixturesResult, standingsResult, awardsResult, groupsResult] = await withTimeout(() => Promise.all([
+        scoped("entries", "tournament_id", tournamentIds),
+        scoped("fixtures", "tournament_id", tournamentIds),
+        scoped("standings", "tournament_id", tournamentIds),
+        scoped("awards", "tournament_id", tournamentIds),
+        scoped("groups", "tournament_id", tournamentIds),
       ]), 10_000);
-      if ([entriesResult, fixturesResult, fixtureEntriesResult, standingsResult, awardsResult, groupsResult, groupEntriesResult, fixtureSlotsResult].some((result) => result.error)) throw new Error("Results query failed");
+      if ([entriesResult, fixturesResult, standingsResult, awardsResult, groupsResult].some((result) => result.error)) throw new Error("Results query failed");
       rows.entries = asRows(entriesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
       rows.fixtures = asRows(fixturesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
-      const fixtureIds = new Set(rows.fixtures.map((item) => item.id));
-      rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIds.has(String(item.fixture_id)));
       rows.standings = asRows(standingsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
       rows.awards = asRows(awardsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
       rows.groups = asRows(groupsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
-      const resultGroupIds = new Set(rows.groups.map((item) => item.id));
-      rows.group_entries = asRows(groupEntriesResult.data).filter((item) => resultGroupIds.has(String(item.group_id)));
+      const fixtureIds = rows.fixtures.map((item) => item.id);
+      const groupIds = rows.groups.map((item) => item.id);
+      const fixtureSlotsQuery = supabase.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en,archived_at").eq("tenant_id", tenantId).is("archived_at", null);
+      const [fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult] = await withTimeout(() => Promise.all([
+        scoped("fixture_entries", "fixture_id", fixtureIds),
+        scoped("group_entries", "group_id", groupIds),
+        (fixtureIds.length ? fixtureSlotsQuery.in("fixture_id", fixtureIds) : fixtureSlotsQuery.limit(0)),
+      ]), 10_000);
+      if ([fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult].some((result) => result.error)) throw new Error("Results query failed");
+      rows.fixture_entries = asRows(fixtureEntriesResult.data);
+      rows.group_entries = asRows(groupEntriesResult.data);
       fixtureSlots = asRows(fixtureSlotsResult.data);
     } catch {
       resultsLoadError = true;

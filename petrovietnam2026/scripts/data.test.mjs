@@ -244,6 +244,14 @@ test("admin auth has a bounded wait instead of an infinite loading shell", async
   await assert.rejects(() => import("../src/lib/auth-timeout.ts").then(({ withTimeout }) => withTimeout(() => new Promise(() => {}), 5)), /timeout/);
 });
 
+test("admin results scope database reads before loading competition data", () => {
+  assert.match(adminSportPage, /scoped\("entries", "tournament_id", tournamentIds\)/);
+  assert.match(adminSportPage, /scoped\("fixtures", "tournament_id", tournamentIds\)/);
+  assert.match(adminSportPage, /scoped\("fixture_entries", "fixture_id", fixtureIds\)/);
+  assert.match(adminSportPage, /scoped\("group_entries", "group_id", groupIds\)/);
+  assert.match(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
+});
+
 test("schedule uses grouped match rows for the global page and each sport", () => {
   assert.match(scheduleView, /schedule-day/);
   assert.match(scheduleView, /venue_id/);
