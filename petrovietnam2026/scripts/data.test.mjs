@@ -65,6 +65,9 @@ test("started brackets lock structure and admin board uses source slots", () => 
   assert.match(bracketControlsMigration, /source_metadata jsonb/);
   assert.match(competitionBoard, /layoutBracket/);
   assert.match(competitionBoard, /slotLabel/);
+  assert.match(competitionBoard, /ZoomableBracket/);
+  assert.match(competitionBoard, /setZoom/);
+  assert.ok(competitionBoard.indexOf("{isBracket &&") < competitionBoard.indexOf("{tournament.competition_mode === \"group_knockout\" && table"));
   assert.match(adminActions, /saveFixtureSlot/);
   assert.match(adminActions, /previewFixtureReset/);
 });
@@ -262,8 +265,9 @@ test("schedule labels unassigned teams and renders source-driven boards", () => 
   assert.match(adminCss, /\.schedule-page/);
   assert.match(competitionBoard, /board-selector/);
   assert.match(competitionBoard, /\[selectedTournament\]/);
+  assert.match(competitionBoard, /matchLabel/);
   assert.match(adminCss, /@media \(max-width: 600px\)/);
-  assert.match(adminCss, /\.bracket-scroll \{[^}]*overflow-x: hidden/s);
+  assert.match(adminCss, /\.bracket-canvas-viewport \{/);
   assert.match(adminCss, /\.schedule-day td:nth-child\(1\)::before/);
   assert.match(publicPages, /leaderboard-table/);
 });

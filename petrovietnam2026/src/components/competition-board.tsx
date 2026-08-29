@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { layoutBracket, slotLabel } from "@/lib/brackets";
 import { copy, localized, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Standing, type Tournament } from "@/lib/site";
 
@@ -17,6 +17,27 @@ type Props = {
   standings: Standing[];
   adminHref?: string;
 };
+
+type BracketLayout = ReturnType<typeof layoutBracket>;
+
+function ZoomableBracket({ layout, children, locale }: { layout: BracketLayout; children: React.ReactNode; locale: Locale }) {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  const fit = () => setZoom(Math.min(1, Math.max(0.25, ((viewportRef.current?.clientWidth ?? window.innerWidth) - 16) / layout.width)));
+  useEffect(() => {
+    const update = () => {
+      const width = viewportRef.current?.clientWidth ?? window.innerWidth;
+      setZoom(Math.min(1, Math.max(0.25, (width - 16) / layout.width)));
+    };
+    const frame = window.requestAnimationFrame(update);
+    window.addEventListener("resize", update);
+    return () => { window.cancelAnimationFrame(frame); window.removeEventListener("resize", update); };
+  }, [layout.width]);
+  return <section className="bracket-canvas" aria-label={locale === "vi" ? "Nhánh đấu có thể phóng to" : "Zoomable bracket canvas"}>
+    <div className="bracket-canvas-toolbar"><span>{locale === "vi" ? "Nhánh đấu" : "Bracket"}</span><div><button type="button" onClick={() => setZoom((value) => Math.max(0.25, Number((value - 0.1).toFixed(2))))} aria-label={locale === "vi" ? "Thu nhỏ" : "Zoom out"}>−</button><button type="button" onClick={fit} aria-label={locale === "vi" ? "Vừa khung" : "Fit to view"}>{Math.round(zoom * 100)}%</button><button type="button" onClick={() => setZoom((value) => Math.min(1.5, Number((value + 0.1).toFixed(2))))} aria-label={locale === "vi" ? "Phóng to" : "Zoom in"}>＋</button></div></div>
+    <div className="bracket-canvas-viewport" ref={viewportRef}><div className="bracket-canvas-stage" style={{ width: layout.width * zoom, height: layout.height * zoom }}><div className="source-bracket" style={{ width: layout.width, height: layout.height, transform: `scale(${zoom})` }}>{children}</div></div></div>
+  </section>;
+}
 
 function sourceNote(tournament: Tournament, locale: Locale) {
   const source = tournament.source_metadata ?? {};
@@ -35,6 +56,13 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const fixtureRows = Map.groupBy(fixtureEntries, (row) => row.fixture_id);
   const fixtureSlotsById = Map.groupBy(fixtureSlots, (slot) => slot.fixture_id);
   const groupsByTournament = Map.groupBy(groups, (group) => group.tournament_id);
+
+  const matchLabel = (fixture: Fixture) => {
+    if (!fixture.source_code) return localized(fixture, "round", locale) || t.updating;
+    const sameCode = fixtures.filter((item) => item.tournament_id === fixture.tournament_id && item.source_code === fixture.source_code);
+    const occurrence = sameCode.findIndex((item) => item.id === fixture.id) + 1;
+    return `${locale === "vi" ? "Trận" : "Match"} ${fixture.source_code}${sameCode.length > 1 ? ` (${occurrence})` : ""}`;
+  };
 
   const entryName = (id: string | null | undefined) => id ? localized(entriesById.get(id) ?? {}, "name", locale) : "";
   const matchRows = (fixture: Fixture) => {
@@ -59,7 +87,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     })}</div>;
   };
 
-  const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); return <tr key={fixture.id}><td>{fixture.source_code || "—"}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td>{rows.map((row) => row.label).join(" — ")}</td><td>{rows.map((row) => row.row?.score ?? "—").join(" : ")}</td></tr>; })}</tbody></table></div>;
+  const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); return <tr key={fixture.id}><td>{matchLabel(fixture)}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td>{rows.map((row) => row.label).join(" — ")}</td><td>{rows.map((row) => row.row?.score ?? "—").join(" : ")}</td></tr>; })}</tbody></table></div>;
 
   if (!available.length) return <section className="panel empty-state"><h2>{t.empty}</h2></section>;
   const selectedTournament = available.find((tournament) => tournament.id === selectedId) ?? available[0];
@@ -72,17 +100,14 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id}>
       <header className="board-heading"><div><h2>{localized(tournament, "name", locale)}</h2>{sourceNote(tournament, locale)}</div><span>{localized(tournament, "format", locale)}</span></header>
       {warnings.map((warning) => <p className="board-warning" key={warning}>⚠ {warning}</p>)}
-      {tournament.competition_mode === "group_knockout" && table(tournament, tournamentGroups)}
       {isBracket && knockout.length > 0 && (() => {
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
         const layout = layoutBracket(knockout, slots);
-        return <div className="bracket-scroll"><div className="source-bracket" style={{ width: layout.width, height: layout.height }}>
-          <svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>
-          {layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className="bracket-match source-bracket-match"><small>{[fixture.source_code ? `${locale === "vi" ? "Trận" : "Match"} ${fixture.source_code}` : "", localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small><div className="bracket-teams">{rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{row?.score ?? "—"}</b></div>)}</div></article>;
-            return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
-          })}
-        </div></div>;
+        return <ZoomableBracket key={`${tournament.id}-${layout.width}`} locale={locale} layout={layout}><svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>{layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className="bracket-match source-bracket-match"><small>{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small><div className="bracket-teams">{rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{row?.score ?? "—"}</b></div>)}</div></article>;
+          return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
+        })}</ZoomableBracket>;
       })()}
+      {tournament.competition_mode === "group_knockout" && table(tournament, tournamentGroups)}
       {(tournament.competition_mode === "round_robin" || tournament.competition_mode === "swiss") && <>{table(tournament, tournamentGroups)}{matchesTable(tournamentFixtures)}</>}
       {tournament.competition_mode === "race" && <div className="panel table-scroll board-race"><table><thead><tr><th>{t.rank}</th><th>{t.court}</th><th>{t.teams}</th><th>{locale === "vi" ? "Thành tích" : "Performance"}</th><th>{locale === "vi" ? "Trạng thái" : "Status"}</th></tr></thead><tbody>{tournamentFixtures.flatMap((fixture) => (fixtureRows.get(fixture.id) ?? []).sort((a, b) => (a.lane ?? a.seed_order ?? 999) - (b.lane ?? b.seed_order ?? 999))).map((row) => <tr key={row.id}><td>{row.rank ?? "—"}</td><td>{row.lane ?? "—"}</td><td>{entryName(row.entry_id)}</td><td>{row.score ?? row.score_numeric ?? "—"}</td><td>{row.result_status?.toUpperCase() ?? t.updating}</td></tr>)}</tbody></table></div>}
       {!tournamentFixtures.length && !tournamentGroups.length && <div className="panel board-empty">{t.empty}</div>}
