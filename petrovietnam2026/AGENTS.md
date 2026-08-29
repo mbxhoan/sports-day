@@ -38,6 +38,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Use `next/image` for images; update `next.config.ts` remote patterns when adding a new image host.
 - Keep public pages localized in both `vi` and `en`; use `localized()` and `copy` from `src/lib/site.ts`.
 
+## Responsive and usability rules
+
+- Design mobile-first. Assume most visitors use a phone like the supplied reference screenshot; validate narrow viewports before desktop polish.
+- Never allow page-level horizontal scrolling. Use `min-width: 0`, flexible grid/flex tracks, wrapping, truncation, and responsive stacking instead of fixed-width overflow. Tables, brackets, and other dense data must have a deliberate mobile presentation (stacked rows, compact columns, or a clearly bounded scroll region only when the data cannot be reflowed).
+- Keep the interface minimal and approachable for non-technical users. Prefer plain Vietnamese labels, familiar icons with accessible names, visible primary actions, sensible defaults, and short step-by-step flows. Do not expose implementation terms or technical jargon in user-facing UI.
+- Do not build all-in-one pages. A page must have one clear primary task. Split unrelated information, filters, forms, dashboards, schedules, standings, and detail content into routes, tabs, steps, or progressive disclosure. Keep only the information needed for the current decision in the first viewport.
+- Preserve business logic and data meaning while changing presentation. Do not remove fields, alter ordering/rules, change permissions, or hide required actions just to fit mobile; adapt the layout and provide an obvious path to the full detail.
+- Maintain visual balance at every breakpoint. Avoid oversized headers, dense card stacks, tiny unreadable text, clipped controls, overlapping content, unstable layout shifts, and controls that depend on hover. Use stable dimensions for icons, buttons, tabs, tables, and bracket nodes.
+- Make touch interactions comfortable: controls should be easy to tap, have visible focus states, and remain usable with keyboard and screen readers. Do not use icon-only controls without an accessible label or tooltip.
+- Before finishing a UI change, check at least phone portrait, phone landscape, tablet, and desktop widths. Verify no clipped text or controls, no accidental horizontal scroll, no overlap, and that the primary action remains obvious. Run the narrowest relevant lint/typecheck/test command after the change.
+
 ## Commands
 
 ```bash

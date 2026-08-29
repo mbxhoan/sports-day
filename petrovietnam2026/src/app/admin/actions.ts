@@ -9,6 +9,7 @@ import { eventFieldNames } from "@/lib/admin-event";
 import { assertImageFile, heroStoragePath, mediaDeletionIds } from "@/lib/admin-media";
 import { relationEntity } from "@/lib/admin-relations";
 import { deriveStandings, headToHeadRule } from "@/lib/standings";
+import { deriveRaceRanks } from "@/lib/brackets";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
@@ -54,6 +55,10 @@ export async function saveRecord(formData: FormData) {
   const query = id ? supabase.from(entity).update(payload).eq("tenant_id", tenantId).eq("id", id) : supabase.from(entity).insert({ ...payload, tenant_id: tenantId });
   const { error } = await query;
   if (error) throw new Error(error.message);
+  if (entity === "standings" && payload.tournament_id) {
+    const { error: syncError } = await supabase.rpc("sync_tournament_slots", { p_tournament_id: payload.tournament_id });
+    if (syncError) throw new Error(syncError.message);
+  }
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -144,10 +149,11 @@ export async function saveFixtureResult(formData: FormData) {
   const status = String(formData.get("status") ?? "completed");
   const selected = [1, 2].map((index) => ({ entry_id: String(formData.get(`entry_${index}`) ?? ""), score: String(formData.get(`score_${index}`) ?? "").trim() }));
   if (!fixtureId || selected.some((item) => !item.entry_id) || selected[0].entry_id === selected[1].entry_id) throw new Error("Chọn hai đội khác nhau");
+  const note = String(formData.get("note") ?? "").trim();
   const entries = selected.map((item, index) => {
     const scoreNumeric = item.score === "" ? null : Number(item.score);
     if (scoreNumeric !== null && (!Number.isFinite(scoreNumeric) || scoreNumeric < 0)) throw new Error("Tỷ số không hợp lệ");
-    return { entry_id: item.entry_id, side: index === 0 ? "home" : "away", score: item.score || null, score_numeric: scoreNumeric, rank: null, result_detail: {} };
+    return { entry_id: item.entry_id, side: index === 0 ? "home" : "away", score: item.score || null, score_numeric: scoreNumeric, rank: null, result_detail: note ? { note } : {} };
   });
   const { supabase, tenantId } = await adminClient();
   const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
@@ -167,6 +173,77 @@ export async function saveFixtureResult(formData: FormData) {
   const labelsById = new Map((labels ?? []).map((item) => [item.id, item]));
   const summary = (field: "name_vi" | "name_en") => entries.map((item) => `${labelsById.get(item.entry_id)?.[field] ?? ""} ${item.score ?? ""}`.trim()).join(" - ");
   const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: winnerEntryId || null, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: standings.length ? standings : null });
+  if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
+  revalidatePath("/admin");
+}
+
+export async function saveRaceResult(formData: FormData) {
+  const fixtureId = String(formData.get("fixture_id") ?? "");
+  const entryIds = formData.getAll("entry_id").map(String);
+  const lanes = formData.getAll("lane").map(String);
+  const scores = formData.getAll("score").map(String);
+  const statuses = formData.getAll("result_status").map(String);
+  if (!fixtureId || !entryIds.length || new Set(entryIds).size !== entryIds.length) throw new Error("Danh sách thi đấu không hợp lệ");
+  const raw = entryIds.map((entryId, index) => {
+    const score = scores[index]?.trim() ?? "";
+    const scoreNumeric = score ? Number(score) : null;
+    if (scoreNumeric !== null && (!Number.isFinite(scoreNumeric) || scoreNumeric < 0)) throw new Error("Thành tích không hợp lệ");
+    return { entry_id: entryId, side: null, lane: lanes[index] ? Number(lanes[index]) : null, score: score || null, score_numeric: scoreNumeric, result_status: statuses[index] || null };
+  });
+  const ranks = new Map(deriveRaceRanks(raw).map((row) => [row.entry_id, row.rank]));
+  const entries = raw.map((row) => ({ ...row, rank: ranks.get(row.entry_id) ?? null, result_detail: {} }));
+  const { supabase, tenantId } = await adminClient();
+  const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
+  if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
+  const status = entries.every((row) => row.result_status) ? "completed" : "scheduled";
+  const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
+  if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
+  revalidatePath("/admin");
+}
+
+export async function saveFixtureSlot(formData: FormData) {
+  const slotId = String(formData.get("slot_id") ?? "");
+  const sourceKind = String(formData.get("source_kind") ?? "");
+  if (!slotId || !["entry", "group_rank", "fixture_winner", "fixture_loser", "bye"].includes(sourceKind)) throw new Error("Nguồn nhánh không hợp lệ");
+  const payload = {
+    source_kind: sourceKind,
+    source_entry_id: sourceKind === "entry" ? String(formData.get("source_entry_id") ?? "") || null : null,
+    source_group_id: sourceKind === "group_rank" ? String(formData.get("source_group_id") ?? "") || null : null,
+    source_fixture_id: ["fixture_winner", "fixture_loser"].includes(sourceKind) ? String(formData.get("source_fixture_id") ?? "") || null : null,
+    source_rank: sourceKind === "group_rank" ? Number(formData.get("source_rank") ?? 0) || null : null,
+    label_vi: String(formData.get("label_vi") ?? "").trim(),
+    label_en: String(formData.get("label_en") ?? "").trim(),
+  };
+  if ((sourceKind === "entry" && !payload.source_entry_id) || (sourceKind === "group_rank" && (!payload.source_group_id || !payload.source_rank)) || (["fixture_winner", "fixture_loser"].includes(sourceKind) && !payload.source_fixture_id)) throw new Error("Chưa chọn nguồn nhánh");
+  const { supabase, tenantId } = await adminClient();
+  const { data: slot, error: slotError } = await supabase.from("fixture_slots").select("id,fixture_id,fixtures!inner(tournament_id,tenant_id)").eq("id", slotId).eq("fixtures.tenant_id", tenantId).single();
+  if (slotError || !slot) throw new Error("Không tìm thấy ô nhánh");
+  const { error } = await supabase.from("fixture_slots").update(payload).eq("id", slotId);
+  if (error) throw new Error(error.message);
+  const tournamentId = (slot.fixtures as unknown as { tournament_id: string }).tournament_id;
+  const { error: syncError } = await supabase.rpc("sync_tournament_slots", { p_tournament_id: tournamentId });
+  if (syncError) throw new Error(syncError.message);
+  revalidatePath("/", "layout");
+  revalidatePath("/admin");
+}
+
+export async function previewFixtureReset(formData: FormData) {
+  const fixtureId = String(formData.get("fixture_id") ?? "");
+  const slug = String(formData.get("sport_slug") ?? "");
+  const { supabase } = await adminClient();
+  const { data, error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: false });
+  if (error) throw new Error(error.message);
+  const count = Array.isArray(data?.fixtures) ? data.fixtures.length : 0;
+  redirect(`/admin/sports/${encodeURIComponent(slug)}?section=results&reset=${encodeURIComponent(fixtureId)}&affected=${count}#results`);
+}
+
+export async function confirmFixtureReset(formData: FormData) {
+  const fixtureId = String(formData.get("fixture_id") ?? "");
+  if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận đặt lại vòng sau");
+  const { supabase } = await adminClient();
+  const { error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: true });
   if (error) throw new Error(error.message);
   revalidatePath("/", "layout");
   revalidatePath("/admin");

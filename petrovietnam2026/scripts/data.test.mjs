@@ -40,6 +40,8 @@ const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
   .join("\n");
 const bracketMigration = readFileSync(new URL("migrations/20260828170000_source_driven_brackets.sql", supabaseRoot), "utf8");
+const bracketControlsMigration = readFileSync(new URL("migrations/20260828173024_source_bracket_admin_controls.sql", supabaseRoot), "utf8");
+const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 
 test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
@@ -55,6 +57,16 @@ test("result RPC propagates and previews dependent reset", () => {
   assert.match(bracketMigration, /create or replace function public\.reset_fixture_dependents/);
   assert.match(bracketMigration, /for update/);
   assert.match(bracketMigration, /Trận phụ thuộc đã có kết quả/);
+});
+
+test("started brackets lock structure and admin board uses source slots", () => {
+  assert.match(bracketControlsMigration, /fixture_slots_lock_started/);
+  assert.match(bracketControlsMigration, /sync_tournament_slots/);
+  assert.match(bracketControlsMigration, /source_metadata jsonb/);
+  assert.match(competitionBoard, /layoutBracket/);
+  assert.match(competitionBoard, /slotLabel/);
+  assert.match(adminActions, /saveFixtureSlot/);
+  assert.match(adminActions, /previewFixtureReset/);
 });
 
 test("source topology covers every supplied category", () => {
@@ -239,16 +251,21 @@ test("schedule uses grouped match rows for the global page and each sport", () =
   assert.match(siteLib, /courts: Court\[\]/);
 });
 
-test("schedule labels unassigned teams clearly and renders inferred knockout rounds", () => {
+test("schedule labels unassigned teams and renders source-driven boards", () => {
   assert.match(scheduleView, /teamsNotAssigned/);
   assert.match(siteLib, /teamsNotAssigned: "Chưa xếp đội"/);
-  assert.match(siteLib, /isKnockoutFixture/);
-  assert.match(scheduleView, /schedule-brackets/);
-  assert.match(sportTabs, /bracket-team/);
+  assert.match(scheduleView, /CompetitionBoard/);
+  assert.match(scheduleView, /fixtureSlots/);
+  assert.match(sportTabs, /CompetitionBoard/);
   assert.match(sportTabs, /bracket-overview/);
-  assert.match(sportTabs, /: "\?"/);
   assert.match(publicPages, /schedule-page/);
   assert.match(adminCss, /\.schedule-page/);
+  assert.match(competitionBoard, /board-selector/);
+  assert.match(competitionBoard, /\[selectedTournament\]/);
+  assert.match(adminCss, /@media \(max-width: 600px\)/);
+  assert.match(adminCss, /\.bracket-scroll \{[^}]*overflow-x: hidden/s);
+  assert.match(adminCss, /\.schedule-day td:nth-child\(1\)::before/);
+  assert.match(publicPages, /leaderboard-table/);
 });
 
 test("knockout brackets include explicit bracket matches and ungrouped ordered rounds", () => {

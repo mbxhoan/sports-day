@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, Clock3, MapPin, Printer, Users } from "lucide-react";
-import { copy, isKnockoutFixture, localized, type Court, type Entry, type Fixture, type FixtureEntry, type Group, type Locale, type Sport, type Tournament, type Venue } from "@/lib/site";
+import { CalendarDays, Clock3, GitBranch, MapPin, Printer } from "lucide-react";
+import { copy, localized, type Court, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Sport, type Standing, type Tournament, type Venue } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
+import { CompetitionBoard } from "./competition-board";
 
 type Props = {
   locale: Locale;
@@ -11,8 +12,11 @@ type Props = {
   tournaments: Tournament[];
   entries: Entry[];
   groups?: Group[];
+  groupEntries?: GroupEntry[];
   fixtures: Fixture[];
   fixtureEntries: FixtureEntry[];
+  fixtureSlots?: FixtureSlot[];
+  standings?: Standing[];
   venues?: Venue[];
   courts?: Court[];
   sportId?: string;
@@ -33,12 +37,12 @@ function timeLabel(value: string | null, locale: Locale) {
   return formatted.slice(-5) || "—";
 }
 
-export function ScheduleView({ locale, sports, tournaments, entries, groups = [], fixtures, fixtureEntries, venues = [], courts = [], sportId, defaultVenue }: Props) {
+export function ScheduleView({ locale, sports, tournaments, entries, groups = [], groupEntries = [], fixtures, fixtureEntries, fixtureSlots = [], standings = [], venues = [], courts = [], sportId, defaultVenue }: Props) {
   const t = copy[locale];
   const [selectedSport, setSelectedSport] = useState(sportId ?? "all");
   const [selectedTournament, setSelectedTournament] = useState("all");
   const [status, setStatus] = useState("all");
-  const [mode, setMode] = useState<"calendar" | "team">("calendar");
+  const [mode, setMode] = useState<"calendar" | "board">("calendar");
   const tournamentsById = useMemo(() => new Map(tournaments.map((item) => [item.id, item])), [tournaments]);
   const sportsById = useMemo(() => new Map(sports.map((item) => [item.id, item])), [sports]);
   const entriesById = useMemo(() => new Map(entries.map((item) => [item.id, item])), [entries]);
@@ -56,10 +60,6 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     return (!sportId || tournament?.sport_id === sportId) && (selectedSport === "all" || tournament?.sport_id === selectedSport) && (selectedTournament === "all" || fixture.tournament_id === selectedTournament) && (status === "all" || fixture.status === status);
   }).sort((a, b) => a.starts_at && b.starts_at ? Date.parse(a.starts_at) - Date.parse(b.starts_at) : a.starts_at ? -1 : b.starts_at ? 1 : 0), [fixtures, sportId, selectedSport, selectedTournament, status, tournamentsById]);
   const byDay = useMemo(() => Map.groupBy(filtered, (fixture) => dayLabel(fixture.starts_at, locale, t.updating)), [filtered, locale, t.updating]);
-  const bracketTournaments = useMemo(() => availableTournaments.map((tournament) => {
-    const knockout = filtered.filter((fixture) => fixture.tournament_id === tournament.id && isKnockoutFixture(fixture)).sort((a, b) => (a.round_order ?? 999) - (b.round_order ?? 999));
-    return { tournament, rounds: Map.groupBy(knockout, (fixture) => fixture.round_order ?? localized(fixture, "round", locale)) };
-  }).filter(({ rounds }) => rounds.size), [availableTournaments, filtered, locale]);
   const statusText = (value: string) => statusKeys.includes(value as typeof statusKeys[number]) ? t[value as typeof statusKeys[number]] : value;
   const matchNames = (fixture: Fixture) => (fixtureEntriesById.get(fixture.id) ?? []).map((item) => {
     const entry = entriesById.get(item.entry_id);
@@ -71,21 +71,11 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
       {!sportId && <select value={selectedSport} onChange={(event) => { setSelectedSport(event.target.value); setSelectedTournament("all"); }} aria-label={t.filterSport}><option value="all">{t.filterSport}</option>{sports.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)}</option>)}</select>}
       <select value={selectedTournament} onChange={(event) => setSelectedTournament(event.target.value)} aria-label={t.filterCategory}><option value="all">{t.filterCategory}</option>{availableTournaments.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)}</option>)}</select>
       <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label={t.filterStatus}><option value="all">{t.filterStatus}</option>{statusKeys.map((key) => <option key={key} value={key}>{t[key]}</option>)}</select>
-      <div className="segmented"><button className={mode === "calendar" ? "active" : ""} onClick={() => setMode("calendar")}><CalendarDays size={16}/>{t.calendar}</button><button className={mode === "team" ? "active" : ""} onClick={() => setMode("team")}><Users size={16}/>{t.byTeam}</button></div>
+      <div className="segmented"><button className={mode === "calendar" ? "active" : ""} onClick={() => setMode("calendar")}><CalendarDays size={16}/>{t.calendar}</button><button className={mode === "board" ? "active" : ""} onClick={() => setMode("board")}><GitBranch size={16}/>{t.board}</button></div>
       <button className="gold-button" onClick={() => window.print()}><Printer size={16}/>{t.print}</button>
     </div>
     {!sportId && <div className="schedule-sport-pills no-print"><button className={selectedSport === "all" ? "active" : ""} onClick={() => { setSelectedSport("all"); setSelectedTournament("all"); }}>{t.allSports}</button>{sports.map((item) => <button key={item.id} className={selectedSport === item.id ? "active" : ""} onClick={() => { setSelectedSport(item.id); setSelectedTournament("all"); }}>{localized(item, "name", locale)}</button>)}</div>}
-    {mode === "team" ? (bracketTournaments.length ? <div className="tournament-stack schedule-brackets">{bracketTournaments.map(({ tournament, rounds }) => <section className="tournament-block" key={tournament.id}>
-      <h2>{localized(tournament, "name", locale)}</h2>
-      <div className="bracket-scroll"><div className="bracket-columns">{[...rounds].map(([round, roundFixtures]) => <div className="bracket-round" key={String(round)}><h3>{localized(roundFixtures[0], "round", locale) || t.round}</h3>{roundFixtures.map((fixture) => {
-        const rows = fixtureEntriesById.get(fixture.id) ?? [];
-        return <article className="bracket-match" key={fixture.id}><small>{fixture.starts_at ? `${dayLabel(fixture.starts_at, locale, t.updating)} ${timeLabel(fixture.starts_at, locale)}` : t.updating}</small><div className="bracket-teams">{[0, 1].map((index) => {
-          const row = rows[index];
-          const entry = row ? entriesById.get(row.entry_id) : undefined;
-          return <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{entry ? localized(entry, "name", locale) : "?"}</span><b>{row?.score ?? "—"}</b></div>;
-        })}</div></article>;
-      })}</div>)}</div></div>
-    </section>)}</div> : <section className="panel empty-state"><Users/><h2>{t.empty}</h2></section>) : byDay.size ? <div className="schedule-days">{[...byDay].map(([day, dayFixtures]) => <section className="panel schedule-day" key={day}>
+    {mode === "board" ? <CompetitionBoard locale={locale} tournaments={availableTournaments.filter((item) => selectedTournament === "all" || item.id === selectedTournament)} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={filtered} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings}/> : byDay.size ? <div className="schedule-days">{[...byDay].map(([day, dayFixtures]) => <section className="panel schedule-day" key={day}>
       <h2 className="schedule-day-title"><CalendarDays size={17}/>{day}<small>{dayFixtures.length} {t.fixtureUnit}</small></h2>
       <div className="table-scroll"><table><thead><tr><th>{t.time}</th><th>{t.sports}</th><th>{t.categories}</th><th>{t.match}</th><th>{t.round}</th><th>{t.venue}</th><th>{t.court}</th><th>{t.result}</th></tr></thead><tbody>{dayFixtures.map((fixture) => {
         const tournament = tournamentsById.get(fixture.tournament_id);

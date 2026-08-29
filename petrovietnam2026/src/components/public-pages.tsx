@@ -67,12 +67,12 @@ export async function SportPage({ locale, slug, tab = "info" }: { locale: Locale
   const tournaments = data.tournaments.filter((item) => item.sport_id === sport.id);
   const active = (["info","teams","times","fixtures","brackets"] as TabKey[]).includes(tab as TabKey) ? tab as TabKey : "info";
   const hrefBase = `${locale === "en" ? "/en" : ""}/sports/${sport.slug}`;
-  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
+  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
 }
 
 export async function SchedulePage({ locale }: { locale: Locale }) {
   const data = await getSiteData();
-  return <SiteShell locale={locale}><div className="container page-container schedule-page"><PageTitle emoji="📅" title={copy[locale].schedule}/><ScheduleView locale={locale} sports={data.sports} tournaments={data.tournaments} entries={data.entries} groups={data.groups} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} venues={data.venues} courts={data.courts} defaultVenue={localized(data.event,"venue",locale)}/></div></SiteShell>;
+  return <SiteShell locale={locale}><div className="container page-container schedule-page"><PageTitle emoji="📅" title={copy[locale].schedule}/><ScheduleView locale={locale} sports={data.sports} tournaments={data.tournaments} entries={data.entries} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts} defaultVenue={localized(data.event,"venue",locale)}/></div></SiteShell>;
 }
 
 export async function LeaderboardPage({ locale }: { locale: Locale }) {
@@ -82,7 +82,7 @@ export async function LeaderboardPage({ locale }: { locale: Locale }) {
   const podium = [rows[1], rows[0], rows[2]];
   return <SiteShell locale={locale}><div className="container page-container"><PageTitle emoji="🏆" title={t.leaderboard}/>{rows.length ? <>
     <section className="leaderboard podium panel">{podium.map((row, index) => row ? <div className={index === 1 ? "first" : ""} key={row.organization.id}><span>{index === 0 ? "🥈" : index === 1 ? "🥇" : "🥉"}</span><b>{localized(row.organization, "name", locale)}</b><small>{row.total} {t.medals}</small></div> : <div className={index === 1 ? "first" : ""} key={index}/>)}</section>
-    <section className="panel table-scroll"><table><thead><tr><th>#</th><th>{t.organization}</th><th>🥇</th><th>🥈</th><th>🥉</th><th>{t.total}</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.organization.id}><td>{index + 1}</td><td>{localized(row.organization, "name", locale)}</td><td>{row.gold}</td><td>{row.silver}</td><td>{row.bronze}</td><td><b>{row.total}</b></td></tr>)}</tbody></table></section>
+    <section className="panel table-scroll"><table className="leaderboard-table"><thead><tr><th>#</th><th>{t.organization}</th><th>🥇</th><th>🥈</th><th>🥉</th><th>{t.total}</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.organization.id}><td>{index + 1}</td><td>{localized(row.organization, "name", locale)}</td><td>{row.gold}</td><td>{row.silver}</td><td>{row.bronze}</td><td><b>{row.total}</b></td></tr>)}</tbody></table></section>
   </> : <section className="panel empty-state"><Medal/><h2>{t.leaderboardEmpty}</h2></section>}</div></SiteShell>;
 }
 

@@ -93,6 +93,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -118,6 +119,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -143,6 +145,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -165,7 +168,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -203,6 +207,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -228,6 +233,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -236,23 +242,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng E",
+              "group": "Bảng F",
               "rank": 2,
-              "label_vi": "2E",
-              "label_en": "2E"
+              "label_vi": "2F",
+              "label_en": "2F"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 1,
-              "label_vi": "1C",
-              "label_en": "1C"
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -278,6 +285,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -286,23 +294,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng A",
+              "group": "Bảng C",
               "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
+              "label_vi": "2C",
+              "label_en": "2C"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -327,6 +336,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -334,23 +344,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 2,
-              "label_vi": "2F",
-              "label_en": "2F"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-2",
               "label_vi": "Thắng 2",
               "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -375,6 +386,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -382,23 +394,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 2,
-              "label_vi": "2C",
-              "label_en": "2C"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
             }
           ]
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -422,6 +435,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -445,6 +459,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -482,6 +497,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -507,6 +523,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -532,6 +549,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -554,7 +572,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -592,6 +611,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -617,6 +637,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -642,6 +663,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -664,7 +686,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -702,6 +725,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -727,6 +751,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -752,6 +777,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -774,7 +800,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -812,6 +839,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -837,6 +865,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -862,6 +891,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -884,7 +914,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -922,6 +953,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -945,6 +977,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -953,21 +986,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Dương Trí Quả / Trịnh Văn Thành",
-              "label_vi": "Dương Trí Quả / Trịnh Văn Thành",
-              "label_en": "Dương Trí Quả / Trịnh Văn Thành"
+              "entry_name": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI",
+              "label_vi": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI",
+              "label_en": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL",
-              "label_vi": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL",
-              "label_en": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL"
+              "entry_name": "Đào Quốc Dũng / Võ Văn Thịnh-PVG",
+              "label_vi": "Đào Quốc Dũng / Võ Văn Thịnh-PVG",
+              "label_en": "Đào Quốc Dũng / Võ Văn Thịnh-PVG"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -976,21 +1010,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Nguyễn Đình Toàn / Võ Quang Khải-PVG",
-              "label_vi": "Nguyễn Đình Toàn / Võ Quang Khải-PVG",
-              "label_en": "Nguyễn Đình Toàn / Võ Quang Khải-PVG"
+              "entry_name": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo",
+              "label_vi": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo",
+              "label_en": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC",
-              "label_vi": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC",
-              "label_en": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC"
+              "entry_name": "Nguyễn Đình Toàn / Võ Quang Khải-PVG",
+              "label_vi": "Nguyễn Đình Toàn / Võ Quang Khải-PVG",
+              "label_en": "Nguyễn Đình Toàn / Võ Quang Khải-PVG"
             }
           ]
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -1014,31 +1049,9 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 2,
-          "round_vi": "Tứ kết",
-          "round_en": "Quarterfinal",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "entry",
-              "entry_name": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI",
-              "label_vi": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI",
-              "label_en": "Lê Nguyễn Hoàng Dương / Vũ Khoa Huân-PVI"
-            },
-            {
-              "side": "away",
-              "kind": "entry",
-              "entry_name": "Đào Quốc Dũng / Võ Văn Thịnh-PVG",
-              "label_vi": "Đào Quốc Dũng / Võ Văn Thịnh-PVG",
-              "label_en": "Đào Quốc Dũng / Võ Văn Thịnh-PVG"
-            }
-          ]
-        },
-        {
-          "key": "match-6",
-          "round_order": 2,
-          "bracket_position": 3,
           "round_vi": "Tứ kết",
           "round_en": "Quarterfinal",
           "slots": [
@@ -1052,6 +1065,30 @@
             {
               "side": "away",
               "kind": "entry",
+              "entry_name": "Dương Trí Quả / Trịnh Văn Thành",
+              "label_vi": "Dương Trí Quả / Trịnh Văn Thành",
+              "label_en": "Dương Trí Quả / Trịnh Văn Thành"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "source_code": "6",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL",
+              "label_vi": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL",
+              "label_en": "Lê Minh Đức / Nguyễn Khánh Phong-PVOIL"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
               "entry_name": "Đỗ Đức Thọ / Nguyễn Việt Thắng-PVD",
               "label_vi": "Đỗ Đức Thọ / Nguyễn Việt Thắng-PVD",
               "label_en": "Đỗ Đức Thọ / Nguyễn Việt Thắng-PVD"
@@ -1060,6 +1097,7 @@
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -1067,22 +1105,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "entry",
-              "entry_name": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo",
-              "label_vi": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo",
-              "label_en": "Chung Bảo Hiếu / Lê Tiến Bảo-PVFCCo"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-3",
               "label_vi": "Thắng 3",
               "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC",
+              "label_vi": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC",
+              "label_en": "Nguyễn Minh Hoàng / Nguyễn Văn Hiếu-PQPOC"
             }
           ]
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -1106,6 +1145,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -1129,6 +1169,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -1166,6 +1207,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -1189,6 +1231,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -1197,21 +1240,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Nguyễn Trung Hải / Tất Phi Hải",
-              "label_vi": "Nguyễn Trung Hải / Tất Phi Hải",
-              "label_en": "Nguyễn Trung Hải / Tất Phi Hải"
+              "entry_name": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa",
+              "label_vi": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa",
+              "label_en": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Đỗ Văn Toàn / Trần Quốc Huy",
-              "label_vi": "Đỗ Văn Toàn / Trần Quốc Huy",
-              "label_en": "Đỗ Văn Toàn / Trần Quốc Huy"
+              "entry_name": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh",
+              "label_vi": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh",
+              "label_en": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -1220,21 +1264,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Phạm Văn Hiệu / Vũ Văn Dũng",
-              "label_vi": "Phạm Văn Hiệu / Vũ Văn Dũng",
-              "label_en": "Phạm Văn Hiệu / Vũ Văn Dũng"
+              "entry_name": "Hồ Viết Tập / Phạm Tất Lộc",
+              "label_vi": "Hồ Viết Tập / Phạm Tất Lộc",
+              "label_en": "Hồ Viết Tập / Phạm Tất Lộc"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Hoàng Quang Chính / Ng Công Anh Anh",
-              "label_vi": "Hoàng Quang Chính / Ng Công Anh Anh",
-              "label_en": "Hoàng Quang Chính / Ng Công Anh Anh"
+              "entry_name": "Phạm Văn Hiệu / Vũ Văn Dũng",
+              "label_vi": "Phạm Văn Hiệu / Vũ Văn Dũng",
+              "label_en": "Phạm Văn Hiệu / Vũ Văn Dũng"
             }
           ]
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -1258,31 +1303,9 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 2,
-          "round_vi": "Tứ kết",
-          "round_en": "Quarterfinal",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "entry",
-              "entry_name": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa",
-              "label_vi": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa",
-              "label_en": "Ngô Thế Quỳnh / Nguyễn Đăng Khoa"
-            },
-            {
-              "side": "away",
-              "kind": "entry",
-              "entry_name": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh",
-              "label_vi": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh",
-              "label_en": "Nguyễn Đình Phong / Nguyễn Ngọc Ánh"
-            }
-          ]
-        },
-        {
-          "key": "match-6",
-          "round_order": 2,
-          "bracket_position": 3,
           "round_vi": "Tứ kết",
           "round_en": "Quarterfinal",
           "slots": [
@@ -1296,6 +1319,30 @@
             {
               "side": "away",
               "kind": "entry",
+              "entry_name": "Nguyễn Trung Hải / Tất Phi Hải",
+              "label_vi": "Nguyễn Trung Hải / Tất Phi Hải",
+              "label_en": "Nguyễn Trung Hải / Tất Phi Hải"
+            }
+          ]
+        },
+        {
+          "key": "match-6",
+          "source_code": "6",
+          "round_order": 2,
+          "bracket_position": 3,
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "Đỗ Văn Toàn / Trần Quốc Huy",
+              "label_vi": "Đỗ Văn Toàn / Trần Quốc Huy",
+              "label_en": "Đỗ Văn Toàn / Trần Quốc Huy"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
               "entry_name": "Đặng Đình Bình / Nguyễn Hải Long",
               "label_vi": "Đặng Đình Bình / Nguyễn Hải Long",
               "label_en": "Đặng Đình Bình / Nguyễn Hải Long"
@@ -1304,6 +1351,7 @@
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -1311,22 +1359,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "entry",
-              "entry_name": "Hồ Viết Tập / Phạm Tất Lộc",
-              "label_vi": "Hồ Viết Tập / Phạm Tất Lộc",
-              "label_en": "Hồ Viết Tập / Phạm Tất Lộc"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-3",
               "label_vi": "Thắng 3",
               "label_en": "Winner 3"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Hoàng Quang Chính / Ng Công Anh Anh",
+              "label_vi": "Hoàng Quang Chính / Ng Công Anh Anh",
+              "label_en": "Hoàng Quang Chính / Ng Công Anh Anh"
             }
           ]
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -1350,6 +1399,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -1373,6 +1423,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -1410,6 +1461,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -1433,6 +1485,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -1456,6 +1509,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -1479,6 +1533,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -1502,6 +1557,7 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -1525,6 +1581,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -1547,7 +1604,8 @@
           ]
         },
         {
-          "key": "match-7",
+          "key": "match-6-2",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 7,
           "round_vi": "Vòng loại 1",
@@ -1571,6 +1629,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 1,
           "bracket_position": 8,
           "round_vi": "Vòng loại 1",
@@ -1594,6 +1653,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -1617,6 +1677,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -1640,6 +1701,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -1663,6 +1725,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -1671,9 +1734,9 @@
             {
               "side": "home",
               "kind": "fixture_winner",
-              "fixture": "match-7",
-              "label_vi": "Thắng 7",
-              "label_en": "Winner 7"
+              "fixture": "match-6-2",
+              "label_vi": "Thắng 6",
+              "label_en": "Winner 6"
             },
             {
               "side": "away",
@@ -1685,7 +1748,8 @@
           ]
         },
         {
-          "key": "match-13",
+          "key": "match-14",
+          "source_code": "14",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -1708,7 +1772,8 @@
           ]
         },
         {
-          "key": "match-14",
+          "key": "match-14-2",
+          "source_code": "14",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -1732,6 +1797,7 @@
         },
         {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -1740,14 +1806,14 @@
             {
               "side": "home",
               "kind": "fixture_winner",
-              "fixture": "match-13",
-              "label_vi": "Thắng 13",
-              "label_en": "Winner 13"
+              "fixture": "match-14",
+              "label_vi": "Thắng 14",
+              "label_en": "Winner 14"
             },
             {
               "side": "away",
               "kind": "fixture_winner",
-              "fixture": "match-14",
+              "fixture": "match-14-2",
               "label_vi": "Thắng 14",
               "label_en": "Winner 14"
             }
@@ -1769,6 +1835,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -1794,6 +1861,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -1819,6 +1887,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -1841,7 +1910,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -1879,6 +1949,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -1904,6 +1975,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -1929,6 +2001,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -1951,7 +2024,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -1989,6 +2063,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -2012,6 +2087,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -2035,6 +2111,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -2058,6 +2135,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -2066,21 +2144,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm",
-              "label_vi": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm",
-              "label_en": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm"
+              "entry_name": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng",
+              "label_vi": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng",
+              "label_en": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Huỳnh Thu Hiền / Phạm Khắc Đạt",
-              "label_vi": "Huỳnh Thu Hiền / Phạm Khắc Đạt",
-              "label_en": "Huỳnh Thu Hiền / Phạm Khắc Đạt"
+              "entry_name": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm",
+              "label_vi": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm",
+              "label_en": "Đào Thị Mùa Thu / Ngọc Vũ Nhiệm"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -2089,21 +2168,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Hà Thị Thanh Hương / Trần Quốc Hòa",
-              "label_vi": "Hà Thị Thanh Hương / Trần Quốc Hòa",
-              "label_en": "Hà Thị Thanh Hương / Trần Quốc Hòa"
+              "entry_name": "Huỳnh Thu Hiền / Phạm Khắc Đạt",
+              "label_vi": "Huỳnh Thu Hiền / Phạm Khắc Đạt",
+              "label_en": "Huỳnh Thu Hiền / Phạm Khắc Đạt"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải",
-              "label_vi": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải",
-              "label_en": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải"
+              "entry_name": "Hà Thị Thanh Hương / Trần Quốc Hòa",
+              "label_vi": "Hà Thị Thanh Hương / Trần Quốc Hòa",
+              "label_en": "Hà Thị Thanh Hương / Trần Quốc Hòa"
             }
           ]
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -2112,21 +2192,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc",
-              "label_vi": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc",
-              "label_en": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc"
+              "entry_name": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải",
+              "label_vi": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải",
+              "label_en": "Ngn Huỳnh Hưng Thịnh / Nguyễn Thị Như Hải"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương",
-              "label_vi": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương",
-              "label_en": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương"
+              "entry_name": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc",
+              "label_vi": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc",
+              "label_en": "Nguyễn Văn Thành Vinh / Phan Thanh Trúc"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -2150,6 +2231,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -2173,6 +2255,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -2180,22 +2263,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "entry",
-              "entry_name": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng",
-              "label_vi": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng",
-              "label_en": "Nguyễn Trung Thanh Thảo / Phạm Tiến Dũng"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
             }
           ]
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -2204,21 +2288,22 @@
             {
               "side": "home",
               "kind": "fixture_winner",
-              "fixture": "match-5",
-              "label_vi": "Thắng 5",
-              "label_en": "Winner 5"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
               "fixture": "match-6",
               "label_vi": "Thắng 6",
               "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương",
+              "label_vi": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương",
+              "label_en": "Nguyễn Thành Thịnh / Tăng Thụy Thanh Phương"
             }
           ]
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -2242,6 +2327,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -2265,6 +2351,7 @@
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -2315,6 +2402,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -2340,6 +2428,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -2365,6 +2454,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -2387,7 +2477,8 @@
           ]
         },
         {
-          "key": "match-4",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -2583,6 +2674,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -2591,21 +2683,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "PETROSETCO",
-              "label_vi": "PETROSETCO",
-              "label_en": "PETROSETCO"
+              "entry_name": "PQPOC",
+              "label_vi": "PQPOC",
+              "label_en": "PQPOC"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "PCTRANS",
-              "label_vi": "PCTRANS",
-              "label_en": "PCTRANS"
+              "entry_name": "BỘ MÁY QL&ĐH PETROVN",
+              "label_vi": "BỘ MÁY QL&ĐH PETROVN",
+              "label_en": "BỘ MÁY QL&ĐH PETROVN"
             }
           ]
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Vòng loại 2",
@@ -2629,6 +2722,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Vòng loại 2",
@@ -2652,6 +2746,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Vòng loại 2",
@@ -2675,6 +2770,7 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Vòng loại 2",
@@ -2698,8 +2794,81 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 2,
           "bracket_position": 5,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PETROSETCO",
+              "label_vi": "PETROSETCO",
+              "label_en": "PETROSETCO"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PCTRANS",
+              "label_vi": "PCTRANS",
+              "label_en": "PCTRANS"
+            }
+          ]
+        },
+        {
+          "key": "match-7",
+          "source_code": "7",
+          "round_order": 2,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "PVD",
+              "label_vi": "PVD",
+              "label_en": "PVD"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "SWPOC",
+              "label_vi": "SWPOC",
+              "label_en": "SWPOC"
+            }
+          ]
+        },
+        {
+          "key": "match-8",
+          "source_code": "8",
+          "round_order": 2,
+          "bracket_position": 7,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "entry",
+              "entry_name": "NCKH",
+              "label_vi": "NCKH",
+              "label_en": "NCKH"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVCOMBANK",
+              "label_vi": "PVCOMBANK",
+              "label_en": "PVCOMBANK"
+            }
+          ]
+        },
+        {
+          "key": "match-9",
+          "source_code": "9",
+          "round_order": 2,
+          "bracket_position": 8,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
@@ -2713,75 +2882,6 @@
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "PVD",
-              "label_vi": "PVD",
-              "label_en": "PVD"
-            }
-          ]
-        },
-        {
-          "key": "match-7",
-          "round_order": 2,
-          "bracket_position": 6,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "entry",
-              "entry_name": "SWPOC",
-              "label_vi": "SWPOC",
-              "label_en": "SWPOC"
-            },
-            {
-              "side": "away",
-              "kind": "entry",
-              "entry_name": "NCKH",
-              "label_vi": "NCKH",
-              "label_en": "NCKH"
-            }
-          ]
-        },
-        {
-          "key": "match-8",
-          "round_order": 2,
-          "bracket_position": 7,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "entry",
-              "entry_name": "PVCOMBANK",
-              "label_vi": "PVCOMBANK",
-              "label_en": "PVCOMBANK"
-            },
-            {
-              "side": "away",
-              "kind": "entry",
-              "entry_name": "PQPOC",
-              "label_vi": "PQPOC",
-              "label_en": "PQPOC"
-            }
-          ]
-        },
-        {
-          "key": "match-9",
-          "round_order": 2,
-          "bracket_position": 8,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "entry",
-              "entry_name": "BỘ MÁY QL&ĐH PETROVN",
-              "label_vi": "BỘ MÁY QL&ĐH PETROVN",
-              "label_en": "BỘ MÁY QL&ĐH PETROVN"
-            },
-            {
-              "side": "away",
-              "kind": "entry",
               "entry_name": "VSP",
               "label_vi": "VSP",
               "label_en": "VSP"
@@ -2790,6 +2890,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -2813,6 +2914,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -2836,6 +2938,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 3,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -2859,6 +2962,7 @@
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 3,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -2882,6 +2986,7 @@
         },
         {
           "key": "match-14",
+          "source_code": "14",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -2905,6 +3010,7 @@
         },
         {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 4,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -2928,6 +3034,7 @@
         },
         {
           "key": "match-16",
+          "source_code": "16",
           "round_order": 5,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -2965,6 +3072,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -2988,6 +3096,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -2996,21 +3105,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "PVOIL",
-              "label_vi": "PVOIL",
-              "label_en": "PVOIL"
+              "entry_name": "NCKH",
+              "label_vi": "NCKH",
+              "label_en": "NCKH"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "PVMR",
-              "label_vi": "PVMR",
-              "label_en": "PVMR"
+              "entry_name": "PVOIL",
+              "label_vi": "PVOIL",
+              "label_en": "PVOIL"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -3034,6 +3144,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -3042,21 +3153,22 @@
             {
               "side": "home",
               "kind": "entry",
-              "entry_name": "PVPMB",
-              "label_vi": "PVPMB",
-              "label_en": "PVPMB"
+              "entry_name": "PETROCONs",
+              "label_vi": "PETROCONs",
+              "label_en": "PETROCONs"
             },
             {
               "side": "away",
               "kind": "entry",
-              "entry_name": "PETROSETCO",
-              "label_vi": "PETROSETCO",
-              "label_en": "PETROSETCO"
+              "entry_name": "PVPMB",
+              "label_vi": "PVPMB",
+              "label_en": "PVPMB"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -3080,6 +3192,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -3087,22 +3200,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "entry",
-              "entry_name": "NCKH",
-              "label_vi": "NCKH",
-              "label_en": "NCKH"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-2",
               "label_vi": "Thắng 2",
               "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PVMR",
+              "label_vi": "PVMR",
+              "label_en": "PVMR"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -3126,6 +3240,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -3133,22 +3248,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "entry",
-              "entry_name": "PETROCONs",
-              "label_vi": "PETROCONs",
-              "label_en": "PETROCONs"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "entry",
+              "entry_name": "PETROSETCO",
+              "label_vi": "PETROSETCO",
+              "label_en": "PETROSETCO"
             }
           ]
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -3172,6 +3288,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -3195,6 +3312,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -3225,11 +3343,14 @@
       "source": {
         "file": "PICKLEBALL/PDF/DÔI NAM 31-40T 37 (1).pdf",
         "page_or_sheet": 7,
-        "warnings": []
+        "warnings": [
+          "Tiêu đề PDF ghi năm 2024; hiển thị thống nhất năm sự kiện 2026."
+        ]
       },
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -3255,6 +3376,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -3263,23 +3385,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng J",
-              "rank": 2,
-              "label_vi": "2J",
-              "label_en": "2J"
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 1,
-              "label_vi": "1C",
-              "label_en": "1C"
+              "group": "Bảng J",
+              "rank": 2,
+              "label_vi": "2J",
+              "label_en": "2J"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -3305,6 +3428,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -3313,23 +3437,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng G",
+              "group": "Bảng H",
               "rank": 2,
-              "label_vi": "2G",
-              "label_en": "2G"
+              "label_vi": "2H",
+              "label_en": "2H"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -3355,6 +3480,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -3363,23 +3489,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 2,
-              "label_vi": "2D",
-              "label_en": "2D"
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng I",
-              "rank": 1,
-              "label_vi": "1I",
-              "label_en": "1I"
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 1,
           "bracket_position": 7,
           "round_vi": "Vòng loại 1",
@@ -3405,6 +3532,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 1,
           "bracket_position": 8,
           "round_vi": "Vòng loại 1",
@@ -3413,23 +3541,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng A",
+              "group": "Bảng B",
               "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
+              "label_vi": "2B",
+              "label_en": "2B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng L",
-              "rank": 1,
-              "label_vi": "1L",
-              "label_en": "1L"
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
             }
           ]
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Vòng loại 2",
@@ -3454,6 +3583,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Vòng loại 2",
@@ -3461,23 +3591,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 1,
-              "label_vi": "1B",
-              "label_en": "1B"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-2",
               "label_vi": "Thắng 2",
               "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
             }
           ]
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Vòng loại 2",
@@ -3502,6 +3633,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Vòng loại 2",
@@ -3509,23 +3641,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng H",
-              "rank": 2,
-              "label_vi": "2H",
-              "label_en": "2H"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
             }
           ]
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 2,
           "bracket_position": 5,
           "round_vi": "Vòng loại 2",
@@ -3550,6 +3683,7 @@
         },
         {
           "key": "match-14",
+          "source_code": "14",
           "round_order": 2,
           "bracket_position": 6,
           "round_vi": "Vòng loại 2",
@@ -3557,23 +3691,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng H",
-              "rank": 1,
-              "label_vi": "1H",
-              "label_en": "1H"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-6",
               "label_vi": "Thắng 6",
               "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng I",
+              "rank": 1,
+              "label_vi": "1I",
+              "label_en": "1I"
             }
           ]
         },
         {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 2,
           "bracket_position": 7,
           "round_vi": "Vòng loại 2",
@@ -3598,6 +3733,7 @@
         },
         {
           "key": "match-16",
+          "source_code": "16",
           "round_order": 2,
           "bracket_position": 8,
           "round_vi": "Vòng loại 2",
@@ -3605,23 +3741,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-8",
               "label_vi": "Thắng 8",
               "label_en": "Winner 8"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng L",
+              "rank": 1,
+              "label_vi": "1L",
+              "label_en": "1L"
             }
           ]
         },
         {
           "key": "match-17",
+          "source_code": "17",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -3645,6 +3782,7 @@
         },
         {
           "key": "match-18",
+          "source_code": "18",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -3668,6 +3806,7 @@
         },
         {
           "key": "match-19",
+          "source_code": "19",
           "round_order": 3,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -3691,6 +3830,7 @@
         },
         {
           "key": "match-20",
+          "source_code": "20",
           "round_order": 3,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -3714,6 +3854,7 @@
         },
         {
           "key": "match-21",
+          "source_code": "21",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -3737,6 +3878,7 @@
         },
         {
           "key": "match-22",
+          "source_code": "22",
           "round_order": 4,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -3760,6 +3902,7 @@
         },
         {
           "key": "match-23",
+          "source_code": "23",
           "round_order": 5,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -3791,116 +3934,17 @@
         "file": "PICKLEBALL/PDF/DÔI NAM 41-50T-40.pdf",
         "page_or_sheet": 12,
         "warnings": [
-          "PDF in nhãn 1J hai lần; giữ nguyên PDF để admin đối soát."
+          "PDF in mã trận 5 hai lần; giữ nguyên PDF để admin đối soát."
         ]
       },
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
           "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng A",
-              "rank": 1,
-              "label_vi": "1A",
-              "label_en": "1A"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 1,
-              "label_vi": "1B",
-              "label_en": "1B"
-            }
-          ]
-        },
-        {
-          "key": "match-2",
-          "round_order": 1,
-          "bracket_position": 2,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 1,
-              "label_vi": "1D",
-              "label_en": "1D"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 2,
-              "label_vi": "2F",
-              "label_en": "2F"
-            }
-          ]
-        },
-        {
-          "key": "match-3",
-          "round_order": 1,
-          "bracket_position": 3,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng G",
-              "rank": 1,
-              "label_vi": "1G",
-              "label_en": "1G"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng H",
-              "rank": 1,
-              "label_vi": "1H",
-              "label_en": "1H"
-            }
-          ]
-        },
-        {
-          "key": "match-4",
-          "round_order": 1,
-          "bracket_position": 4,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng J",
-              "rank": 1,
-              "label_vi": "1J",
-              "label_en": "1J"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
-            }
-          ]
-        },
-        {
-          "key": "match-5",
-          "round_order": 2,
-          "bracket_position": 1,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
           "slots": [
             {
               "side": "home",
@@ -3921,9 +3965,88 @@
           ]
         },
         {
-          "key": "match-6",
-          "round_order": 2,
+          "key": "match-2",
+          "source_code": "2",
+          "round_order": 1,
           "bracket_position": 2,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 2,
+              "label_vi": "2F",
+              "label_en": "2F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            }
+          ]
+        },
+        {
+          "key": "match-3",
+          "source_code": "3",
+          "round_order": 1,
+          "bracket_position": 3,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 2,
+              "label_vi": "2E",
+              "label_en": "2E"
+            }
+          ]
+        },
+        {
+          "key": "match-4",
+          "source_code": "4",
+          "round_order": 1,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 1",
+          "round_en": "Knockout round 1",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            }
+          ]
+        },
+        {
+          "key": "match-5",
+          "source_code": "5",
+          "round_order": 2,
+          "bracket_position": 1,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
@@ -3937,6 +4060,32 @@
             {
               "side": "away",
               "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 1,
+              "label_vi": "1A",
+              "label_en": "1A"
+            }
+          ]
+        },
+        {
+          "key": "match-5-2",
+          "source_code": "5",
+          "round_order": 2,
+          "bracket_position": 2,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
               "group": "Bảng H",
               "rank": 2,
               "label_vi": "2H",
@@ -3946,6 +4095,7 @@
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Vòng loại 2",
@@ -3971,6 +4121,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Vòng loại 2",
@@ -3978,50 +4129,26 @@
           "slots": [
             {
               "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
+            },
+            {
+              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-2",
               "label_vi": "Thắng 2",
               "label_en": "Winner 2"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 1,
-              "label_vi": "1E",
-              "label_en": "1E"
             }
           ]
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 5,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 2,
-              "label_vi": "2E",
-              "label_en": "2E"
-            }
-          ]
-        },
-        {
-          "key": "match-10",
-          "round_order": 2,
-          "bracket_position": 6,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
@@ -4035,6 +4162,32 @@
             {
               "side": "away",
               "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
+            }
+          ]
+        },
+        {
+          "key": "match-10",
+          "source_code": "10",
+          "round_order": 2,
+          "bracket_position": 6,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
               "group": "Bảng D",
               "rank": 2,
               "label_vi": "2D",
@@ -4044,6 +4197,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 2,
           "bracket_position": 7,
           "round_vi": "Vòng loại 2",
@@ -4069,6 +4223,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 2,
           "bracket_position": 8,
           "round_vi": "Vòng loại 2",
@@ -4076,23 +4231,24 @@
           "slots": [
             {
               "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 1,
+              "label_vi": "1J",
+              "label_en": "1J"
+            },
+            {
+              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng A",
-              "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
             }
           ]
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -4108,14 +4264,15 @@
             {
               "side": "away",
               "kind": "fixture_winner",
-              "fixture": "match-6",
-              "label_vi": "Thắng 6",
-              "label_en": "Winner 6"
+              "fixture": "match-5-2",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
             }
           ]
         },
         {
           "key": "match-14",
+          "source_code": "14",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -4139,6 +4296,7 @@
         },
         {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 3,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -4162,6 +4320,7 @@
         },
         {
           "key": "match-16",
+          "source_code": "16",
           "round_order": 3,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -4185,6 +4344,7 @@
         },
         {
           "key": "match-17",
+          "source_code": "17",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -4208,6 +4368,7 @@
         },
         {
           "key": "match-18",
+          "source_code": "18",
           "round_order": 4,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -4231,6 +4392,7 @@
         },
         {
           "key": "match-19",
+          "source_code": "19",
           "round_order": 5,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -4266,6 +4428,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -4291,6 +4454,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -4299,23 +4463,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng C",
+              "group": "Bảng B",
               "rank": 1,
-              "label_vi": "1C",
-              "label_en": "1C"
+              "label_vi": "1B",
+              "label_en": "1B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 1,
-              "label_vi": "1D",
-              "label_en": "1D"
+              "group": "Bảng G",
+              "rank": 2,
+              "label_vi": "2G",
+              "label_en": "2G"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -4324,23 +4489,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 1,
-              "label_vi": "1E",
-              "label_en": "1E"
+              "group": "Bảng H",
+              "rank": 2,
+              "label_vi": "2H",
+              "label_en": "2H"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng J",
+              "group": "Bảng I",
               "rank": 2,
-              "label_vi": "2J",
-              "label_en": "2J"
+              "label_vi": "2I",
+              "label_en": "2I"
             }
           ]
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -4366,6 +4532,7 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -4374,23 +4541,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng H",
-              "rank": 1,
-              "label_vi": "1H",
-              "label_en": "1H"
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng I",
-              "rank": 1,
-              "label_vi": "1I",
-              "label_en": "1I"
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
             }
           ]
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -4399,23 +4567,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng A",
+              "group": "Bảng B",
               "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
+              "label_vi": "2B",
+              "label_en": "2B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng K",
+              "group": "Bảng J",
               "rank": 1,
-              "label_vi": "1K",
-              "label_en": "1K"
+              "label_vi": "1J",
+              "label_en": "1J"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Vòng loại 2",
@@ -4440,33 +4609,9 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 2,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 1,
-              "label_vi": "1B",
-              "label_en": "1B"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng G",
-              "rank": 2,
-              "label_vi": "2G",
-              "label_en": "2G"
-            }
-          ]
-        },
-        {
-          "key": "match-9",
-          "round_order": 2,
-          "bracket_position": 3,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
@@ -4480,27 +4625,28 @@
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng H",
-              "rank": 2,
-              "label_vi": "2H",
-              "label_en": "2H"
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
             }
           ]
         },
         {
-          "key": "match-10",
+          "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
-          "bracket_position": 4,
+          "bracket_position": 3,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng I",
-              "rank": 2,
-              "label_vi": "2I",
-              "label_en": "2I"
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
             },
             {
               "side": "away",
@@ -4512,7 +4658,34 @@
           ]
         },
         {
+          "key": "match-10",
+          "source_code": "10",
+          "round_order": 2,
+          "bracket_position": 4,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng J",
+              "rank": 2,
+              "label_vi": "2J",
+              "label_en": "2J"
+            }
+          ]
+        },
+        {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 2,
           "bracket_position": 5,
           "round_vi": "Vòng loại 2",
@@ -4537,33 +4710,9 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 2,
           "bracket_position": 6,
-          "round_vi": "Vòng loại 2",
-          "round_en": "Knockout round 2",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 2,
-              "label_vi": "2D",
-              "label_en": "2D"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 2,
-              "label_vi": "2C",
-              "label_en": "2C"
-            }
-          ]
-        },
-        {
-          "key": "match-13",
-          "round_order": 2,
-          "bracket_position": 7,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
@@ -4577,27 +4726,28 @@
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
+              "group": "Bảng H",
+              "rank": 1,
+              "label_vi": "1H",
+              "label_en": "1H"
             }
           ]
         },
         {
-          "key": "match-14",
+          "key": "match-13",
+          "source_code": "13",
           "round_order": 2,
-          "bracket_position": 8,
+          "bracket_position": 7,
           "round_vi": "Vòng loại 2",
           "round_en": "Knockout round 2",
           "slots": [
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng J",
+              "group": "Bảng I",
               "rank": 1,
-              "label_vi": "1J",
-              "label_en": "1J"
+              "label_vi": "1I",
+              "label_en": "1I"
             },
             {
               "side": "away",
@@ -4609,7 +4759,34 @@
           ]
         },
         {
+          "key": "match-14",
+          "source_code": "14",
+          "round_order": 2,
+          "bracket_position": 8,
+          "round_vi": "Vòng loại 2",
+          "round_en": "Knockout round 2",
+          "slots": [
+            {
+              "side": "home",
+              "kind": "group_rank",
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng K",
+              "rank": 1,
+              "label_vi": "1K",
+              "label_en": "1K"
+            }
+          ]
+        },
+        {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -4633,6 +4810,7 @@
         },
         {
           "key": "match-16",
+          "source_code": "16",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -4656,6 +4834,7 @@
         },
         {
           "key": "match-17",
+          "source_code": "17",
           "round_order": 3,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -4679,6 +4858,7 @@
         },
         {
           "key": "match-18",
+          "source_code": "18",
           "round_order": 3,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -4702,6 +4882,7 @@
         },
         {
           "key": "match-19",
+          "source_code": "19",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -4725,6 +4906,7 @@
         },
         {
           "key": "match-20",
+          "source_code": "20",
           "round_order": 4,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -4748,6 +4930,7 @@
         },
         {
           "key": "match-21",
+          "source_code": "21",
           "round_order": 5,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -4783,6 +4966,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -4808,6 +4992,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -4833,6 +5018,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -4858,6 +5044,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -4883,6 +5070,7 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -4908,6 +5096,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -4933,6 +5122,7 @@
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 1,
           "bracket_position": 7,
           "round_vi": "Vòng loại 1",
@@ -4958,6 +5148,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 1,
           "bracket_position": 8,
           "round_vi": "Vòng loại 1",
@@ -4983,6 +5174,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -5006,6 +5198,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -5029,6 +5222,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -5052,6 +5246,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -5075,6 +5270,7 @@
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -5098,6 +5294,7 @@
         },
         {
           "key": "match-14",
+          "source_code": "14",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -5121,6 +5318,7 @@
         },
         {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -5156,6 +5354,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -5181,6 +5380,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -5206,6 +5406,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -5231,6 +5432,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -5239,23 +5441,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 2,
-              "label_vi": "2C",
-              "label_en": "2C"
+              "group": "Bảng D",
+              "rank": 1,
+              "label_vi": "1D",
+              "label_en": "1D"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 1,
-              "label_vi": "1E",
-              "label_en": "1E"
+              "group": "Bảng C",
+              "rank": 2,
+              "label_vi": "2C",
+              "label_en": "2C"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -5264,23 +5467,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
             }
           ]
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -5289,23 +5493,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng A",
-              "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng G",
-              "rank": 1,
-              "label_vi": "1G",
-              "label_en": "1G"
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -5330,6 +5535,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -5353,6 +5559,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -5360,23 +5567,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 1,
-              "label_vi": "1D",
-              "label_en": "1D"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
             }
           ]
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -5385,21 +5592,23 @@
             {
               "side": "home",
               "kind": "fixture_winner",
-              "fixture": "match-5",
-              "label_vi": "Thắng 5",
-              "label_en": "Winner 5"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
               "fixture": "match-6",
               "label_vi": "Thắng 6",
               "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
             }
           ]
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -5423,6 +5632,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -5446,6 +5656,7 @@
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -5481,6 +5692,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -5506,6 +5718,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -5531,6 +5744,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -5556,6 +5770,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -5564,23 +5779,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 2,
-              "label_vi": "2D",
-              "label_en": "2D"
+              "group": "Bảng E",
+              "rank": 1,
+              "label_vi": "1E",
+              "label_en": "1E"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -5589,23 +5805,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 2,
-              "label_vi": "2C",
-              "label_en": "2C"
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng B",
+              "group": "Bảng C",
               "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
+              "label_vi": "2C",
+              "label_en": "2C"
             }
           ]
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -5614,23 +5831,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng A",
+              "group": "Bảng B",
               "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
+              "label_vi": "2B",
+              "label_en": "2B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng G",
-              "rank": 1,
-              "label_vi": "1G",
-              "label_en": "1G"
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -5655,6 +5873,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -5678,6 +5897,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -5685,23 +5905,23 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 1,
-              "label_vi": "1E",
-              "label_en": "1E"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "fixture_winner",
+              "fixture": "match-5",
+              "label_vi": "Thắng 5",
+              "label_en": "Winner 5"
             }
           ]
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -5710,21 +5930,23 @@
             {
               "side": "home",
               "kind": "fixture_winner",
-              "fixture": "match-5",
-              "label_vi": "Thắng 5",
-              "label_en": "Winner 5"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
               "fixture": "match-6",
               "label_vi": "Thắng 6",
               "label_en": "Winner 6"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng G",
+              "rank": 1,
+              "label_vi": "1G",
+              "label_en": "1G"
             }
           ]
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -5748,6 +5970,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -5771,6 +5994,7 @@
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -5806,6 +6030,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -5831,6 +6056,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -5839,23 +6065,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng B",
+              "group": "Bảng A",
               "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
+              "label_vi": "2A",
+              "label_en": "2A"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 1,
-              "label_vi": "1C",
-              "label_en": "1C"
+              "group": "Bảng B",
+              "rank": 2,
+              "label_vi": "2B",
+              "label_en": "2B"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -5880,6 +6107,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -5887,23 +6115,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng A",
-              "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-2",
               "label_vi": "Thắng 2",
               "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -5926,7 +6155,8 @@
           ]
         },
         {
-          "key": "match-6",
+          "key": "match-h3",
+          "source_code": "H3",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Tranh hạng ba",
@@ -5962,6 +6192,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -5987,6 +6218,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -6012,6 +6244,7 @@
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -6037,6 +6270,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -6062,6 +6296,7 @@
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 1,
           "bracket_position": 5,
           "round_vi": "Vòng loại 1",
@@ -6087,6 +6322,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 1,
           "bracket_position": 6,
           "round_vi": "Vòng loại 1",
@@ -6112,6 +6348,7 @@
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 1,
           "bracket_position": 7,
           "round_vi": "Vòng loại 1",
@@ -6137,6 +6374,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 1,
           "bracket_position": 8,
           "round_vi": "Vòng loại 1",
@@ -6162,6 +6400,7 @@
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -6185,6 +6424,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -6208,6 +6448,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -6231,6 +6472,7 @@
         },
         {
           "key": "match-12",
+          "source_code": "12",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -6254,6 +6496,7 @@
         },
         {
           "key": "match-13",
+          "source_code": "13",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -6277,6 +6520,7 @@
         },
         {
           "key": "match-14",
+          "source_code": "14",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -6300,6 +6544,7 @@
         },
         {
           "key": "match-15",
+          "source_code": "15",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -6335,6 +6580,7 @@
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
           "round_vi": "Vòng loại 1",
@@ -6360,6 +6606,7 @@
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
           "round_vi": "Vòng loại 1",
@@ -6368,23 +6615,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 2,
-              "label_vi": "2D",
-              "label_en": "2D"
+              "group": "Bảng B",
+              "rank": 1,
+              "label_vi": "1B",
+              "label_en": "1B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 1,
-              "label_vi": "1C",
-              "label_en": "1C"
+              "group": "Bảng D",
+              "rank": 2,
+              "label_vi": "2D",
+              "label_en": "2D"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
           "round_vi": "Vòng loại 1",
@@ -6410,6 +6658,7 @@
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
           "round_vi": "Vòng loại 1",
@@ -6418,23 +6667,24 @@
             {
               "side": "home",
               "kind": "group_rank",
-              "group": "Bảng A",
+              "group": "Bảng B",
               "rank": 2,
-              "label_vi": "2A",
-              "label_en": "2A"
+              "label_vi": "2B",
+              "label_en": "2B"
             },
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
+              "group": "Bảng A",
+              "rank": 2,
+              "label_vi": "2A",
+              "label_en": "2A"
             }
           ]
         },
         {
           "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 1,
           "round_vi": "Tứ kết",
@@ -6459,6 +6709,7 @@
         },
         {
           "key": "match-6",
+          "source_code": "6",
           "round_order": 2,
           "bracket_position": 2,
           "round_vi": "Tứ kết",
@@ -6466,23 +6717,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 1,
-              "label_vi": "1B",
-              "label_en": "1B"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-2",
               "label_vi": "Thắng 2",
               "label_en": "Winner 2"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng C",
+              "rank": 1,
+              "label_vi": "1C",
+              "label_en": "1C"
             }
           ]
         },
         {
           "key": "match-7",
+          "source_code": "7",
           "round_order": 2,
           "bracket_position": 3,
           "round_vi": "Tứ kết",
@@ -6507,6 +6759,7 @@
         },
         {
           "key": "match-8",
+          "source_code": "8",
           "round_order": 2,
           "bracket_position": 4,
           "round_vi": "Tứ kết",
@@ -6514,23 +6767,24 @@
           "slots": [
             {
               "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
-            },
-            {
-              "side": "away",
               "kind": "fixture_winner",
               "fixture": "match-4",
               "label_vi": "Thắng 4",
               "label_en": "Winner 4"
+            },
+            {
+              "side": "away",
+              "kind": "group_rank",
+              "group": "Bảng F",
+              "rank": 1,
+              "label_vi": "1F",
+              "label_en": "1F"
             }
           ]
         },
         {
           "key": "match-9",
+          "source_code": "9",
           "round_order": 3,
           "bracket_position": 1,
           "round_vi": "Bán kết",
@@ -6554,6 +6808,7 @@
         },
         {
           "key": "match-10",
+          "source_code": "10",
           "round_order": 3,
           "bracket_position": 2,
           "round_vi": "Bán kết",
@@ -6577,6 +6832,7 @@
         },
         {
           "key": "match-11",
+          "source_code": "11",
           "round_order": 4,
           "bracket_position": 1,
           "round_vi": "Chung kết",
@@ -6606,18 +6862,17 @@
       "competition_mode": "group_knockout",
       "source": {
         "file": "PICKLEBALL/PDF/DÔI NỮ 41-50.pdf",
-        "page_or_sheet": 4,
-        "warnings": [
-          "Tiêu đề trang bracket ghi nhầm Đôi nam dưới 30T; hạng mục theo tên file và các trang trước."
-        ]
+        "page_or_sheet": 3,
+        "warnings": []
       },
       "fixtures": [
         {
           "key": "match-1",
+          "source_code": "1",
           "round_order": 1,
           "bracket_position": 1,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
           "slots": [
             {
               "side": "home",
@@ -6630,19 +6885,20 @@
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng H",
+              "group": "Bảng D",
               "rank": 2,
-              "label_vi": "2H",
-              "label_en": "2H"
+              "label_vi": "2D",
+              "label_en": "2D"
             }
           ]
         },
         {
           "key": "match-2",
+          "source_code": "2",
           "round_order": 1,
           "bracket_position": 2,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
           "slots": [
             {
               "side": "home",
@@ -6655,19 +6911,20 @@
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng G",
+              "group": "Bảng C",
               "rank": 2,
-              "label_vi": "2G",
-              "label_en": "2G"
+              "label_vi": "2C",
+              "label_en": "2C"
             }
           ]
         },
         {
           "key": "match-3",
+          "source_code": "3",
           "round_order": 1,
           "bracket_position": 3,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
           "slots": [
             {
               "side": "home",
@@ -6680,19 +6937,20 @@
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng F",
+              "group": "Bảng B",
               "rank": 2,
-              "label_vi": "2F",
-              "label_en": "2F"
+              "label_vi": "2B",
+              "label_en": "2B"
             }
           ]
         },
         {
           "key": "match-4",
+          "source_code": "4",
           "round_order": 1,
           "bracket_position": 4,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
+          "round_vi": "Tứ kết",
+          "round_en": "Quarterfinal",
           "slots": [
             {
               "side": "home",
@@ -6705,106 +6963,6 @@
             {
               "side": "away",
               "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 2,
-              "label_vi": "2E",
-              "label_en": "2E"
-            }
-          ]
-        },
-        {
-          "key": "match-5",
-          "round_order": 1,
-          "bracket_position": 5,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng E",
-              "rank": 1,
-              "label_vi": "1E",
-              "label_en": "1E"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng C",
-              "rank": 2,
-              "label_vi": "2C",
-              "label_en": "2C"
-            }
-          ]
-        },
-        {
-          "key": "match-6",
-          "round_order": 1,
-          "bracket_position": 6,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng F",
-              "rank": 1,
-              "label_vi": "1F",
-              "label_en": "1F"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng D",
-              "rank": 2,
-              "label_vi": "2D",
-              "label_en": "2D"
-            }
-          ]
-        },
-        {
-          "key": "match-7",
-          "round_order": 1,
-          "bracket_position": 7,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng G",
-              "rank": 1,
-              "label_vi": "1G",
-              "label_en": "1G"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
-              "group": "Bảng B",
-              "rank": 2,
-              "label_vi": "2B",
-              "label_en": "2B"
-            }
-          ]
-        },
-        {
-          "key": "match-8",
-          "round_order": 1,
-          "bracket_position": 8,
-          "round_vi": "Vòng loại 1",
-          "round_en": "Knockout round 1",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "group_rank",
-              "group": "Bảng H",
-              "rank": 1,
-              "label_vi": "1H",
-              "label_en": "1H"
-            },
-            {
-              "side": "away",
-              "kind": "group_rank",
               "group": "Bảng A",
               "rank": 2,
               "label_vi": "2A",
@@ -6813,11 +6971,12 @@
           ]
         },
         {
-          "key": "match-9",
+          "key": "match-5",
+          "source_code": "5",
           "round_order": 2,
           "bracket_position": 1,
-          "round_vi": "Tứ kết",
-          "round_en": "Quarterfinal",
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
           "slots": [
             {
               "side": "home",
@@ -6836,11 +6995,12 @@
           ]
         },
         {
-          "key": "match-10",
+          "key": "match-6",
+          "source_code": "6",
           "round_order": 2,
           "bracket_position": 2,
-          "round_vi": "Tứ kết",
-          "round_en": "Quarterfinal",
+          "round_vi": "Bán kết",
+          "round_en": "Semifinal",
           "slots": [
             {
               "side": "home",
@@ -6859,11 +7019,12 @@
           ]
         },
         {
-          "key": "match-11",
-          "round_order": 2,
-          "bracket_position": 3,
-          "round_vi": "Tứ kết",
-          "round_en": "Quarterfinal",
+          "key": "match-7",
+          "source_code": "7",
+          "round_order": 3,
+          "bracket_position": 1,
+          "round_vi": "Chung kết",
+          "round_en": "Final",
           "slots": [
             {
               "side": "home",
@@ -6878,98 +7039,6 @@
               "fixture": "match-6",
               "label_vi": "Thắng 6",
               "label_en": "Winner 6"
-            }
-          ]
-        },
-        {
-          "key": "match-12",
-          "round_order": 2,
-          "bracket_position": 4,
-          "round_vi": "Tứ kết",
-          "round_en": "Quarterfinal",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "fixture_winner",
-              "fixture": "match-7",
-              "label_vi": "Thắng 7",
-              "label_en": "Winner 7"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
-              "fixture": "match-8",
-              "label_vi": "Thắng 8",
-              "label_en": "Winner 8"
-            }
-          ]
-        },
-        {
-          "key": "match-13",
-          "round_order": 3,
-          "bracket_position": 1,
-          "round_vi": "Bán kết",
-          "round_en": "Semifinal",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "fixture_winner",
-              "fixture": "match-9",
-              "label_vi": "Thắng 9",
-              "label_en": "Winner 9"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
-              "fixture": "match-10",
-              "label_vi": "Thắng 10",
-              "label_en": "Winner 10"
-            }
-          ]
-        },
-        {
-          "key": "match-14",
-          "round_order": 3,
-          "bracket_position": 2,
-          "round_vi": "Bán kết",
-          "round_en": "Semifinal",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "fixture_winner",
-              "fixture": "match-11",
-              "label_vi": "Thắng 11",
-              "label_en": "Winner 11"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
-              "fixture": "match-12",
-              "label_vi": "Thắng 12",
-              "label_en": "Winner 12"
-            }
-          ]
-        },
-        {
-          "key": "match-15",
-          "round_order": 4,
-          "bracket_position": 1,
-          "round_vi": "Chung kết",
-          "round_en": "Final",
-          "slots": [
-            {
-              "side": "home",
-              "kind": "fixture_winner",
-              "fixture": "match-13",
-              "label_vi": "Thắng 13",
-              "label_en": "Winner 13"
-            },
-            {
-              "side": "away",
-              "kind": "fixture_winner",
-              "fixture": "match-14",
-              "label_vi": "Thắng 14",
-              "label_en": "Winner 14"
             }
           ]
         }

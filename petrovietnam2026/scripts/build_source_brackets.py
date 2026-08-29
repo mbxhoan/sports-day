@@ -24,7 +24,7 @@ PICKLEBALL = [
     ("doi-nam-41-50", "PICKLEBALL/PDF/DÔI NAM 41-50T-40.pdf", 12, "1J 2I 1A 1B 2H 1C 2G 1D 2F 1E 1F 2E 1G 1H 2D 1I 2C 1J 2B 2A"),
     ("doi-nam-tren-51", "PICKLEBALL/PDF/DÔI NAM 51T-26.pdf", 6, "1A 2H 1B 2G 1C 2F 1D 2E 1E 2C 1F 2D 1G 2B 1H 2A"),
     ("doi-nu-31-40", "PICKLEBALL/PDF/DÔI NỮ 31-40T-18.pdf", 4, "1A 2F 2E 1B 2D 1C 1D 2C 1E 2B 2A 1F"),
-    ("doi-nu-41-50", "PICKLEBALL/PDF/DÔI NỮ 41-50.pdf", 4, "1A 2H 1B 2G 1C 2F 1D 2E 1E 2C 1F 2D 1G 2B 1H 2A"),
+    ("doi-nu-41-50", "PICKLEBALL/PDF/DÔI NỮ 41-50.pdf", 3, "1A 2D 1B 2C 1C 2B 1D 2A"),
     ("doi-nam-nu-duoi-30", "PICKLEBALL/PDF/DÔI NAM NƯ D30T-22.pdf", 6, "1A 2G 1B 2F 1C 2E 1D 1E 2D 1F 2C 2B 2A 1G"),
     ("doi-nam-nu-31-40", "PICKLEBALL/PDF/DÔI NAM NỮ 31-40T-31.pdf", 5, "1A 2H 1B 2G 1C 2F 1D 2E 1E 2C 1F 2D 1G 2B 1H 2A"),
     ("doi-nam-nu-41-50", "PICKLEBALL/PDF/DÔI NAM NỮ 41-50T-21.pdf", 5, "1A 2G 2F 1B 2E 2D 1C 1D 2C 1E 2B 1F 2A 1G"),
@@ -109,57 +109,117 @@ def round_names(round_order: int, total_rounds: int) -> tuple[str, str]:
     return f"Vòng loại {round_order}", f"Knockout round {round_order}"
 
 
-def build_bracket(labels: list[str], kind: str, bronze: bool) -> list[dict]:
-    size = 1
-    while size < len(labels):
-        size *= 2
-    pair_count = size // 2
-    byes = size - len(labels)
-    bye_pairs = {round(index * pair_count / byes) % pair_count for index in range(byes)} if byes else set()
-    while len(bye_pairs) < byes:
-        bye_pairs.add(next(index for index in range(pair_count) if index not in bye_pairs))
+def extract_bracket(file: str, page_number: int, labels: list[str], kind: str, bronze: bool) -> list[dict]:
+    """Read actual PDF connector graph. Leaf order alone cannot place source-defined byes."""
+    import fitz
 
-    inputs = [leaf(label, kind) for label in labels]
-    cursor = 0
-    frontier: list[dict] = []
-    fixtures: list[dict] = []
-    sequence = 1
-    total_rounds = size.bit_length() - 1
+    page = fitz.open(ASSET_DIR / file)[page_number - 1]
+    horizontal: list[tuple[float, float, float]] = []
+    vertical: list[tuple[float, float, float]] = []
+    for drawing in page.get_drawings():
+        for item in drawing["items"]:
+            if item[0] != "l":
+                continue
+            first, second = item[1], item[2]
+            if abs(first.y - second.y) < 1:
+                horizontal.append((min(first.x, second.x), max(first.x, second.x), (first.y + second.y) / 2))
+            elif abs(first.x - second.x) < 1:
+                vertical.append(((first.x + second.x) / 2, min(first.y, second.y), max(first.y, second.y)))
 
-    for position in range(1, pair_count + 1):
-        first = inputs[cursor]
-        cursor += 1
-        if position - 1 in bye_pairs:
-            frontier.append(first)
+    nodes: list[dict] = []
+    for x, top, bottom in vertical:
+        inputs = []
+        for endpoint in (top, bottom):
+            matches = [index for index, (_, right, y) in enumerate(horizontal) if abs(right - x) < 1.5 and abs(y - endpoint) < 1.5]
+            if not matches:
+                break
+            inputs.append(matches[0])
+        if len(inputs) != 2:
             continue
-        second = inputs[cursor]
-        cursor += 1
-        key = f"match-{sequence}"
-        sequence += 1
-        vi, en = round_names(1, total_rounds)
-        fixtures.append({"key": key, "round_order": 1, "bracket_position": len([row for row in fixtures if row["round_order"] == 1]) + 1, "round_vi": vi, "round_en": en, "slots": [{"side": "home", **first}, {"side": "away", **second}]})
-        frontier.append({"kind": "fixture_winner", "fixture": key, "label_vi": f"Thắng {sequence - 1}", "label_en": f"Winner {sequence - 1}"})
+        outputs = [index for index, (left, right, y) in enumerate(horizontal) if left < x + 1.5 and right > x + 3 and top + 1 < y < bottom - 1]
+        if outputs:
+            nodes.append({"x": x, "y": horizontal[outputs[0]][2], "inputs": inputs, "output": outputs[0]})
 
-    semifinal_keys: list[str] = []
-    for round_order in range(2, total_rounds + 1):
-        next_frontier = []
-        if len(frontier) == 2:
-            semifinal_keys = [item["fixture"] for item in frontier if item["kind"] == "fixture_winner"]
-        vi, en = round_names(round_order, total_rounds)
-        for index in range(0, len(frontier), 2):
-            key = f"match-{sequence}"
-            sequence += 1
-            fixtures.append({"key": key, "round_order": round_order, "bracket_position": index // 2 + 1, "round_vi": vi, "round_en": en, "slots": [{"side": "home", **frontier[index]}, {"side": "away", **frontier[index + 1]}]})
-            next_frontier.append({"kind": "fixture_winner", "fixture": key, "label_vi": f"Thắng {sequence - 1}", "label_en": f"Winner {sequence - 1}"})
-        frontier = next_frontier
+    output_to_node = {node["output"]: index for index, node in enumerate(nodes)}
+    used_lines = {line for node in nodes for line in node["inputs"]}
 
-    if bronze and len(semifinal_keys) == 2:
+    def component(root: int) -> tuple[set[int], set[int]]:
+        node_ids, leaf_lines = set(), set()
+
+        def visit(index: int) -> None:
+            if index in node_ids:
+                return
+            node_ids.add(index)
+            for line in nodes[index]["inputs"]:
+                if line in output_to_node:
+                    visit(output_to_node[line])
+                else:
+                    leaf_lines.add(line)
+
+        visit(root)
+        return node_ids, leaf_lines
+
+    roots = [index for index, node in enumerate(nodes) if node["output"] not in used_lines]
+    components = [(node_ids, leaf_lines, root) for root in roots for node_ids, leaf_lines in [component(root)]]
+    candidates = [(node_ids, leaf_lines, root) for node_ids, leaf_lines, root in components if len(leaf_lines) == len(labels)]
+    if len(candidates) != 1:
+        raise ValueError(f"could not isolate bracket graph from {file} page {page_number}; expected {len(labels)} leaves, found {[(len(a), len(b)) for a, b, _ in components]}")
+    node_ids, leaf_lines, root = candidates[0]
+
+    ordered_leaves = sorted(leaf_lines, key=lambda line: horizontal[line][2])
+    leaf_sources = {line: leaf(label, kind) for line, label in zip(ordered_leaves, labels)}
+    x_columns: list[float] = []
+    for x in sorted(nodes[index]["x"] for index in node_ids):
+        if not x_columns or abs(x - x_columns[-1]) > 3:
+            x_columns.append(x)
+
+    texts = []
+    for block in page.get_text("dict")["blocks"]:
+        for line in block.get("lines", []):
+            text = "".join(span["text"] for span in line["spans"]).strip()
+            if text:
+                texts.append((*line["bbox"], text))
+
+    ordered_nodes = sorted(node_ids, key=lambda index: (min(range(len(x_columns)), key=lambda column: abs(x_columns[column] - nodes[index]["x"])), nodes[index]["y"]))
+    codes: dict[int, str] = {}
+    occurrences: dict[str, int] = {}
+    keys: dict[int, str] = {}
+    for fallback, index in enumerate(ordered_nodes, 1):
+        node = nodes[index]
+        printed = [text for _, top, right, bottom, text in texts if text.isdigit() and node["x"] - 16 < right < node["x"] + 2 and abs((top + bottom) / 2 - node["y"]) < 12]
+        code = printed[0] if printed else str(fallback)
+        occurrences[code] = occurrences.get(code, 0) + 1
+        codes[index] = code
+        keys[index] = f"match-{code}" + (f"-{occurrences[code]}" if occurrences[code] > 1 else "")
+
+    fixtures = []
+    positions: dict[int, int] = {}
+    for index in ordered_nodes:
+        node = nodes[index]
+        round_order = min(range(len(x_columns)), key=lambda column: abs(x_columns[column] - node["x"])) + 1
+        positions[round_order] = positions.get(round_order, 0) + 1
+        vi, en = round_names(round_order, len(x_columns))
+        slots = []
+        for side, line in zip(("home", "away"), node["inputs"]):
+            if line in output_to_node:
+                source_node = output_to_node[line]
+                code = codes[source_node]
+                slot = {"kind": "fixture_winner", "fixture": keys[source_node], "label_vi": f"Thắng {code}", "label_en": f"Winner {code}"}
+            else:
+                slot = leaf_sources[line]
+            slots.append({"side": side, **slot})
+        fixtures.append({"key": keys[index], "source_code": codes[index], "round_order": round_order, "bracket_position": positions[round_order], "round_vi": vi, "round_en": en, "slots": slots})
+
+    if bronze:
+        semifinal_nodes = [output_to_node[line] for line in nodes[root]["inputs"] if line in output_to_node]
+        if len(semifinal_nodes) != 2:
+            raise ValueError(f"bronze source lacks two semifinals: {file} page {page_number}")
         fixtures.append({
-            "key": f"match-{sequence}", "round_order": total_rounds, "bracket_position": 2,
+            "key": "match-h3", "source_code": "H3", "round_order": len(x_columns), "bracket_position": positions[len(x_columns)] + 1,
             "round_vi": "Tranh hạng ba", "round_en": "Bronze medal match",
             "slots": [
-                {"side": "home", "kind": "fixture_loser", "fixture": semifinal_keys[0], "label_vi": "Thua bán kết 1", "label_en": "Loser semifinal 1"},
-                {"side": "away", "kind": "fixture_loser", "fixture": semifinal_keys[1], "label_vi": "Thua bán kết 2", "label_en": "Loser semifinal 2"},
+                {"side": "home", "kind": "fixture_loser", "fixture": keys[semifinal_nodes[0]], "label_vi": "Thua bán kết 1", "label_en": "Loser semifinal 1"},
+                {"side": "away", "kind": "fixture_loser", "fixture": keys[semifinal_nodes[1]], "label_vi": "Thua bán kết 2", "label_en": "Loser semifinal 2"},
             ],
         })
     return fixtures
@@ -190,17 +250,21 @@ def extract_manifest() -> dict:
     for row in GROUP_BRACKETS:
         warnings = []
         if row["sport"] == "pickleball" and row["slug"] == "doi-nam-41-50":
-            warnings.append("PDF in nhãn 1J hai lần; giữ nguyên PDF để admin đối soát.")
-        if row["sport"] == "pickleball" and row["slug"] == "doi-nu-41-50":
-            warnings.append("Tiêu đề trang bracket ghi nhầm Đôi nam dưới 30T; hạng mục theo tên file và các trang trước.")
-        tournaments.append({"sport_slug": row["sport"], "tournament_slug": row["slug"], "competition_mode": "group_knockout", "source": source(row["file"], row["page"], warnings), "fixtures": build_bracket(row["leaves"], "group_rank", row["bronze"])})
+            warnings.append("PDF in mã trận 5 hai lần; giữ nguyên PDF để admin đối soát.")
+        if row["sport"] == "pickleball" and row["slug"] == "doi-nam-31-40":
+            warnings.append("Tiêu đề PDF ghi năm 2024; hiển thị thống nhất năm sự kiện 2026.")
+        if row["sport"] == "cau-long" and row["slug"] == "doi-nam-nu-duoi-30":
+            warnings.append("Tiêu đề PDF ghi năm 2025; hiển thị thống nhất năm sự kiện 2026.")
+        tournaments.append({"sport_slug": row["sport"], "tournament_slug": row["slug"], "competition_mode": "group_knockout", "source": source(row["file"], row["page"], warnings), "fixtures": extract_bracket(row["file"], row["page"], row["leaves"], "group_rank", row["bronze"])})
 
     for row in DIRECT_BRACKETS:
         names = extract_direct_names(row["file"], row["page"])
-        tournaments.append({"sport_slug": row["sport"], "tournament_slug": row["slug"], "competition_mode": "knockout", "source": source(row["file"], row["page"]), "fixtures": build_bracket(names, "entry", False)})
+        tournaments.append({"sport_slug": row["sport"], "tournament_slug": row["slug"], "competition_mode": "knockout", "source": source(row["file"], row["page"]), "fixtures": extract_bracket(row["file"], row["page"], names, "entry", False)})
 
     for slug, names in TUG.items():
-        tournaments.append({"sport_slug": "keo-co", "tournament_slug": slug, "competition_mode": "knockout", "source": source("KÉO CO/ĐK KEO CO pvn 2026.pdf", 2 if slug == "nu" else 3), "fixtures": build_bracket(names, "entry", False)})
+        page = 2 if slug == "nu" else 3
+        file = "KÉO CO/ĐK KEO CO pvn 2026.pdf"
+        tournaments.append({"sport_slug": "keo-co", "tournament_slug": slug, "competition_mode": "knockout", "source": source(file, page), "fixtures": extract_bracket(file, page, names, "entry", False)})
 
     for sport, slug, mode, file, page in PASSIVE:
         warnings = ["Tiêu đề PDF ghi năm 2027; giữ nội dung theo bộ hồ sơ Hội thao 2026."] if sport == "dien-kinh" and slug == "400m-nu" else []
@@ -276,12 +340,12 @@ def build_sql(data: dict) -> str:
     modes, entries, groups, fixtures, slots, warnings = [], set(), set(), [], [], []
     for tournament in data["tournaments"]:
         sport, slug, mode = tournament["sport_slug"], tournament["tournament_slug"], tournament["competition_mode"]
-        modes.append((sport, slug, mode))
+        modes.append((sport, slug, mode, json.dumps(tournament["source"], ensure_ascii=False, separators=(",", ":"))))
         for warning in tournament["source"].get("warnings", []):
             warnings.append((Path(tournament["source"]["file"]).name, warning))
         for fixture in tournament.get("fixtures", []):
             fixture_id = uuid5(FIXTURE_NAMESPACE, f"{sport}/{slug}/{fixture['key']}")
-            fixtures.append((str(fixture_id), sport, slug, fixture["key"], fixture["round_vi"], fixture["round_en"], fixture["round_order"], fixture["bracket_position"]))
+            fixtures.append((str(fixture_id), sport, slug, fixture["key"], fixture.get("source_code"), fixture["round_vi"], fixture["round_en"], fixture["round_order"], fixture["bracket_position"]))
             for slot_data in fixture["slots"]:
                 kind = slot_data["kind"]
                 entry_name = slot_data.get("entry_name")
@@ -298,9 +362,9 @@ def build_sql(data: dict) -> str:
         "set app.tenant_slug = 'petrovietnam2026';",
         "",
         "-- Generated by petrovietnam2026/scripts/build_source_brackets.py. PDF topology wins; existing admin rows are never overwritten.",
-        "create temporary table seed_source_modes (sport_slug text, tournament_slug text, competition_mode text) on commit drop;",
+        "create temporary table seed_source_modes (sport_slug text, tournament_slug text, competition_mode text, source_metadata jsonb) on commit drop;",
         "insert into seed_source_modes values\n" + values(modes) + ";",
-        "update public.tournaments t set competition_mode = source.competition_mode",
+        "update public.tournaments t set competition_mode = source.competition_mode, source_metadata = source.source_metadata",
         "from seed_source_modes source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()",
         "where t.sport_id = s.id and t.slug = source.tournament_slug and t.tenant_id = s.tenant_id;",
     ]
@@ -328,10 +392,10 @@ def build_sql(data: dict) -> str:
         ]
     lines += [
         "",
-        "create temporary table seed_source_fixtures (id uuid, sport_slug text, tournament_slug text, fixture_key text, round_vi text, round_en text, round_order integer, bracket_position integer) on commit drop;",
+        "create temporary table seed_source_fixtures (id uuid, sport_slug text, tournament_slug text, fixture_key text, source_code text, round_vi text, round_en text, round_order integer, bracket_position integer) on commit drop;",
         "insert into seed_source_fixtures values\n" + values(fixtures) + ";",
-        "insert into public.fixtures (id, tenant_id, tournament_id, status, round_vi, round_en, round_order, bracket_position)",
-        "select source.id, t.tenant_id, t.id, 'scheduled', source.round_vi, source.round_en, source.round_order, source.bracket_position",
+        "insert into public.fixtures (id, tenant_id, tournament_id, status, source_code, round_vi, round_en, round_order, bracket_position)",
+        "select source.id, t.tenant_id, t.id, 'scheduled', source.source_code, source.round_vi, source.round_en, source.round_order, source.bracket_position",
         "from seed_source_fixtures source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()",
         "join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug and t.tenant_id = s.tenant_id",
         "on conflict (id) do nothing;",

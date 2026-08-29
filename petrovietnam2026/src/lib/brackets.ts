@@ -20,7 +20,12 @@ export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[]) {
   for (const fixture of ordered) {
     const round = Math.max(fixture.round_order ?? 1, 1);
     const sources = slots.filter((slot) => slot.fixture_id === fixture.id && slot.source_fixture_id).map((slot) => byId.get(slot.source_fixture_id!)).filter(Boolean) as Array<{ y: number }>;
-    const y = sources.length ? sources.reduce((sum, source) => sum + source.y, 0) / sources.length : FIRST_ROW_Y + Math.max((fixture.bracket_position ?? 1) - 1, 0) * ROW_GAP;
+    const sourceY = sources.length ? sources.reduce((sum, source) => sum + source.y, 0) / sources.length : null;
+    const positionY = FIRST_ROW_Y + Math.max((fixture.bracket_position ?? 1) - 1, 0) * ROW_GAP;
+    const occupied = nodes.filter((node) => node.x === (round - 1) * (CARD_WIDTH + COLUMN_GAP)).map((node) => node.y);
+    let y = sourceY ?? positionY;
+    if (occupied.some((value) => Math.abs(value - y) < CARD_HEIGHT)) y = positionY;
+    while (occupied.some((value) => Math.abs(value - y) < CARD_HEIGHT)) y += ROW_GAP;
     const node = { id: fixture.id, x: (round - 1) * (CARD_WIDTH + COLUMN_GAP), y };
     nodes.push(node);
     byId.set(node.id, node);

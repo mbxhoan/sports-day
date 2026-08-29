@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { CalendarDays, Clock3, GitBranch, Info, MapPin, Trophy, Users } from "lucide-react";
 import {
-  copy, isKnockoutFixture, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry,
+  copy, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry, type FixtureSlot,
   type Group, type GroupEntry, type Locale, type Organization, type Participant,
   type Sport, type Standing, type Tournament, type Venue, type Court,
 } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
 import { ScheduleView } from "./schedule-view";
+import { CompetitionBoard } from "./competition-board";
 
 type Props = {
   locale: Locale;
@@ -23,6 +24,7 @@ type Props = {
   groupEntries: GroupEntry[];
   fixtures: Fixture[];
   fixtureEntries: FixtureEntry[];
+  fixtureSlots: FixtureSlot[];
   standings: Standing[];
   venues: Venue[];
   courts: Court[];
@@ -30,7 +32,7 @@ type Props = {
 
 export type TabKey = "info" | "teams" | "times" | "fixtures" | "brackets";
 
-export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, standings, venues, courts }: Props) {
+export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, venues, courts }: Props) {
   const t = copy[locale];
   const tournamentIds = new Set(tournaments.map((item) => item.id));
   const sportFixtures = fixtures.filter((fixture) => tournamentIds.has(fixture.tournament_id));
@@ -38,11 +40,8 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
   const sportGroups = groups.filter((group) => tournamentIds.has(group.tournament_id));
   const organizationsById = new Map(organizations.map((item) => [item.id, item]));
   const participantsById = new Map(participants.map((item) => [item.id, item]));
-  const entriesById = new Map(entries.map((item) => [item.id, item]));
   const tournamentsById = new Map(tournaments.map((item) => [item.id, item]));
-  const fixtureEntriesById = new Map<string, FixtureEntry[]>();
   const membersByEntryId = new Map<string, EntryMember[]>();
-  for (const item of fixtureEntries) fixtureEntriesById.set(item.fixture_id, [...(fixtureEntriesById.get(item.fixture_id) ?? []), item]);
   for (const item of entryMembers) membersByEntryId.set(item.entry_id, [...(membersByEntryId.get(item.entry_id) ?? []), item]);
 
   const date = (value: string | null) => value ? formatVietnamDateTime(value, locale) : t.updating;
@@ -52,7 +51,6 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     const split = formatted.lastIndexOf(" ");
     return split < 0 ? { day: formatted, time: "" } : { day: formatted.slice(0, split), time: formatted.slice(split + 1) };
   };
-  const fixtureRows = (fixtureId: string) => (fixtureEntriesById.get(fixtureId) ?? []).map((item) => ({ item, entry: entriesById.get(item.entry_id) })).filter((row) => row.entry);
   const formats = [...new Set(tournaments.map((item) => localized(item, "format", locale)).filter(Boolean))];
   const datedFixtures = sportFixtures.filter((item) => item.starts_at).sort((a, b) => Date.parse(a.starts_at!) - Date.parse(b.starts_at!));
   const competitionDays = [...new Set(datedFixtures.map((item) => dateParts(item.starts_at).day))];
@@ -77,8 +75,7 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     </div>
     {active === "brackets" && <div className="bracket-overview" aria-label={`${t.fixtures} / ${t.categories}`}>
       <Link className="bracket-schedule-link" href={`${hrefBase}?tab=fixtures`}><CalendarDays size={15}/>{t.fixtures}</Link>
-      <span className="bracket-overview-label">{t.categories}</span>
-      <div className="bracket-category-pills">{tournaments.map((tournament) => <a key={tournament.id} href={`#tournament-${tournament.id}`}>{localized(tournament, "name", locale)}</a>)}</div>
+      <span className="bracket-overview-label">{t.categories} · {locale === "vi" ? "Chọn một hạng mục trong bảng" : "Choose one category in the board"}</span>
     </div>}
     <div className="tabs sport-tabs" role="tablist" aria-label={localized(sport, "name", locale)}>
       {tabs.map(([key,label,Icon]) => <Link key={key} href={key === "info" ? hrefBase : `${hrefBase}?tab=${key}`} className={active === key ? "active" : ""} role="tab" aria-selected={active === key} scroll={false}><Icon size={16}/>{label}</Link>)}
@@ -120,27 +117,8 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
       </article>)}</div>
     </section>)}</div> : <section className="panel empty-state"><CalendarDays/><h2>{t.empty}</h2></section>)}
 
-    {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} fixtures={fixtures} fixtureEntries={fixtureEntries} venues={venues} courts={courts} defaultVenue={venue}/>}
+    {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} defaultVenue={venue}/>}
 
-    {active === "brackets" && (sportGroups.length || sportFixtures.some(isKnockoutFixture) ? <div className="tournament-stack">{tournaments.map((tournament) => {
-      const tournamentGroups = sportGroups.filter((group) => group.tournament_id === tournament.id);
-      const knockout = sportFixtures.filter((fixture) => fixture.tournament_id === tournament.id && isKnockoutFixture(fixture)).sort((a, b) => (a.round_order ?? 999) - (b.round_order ?? 999));
-      if (!tournamentGroups.length && !knockout.length) return null;
-      const rounds = Map.groupBy(knockout, (fixture) => fixture.round_order ?? localized(fixture, "round", locale));
-      return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id}>
-        <h2>{localized(tournament,"name",locale)}</h2>
-        {knockout.length > 0 && <div className="bracket-scroll"><div className="bracket-columns">{[...rounds].map(([round, roundFixtures]) => <div className="bracket-round" key={String(round)}><h3>{localized(roundFixtures[0],"round",locale) || t.round}</h3>{roundFixtures.map((fixture) => {
-          const rows = fixtureRows(fixture.id);
-          return <article className="bracket-match" key={fixture.id}><small>{date(fixture.starts_at)}</small><div className="bracket-teams">{[0, 1].map((index) => {
-            const row = rows[index];
-            return <div className={`bracket-team${row?.entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.item.id ?? index}><span>{row?.entry ? localized(row.entry, "name", locale) : "?"}</span><b>{row?.item.score ?? "—"}</b></div>;
-          })}</div>{localized(fixture,"result_summary",locale) && <span>{localized(fixture,"result_summary",locale)}</span>}</article>;
-        })}</div>)}</div></div>}
-        {tournamentGroups.length > 0 && <div className="group-grid">{tournamentGroups.map((group) => {
-          const rows = groupEntries.filter((item) => item.group_id === group.id).map((item) => ({ item, entry: entriesById.get(item.entry_id), standing: standings.find((standing) => standing.group_id === group.id && standing.entry_id === item.entry_id) })).sort((a,b) => (a.standing?.rank ?? a.item.seed_order ?? 999) - (b.standing?.rank ?? b.item.seed_order ?? 999));
-          return <div className="panel table-scroll" key={group.id}><h3 className="table-title">{localized(group,"name",locale)}</h3><table><thead><tr><th>#</th><th>{t.teams}</th><th>P</th><th>W</th><th>D</th><th>L</th><th>{t.points}</th></tr></thead><tbody>{rows.map(({ item, entry, standing }, index) => <tr key={item.id}><td>{standing?.rank ?? index + 1}</td><td>{entry ? localized(entry,"name",locale) : ""}</td><td>{standing?.played ?? 0}</td><td>{standing?.won ?? 0}</td><td>{standing?.drawn ?? 0}</td><td>{standing?.lost ?? 0}</td><td><b>{standing?.points ?? 0}</b></td></tr>)}</tbody></table></div>;
-        })}</div>}
-      </section>;
-    })}</div> : <section className="panel empty-state bracket-placeholder"><GitBranch/><h2>{t.empty}</h2></section>)}
+    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={tournaments} entries={entries} groups={sportGroups} groupEntries={groupEntries} fixtures={sportFixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings}/>}
   </>;
 }

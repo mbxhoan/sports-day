@@ -3,6 +3,7 @@ import { Archive, ArrowLeft, RotateCcw, Save, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { ConfirmedMediaDeleteForm } from "@/components/confirmed-media-delete-form";
+import { CompetitionBoard } from "@/components/competition-board";
 import { MarkdownInput } from "@/components/markdown-input";
 import { MediaUploadForm } from "@/components/media-upload-form";
 import { adminEntities, type AdminEntity, type AdminField } from "@/lib/admin-config";
@@ -10,15 +11,17 @@ import { relationEntity } from "@/lib/admin-relations";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
-import { deleteMedia, saveFixtureResult, saveRecord, saveScoringRule, setArchived, uploadMedia } from "../../actions";
+import type { Entry, Fixture, FixtureEntry, FixtureSlot, Group, GroupEntry, Standing, Tournament } from "@/lib/site";
+import { confirmFixtureReset, deleteMedia, previewFixtureReset, saveFixtureResult, saveFixtureSlot, saveRaceResult, saveRecord, saveScoringRule, setArchived, uploadMedia } from "../../actions";
 
 type Row = Record<string, unknown> & { id: string; archived_at: string | null };
 
 function summary(row: Row) { return String(row.name_vi ?? row.title_vi ?? row.full_name ?? row.code ?? row.value ?? row.id); }
 function resultDate(value: unknown) { return typeof value === "string" && value ? new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", dateStyle: "short", timeStyle: "short" }).format(new Date(value)) : "Chưa xếp lịch"; }
 function resultTeam(row?: Row) { return row ? summary(row) : "Chưa xếp đội"; }
+function resultNote(row?: Row) { const detail = row?.result_detail; return detail && typeof detail === "object" && "note" in detail ? String(detail.note ?? "") : ""; }
 function rule(row: Row) { const value = row.scoring_rule; return value && typeof value === "object" ? value as { type?: string; win?: number; draw?: number; loss?: number } : {}; }
-function selectColumns(entity: AdminEntity) { return [...new Set(["id", "archived_at", ...adminEntities[entity].fields.map((field) => field.name)])].join(","); }
+function selectColumns(entity: AdminEntity) { const extra: Partial<Record<AdminEntity, string[]>> = { tournaments: ["competition_mode", "source_metadata"], fixtures: ["source_code"], fixture_entries: ["result_status"] }; return [...new Set(["id", "archived_at", ...adminEntities[entity].fields.map((field) => field.name), ...(extra[entity] ?? [])])].join(","); }
 function asRows(data: unknown) { return (data ?? []) as Row[]; }
 
 function Fields({ fields, row = {}, rows }: { fields: readonly AdminField[]; row?: Partial<Row>; rows: Record<AdminEntity, Row[]> }) {
@@ -31,7 +34,7 @@ function Fields({ fields, row = {}, rows }: { fields: readonly AdminField[]; row
 
 function CrudSection({ entity, rows, allRows, section, editTarget }: { entity: AdminEntity; rows: Row[]; allRows: Record<AdminEntity, Row[]>; section: string; editTarget?: string }) {
   const config = adminEntities[entity];
-  return <details className="admin-section" open><summary><span>{config.title}</span><small>{rows.length}</small></summary><div className="admin-section-body">
+  return <details className="admin-section" open={Boolean(editTarget)}><summary><span>{config.title}</span><small>{rows.length}</small></summary><div className="admin-section-body">
     <details className="record-form"><summary>＋ Thêm / Add</summary><form action={saveRecord}><input type="hidden" name="entity" value={entity}/><Fields fields={config.fields} rows={allRows}/><button className="gold-button"><Save size={15}/>Lưu / Save</button></form></details>
     <div className="record-list">{rows.map((row) => { const target = `${entity}:${row.id}`; return <details className={`record ${row.archived_at ? "archived" : ""}`} key={row.id} open={editTarget === target}><summary><a href={`?section=${section}&edit=${encodeURIComponent(target)}#${section}`}>{summary(row)}</a>{row.archived_at && <em>Archived</em>}</summary>{editTarget === target && <><form action={saveRecord}><input type="hidden" name="entity" value={entity}/><input type="hidden" name="id" value={row.id}/><Fields fields={config.fields} row={row} rows={allRows}/><button className="gold-button"><Save size={15}/>Lưu / Save</button></form><form action={setArchived}><input type="hidden" name="entity" value={entity}/><input type="hidden" name="id" value={row.id}/><input type="hidden" name="archived" value={row.archived_at ? "false" : "true"}/><button className="archive-button">{row.archived_at ? <RotateCcw size={15}/> : <Archive size={15}/>} {row.archived_at ? "Khôi phục / Restore" : "Lưu trữ / Archive"}</button></form></>}</details>; })}</div>
   </div></details>;
@@ -59,10 +62,12 @@ function SportNavLink({ current, section, href, children }: { current: string; s
   return <a href={href} className={active ? "active" : undefined} aria-current={active ? "page" : undefined}>{children}</a>;
 }
 
-export default async function SportAdminPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ edit?: string; section?: string }> }) {
+export default async function SportAdminPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ edit?: string; section?: string; reset?: string; affected?: string }> }) {
   const { slug } = await params;
   const requested = await searchParams;
   const editTarget = requested.edit;
+  const resetTarget = requested.reset;
+  const resetAffected = Number(requested.affected ?? 0);
   const section = ["overview", "categories", "teams", "schedule", "results", "gallery"].includes(requested.section ?? "") ? requested.section! : "overview";
   const supabase = await createSupabaseServerClient();
   const tenantId = await getTenantId(supabase);
@@ -83,6 +88,7 @@ export default async function SportAdminPage({ params, searchParams }: { params:
   const entityNames = Object.keys(adminEntities) as AdminEntity[];
   const rows = Object.fromEntries(entityNames.map((entity) => [entity, [] as Row[]])) as Record<AdminEntity, Row[]>;
   let resultsLoadError = false;
+  let fixtureSlots: Row[] = [];
   rows.sports = [sport];
   rows.tournaments = tournamentRows;
   if (section === "teams") {
@@ -117,20 +123,27 @@ export default async function SportAdminPage({ params, searchParams }: { params:
     rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIds.has(String(item.fixture_id)));
   } else if (section === "results") {
     try {
-      const [entriesResult, fixturesResult, fixtureEntriesResult, standingsResult, awardsResult] = await withTimeout(() => Promise.all([
+      const [entriesResult, fixturesResult, fixtureEntriesResult, standingsResult, awardsResult, groupsResult, groupEntriesResult, fixtureSlotsResult] = await withTimeout(() => Promise.all([
         all("entries"),
         all("fixtures"),
         all("fixture_entries"),
         all("standings"),
         all("awards"),
+        all("groups"),
+        all("group_entries"),
+        supabase.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en,archived_at").eq("tenant_id", tenantId).is("archived_at", null),
       ]), 10_000);
-      if ([entriesResult, fixturesResult, fixtureEntriesResult, standingsResult, awardsResult].some((result) => result.error)) throw new Error("Results query failed");
+      if ([entriesResult, fixturesResult, fixtureEntriesResult, standingsResult, awardsResult, groupsResult, groupEntriesResult, fixtureSlotsResult].some((result) => result.error)) throw new Error("Results query failed");
       rows.entries = asRows(entriesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
       rows.fixtures = asRows(fixturesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
       const fixtureIds = new Set(rows.fixtures.map((item) => item.id));
       rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIds.has(String(item.fixture_id)));
       rows.standings = asRows(standingsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
       rows.awards = asRows(awardsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
+      rows.groups = asRows(groupsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
+      const resultGroupIds = new Set(rows.groups.map((item) => item.id));
+      rows.group_entries = asRows(groupEntriesResult.data).filter((item) => resultGroupIds.has(String(item.group_id)));
+      fixtureSlots = asRows(fixtureSlotsResult.data);
     } catch {
       resultsLoadError = true;
     }
@@ -160,6 +173,19 @@ export default async function SportAdminPage({ params, searchParams }: { params:
     awards: rows.awards.filter((item) => tournamentIdSet.has(String(item.tournament_id))),
     media: rows.media.filter((item) => item.sport_id === sport.id),
   };
+  fixtureSlots = fixtureSlots.filter((item) => fixtureIds.has(String(item.fixture_id)));
+  const boardProps = {
+    locale: "vi" as const,
+    tournaments: scopedRows.tournaments as unknown as Tournament[],
+    entries: scopedRows.entries as unknown as Entry[],
+    groups: scopedRows.groups as unknown as Group[],
+    groupEntries: scopedRows.group_entries as unknown as GroupEntry[],
+    fixtures: scopedRows.fixtures as unknown as Fixture[],
+    fixtureEntries: scopedRows.fixture_entries as unknown as FixtureEntry[],
+    fixtureSlots: fixtureSlots as unknown as FixtureSlot[],
+    standings: scopedRows.standings as unknown as Standing[],
+  };
+  const tournamentLocked = new Map(scopedRows.tournaments.map((tournament) => [tournament.id, scopedRows.fixtures.some((fixture) => fixture.tournament_id === tournament.id && (["live", "completed"].includes(String(fixture.status)) || fixture.winner_entry_id || scopedRows.fixture_entries.some((item) => item.fixture_id === fixture.id && (item.score != null || item.score_numeric != null || item.rank != null || item.result_status != null))))]));
 
   return <main className="admin-page"><header className="admin-header"><div><b>{summary(sport)}</b><small>Quản lý môn / Sport operations</small></div><Link href="/admin"><ArrowLeft size={16}/> Dashboard</Link></header><div className="admin-main admin-sport-main">
     <div className="admin-sport-workspace">
@@ -169,7 +195,25 @@ export default async function SportAdminPage({ params, searchParams }: { params:
         <section id="categories"><CrudSection entity="tournaments" rows={scopedRows.tournaments} allRows={scopedRows} section="categories" editTarget={editTarget}/><div className="admin-card"><h2>Quy tắc tính BXH / Standings rules</h2><div className="record-list">{scopedRows.tournaments.map((tournament) => { const item = rule(tournament); return <details className="record" key={tournament.id}><summary>{summary(tournament)}</summary><form action={saveScoringRule}><input type="hidden" name="tournament_id" value={tournament.id}/><div className="admin-fields"><label><span>Loại / Type</span><select name="scoring_type" defaultValue={item.type ?? "manual"}><option value="manual">Manual / Other PDF rule</option><option value="head-to-head">Head-to-head points</option></select></label><label><span>Thắng / Win</span><input name="win_points" type="number" step="any" defaultValue={item.win ?? ""}/></label><label><span>Hòa / Draw</span><input name="draw_points" type="number" step="any" defaultValue={item.draw ?? ""}/></label><label><span>Thua / Loss</span><input name="loss_points" type="number" step="any" defaultValue={item.loss ?? ""}/></label></div><button className="gold-button"><Save size={15}/>Lưu quy tắc / Save rule</button></form></details>; })}</div></div></section>
         <section id="teams" className="admin-group"><CrudSection entity="entries" rows={scopedRows.entries} allRows={scopedRows} section="teams" editTarget={editTarget}/><CrudSection entity="participants" rows={scopedRows.participants} allRows={scopedRows} section="teams" editTarget={editTarget}/><CrudSection entity="entry_members" rows={scopedRows.entry_members} allRows={scopedRows} section="teams" editTarget={editTarget}/></section>
         <section id="schedule" className="admin-group"><CrudSection entity="venues" rows={rows.venues} allRows={scopedRows} section="schedule" editTarget={editTarget}/><CrudSection entity="courts" rows={rows.courts} allRows={scopedRows} section="schedule" editTarget={editTarget}/><CrudSection entity="groups" rows={scopedRows.groups} allRows={scopedRows} section="schedule" editTarget={editTarget}/><CrudSection entity="group_entries" rows={scopedRows.group_entries} allRows={scopedRows} section="schedule" editTarget={editTarget}/><CrudSection entity="fixtures" rows={scopedRows.fixtures} allRows={scopedRows} section="schedule" editTarget={editTarget}/><CrudSection entity="fixture_entries" rows={scopedRows.fixture_entries} allRows={scopedRows} section="schedule" editTarget={editTarget}/></section>
-        <section id="results" className="admin-group"><div className="admin-card"><h2>Cập nhật kết quả / Update results</h2><p className="results-help">Bấm vào từng trận để nhập đội, tỷ số và trạng thái. / Click a match to enter teams, score and status.</p>{resultsLoadError ? <p className="results-error" role="alert">Không tải được dữ liệu kết quả. Vui lòng tải lại trang. / Results could not be loaded. Please reload.</p> : <div className="record-list">{scopedRows.fixtures.map((fixture) => { const current = scopedRows.fixture_entries.filter((item) => item.fixture_id === fixture.id); const home = current.find((item) => item.side === "home") ?? current[0]; const away = current.find((item) => item.side === "away") ?? current[1]; const tournament = scopedRows.tournaments.find((item) => item.id === fixture.tournament_id); const target = `fixture-result:${fixture.id}`; return <details className="record result-match" key={fixture.id} open={editTarget === target}><summary className="result-match-summary"><div><b>{resultTeam(scopedRows.entries.find((entry) => entry.id === home?.entry_id))} <span>vs</span> {resultTeam(scopedRows.entries.find((entry) => entry.id === away?.entry_id))}</b><small>{tournament ? summary(tournament) : "Chưa có hạng mục"} · {String(fixture.round_vi ?? "Chưa có vòng")}</small></div><div><time>{resultDate(fixture.starts_at)}</time><strong>{String(home?.score ?? "—")} : {String(away?.score ?? "—")}</strong></div></summary><form action={saveFixtureResult}><input type="hidden" name="fixture_id" value={fixture.id}/><div className="admin-fields"><label><span>Đội 1 / Team 1</span><select name="entry_1" defaultValue={String(home?.entry_id ?? "")} required><option value="">Chọn / Select</option>{scopedRows.entries.filter((entry) => !entry.archived_at).map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select></label><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={String(home?.score ?? "")}/></label><label><span>Đội 2 / Team 2</span><select name="entry_2" defaultValue={String(away?.entry_id ?? "")} required><option value="">Chọn / Select</option>{scopedRows.entries.filter((entry) => !entry.archived_at).map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={String(away?.score ?? "")}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={String(fixture.status ?? "scheduled")}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label><label><span>Đội thắng (nếu khác auto) / Winner</span><select name="winner_entry_id" defaultValue={String(fixture.winner_entry_id ?? "")}><option value="">Tự tính / Auto</option>{scopedRows.entries.filter((entry) => !entry.archived_at).map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select></label></div><button className="gold-button"><Save size={15}/>Lưu kết quả / Save result</button></form></details>; })}</div>} </div><CrudSection entity="standings" rows={scopedRows.standings} allRows={scopedRows} section="results" editTarget={editTarget}/><CrudSection entity="awards" rows={scopedRows.awards} allRows={scopedRows} section="results" editTarget={editTarget}/></section>
+        <section id="results" className="admin-group">
+          {resetTarget && <div className="admin-card reset-warning"><h2>⚠ Mở lại vòng sau</h2><p>Thao tác sẽ xoá tỷ số, thứ hạng và người thắng của {resetAffected} trận phụ thuộc. Không thể hoàn tác tự động.</p><form action={confirmFixtureReset}><input type="hidden" name="fixture_id" value={resetTarget}/><label><input type="checkbox" name="confirm" value="yes" required/> Tôi xác nhận đặt lại dữ liệu vòng sau.</label><button className="archive-button">Xác nhận reset</button></form></div>}
+          {!resultsLoadError && <div className="admin-card admin-board-card"><h2>Bảng đấu theo nguồn</h2><p className="results-help">Chọn trực tiếp một trận trên nhánh để nhập kết quả.</p><CompetitionBoard {...boardProps} adminHref="?section=results"/></div>}
+          <details className="admin-card admin-result-editor" open={Boolean(editTarget?.startsWith("fixture-result:"))}><summary><h2>Cập nhật kết quả / Update results</h2><p className="results-help">Nhánh tự điền khi kết quả hợp lệ; cấu trúc khóa ngay khi hạng mục bắt đầu.</p></summary>{resultsLoadError ? <p className="results-error" role="alert">Không tải được dữ liệu kết quả. Vui lòng tải lại trang.</p> : <div className="record-list">{scopedRows.fixtures.map((fixture) => {
+            const current = scopedRows.fixture_entries.filter((item) => item.fixture_id === fixture.id);
+            const home = current.find((item) => item.side === "home") ?? current[0];
+            const away = current.find((item) => item.side === "away") ?? current[1];
+            const tournament = scopedRows.tournaments.find((item) => item.id === fixture.tournament_id);
+            const target = `fixture-result:${fixture.id}`;
+            const isRace = tournament?.competition_mode === "race";
+            const tournamentEntries = scopedRows.entries.filter((entry) => entry.tournament_id === fixture.tournament_id && !entry.archived_at);
+            const slots = fixtureSlots.filter((item) => item.fixture_id === fixture.id);
+            return <details id={`fixture-${fixture.id}`} className="record result-match" key={fixture.id} open={editTarget === target}><summary className="result-match-summary"><div><b>{isRace ? `${current.length} VĐV/đội` : <>{resultTeam(scopedRows.entries.find((entry) => entry.id === home?.entry_id))} <span>vs</span> {resultTeam(scopedRows.entries.find((entry) => entry.id === away?.entry_id))}</>}</b><small>{tournament ? summary(tournament) : "Chưa có hạng mục"} · {String(fixture.round_vi ?? "Chưa có vòng")}</small></div><div><time>{resultDate(fixture.starts_at)}</time><strong>{isRace ? "Thành tích" : `${String(home?.score ?? "—")} : ${String(away?.score ?? "—")}`}</strong></div></summary>
+              {isRace ? <form action={saveRaceResult}><input type="hidden" name="fixture_id" value={fixture.id}/><div className="race-result-list">{current.map((item) => <div key={item.id}><input type="hidden" name="entry_id" value={String(item.entry_id)}/><b>{resultTeam(scopedRows.entries.find((entry) => entry.id === item.entry_id))}</b><label>Làn<input name="lane" type="number" min="1" defaultValue={String(item.lane ?? "")}/></label><label>Thành tích (giây)<input name="score" type="number" min="0" step="0.001" defaultValue={String(item.score_numeric ?? item.score ?? "")}/></label><label>Trạng thái<select name="result_status" defaultValue={String(item.result_status ?? "")}><option value="">Chưa có</option><option value="finished">Hoàn thành</option><option value="dns">DNS</option><option value="dnf">DNF</option><option value="dsq">DSQ</option></select></label></div>)}</div><button className="gold-button"><Save size={15}/>Lưu thành tích</button></form> : <form action={saveFixtureResult}><input type="hidden" name="fixture_id" value={fixture.id}/><div className="admin-fields"><label><span>Đội 1 / Team 1</span><select name="entry_1" defaultValue={String(home?.entry_id ?? "")} required><option value="">Chọn / Select</option>{tournamentEntries.map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select></label><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={String(home?.score ?? "")}/></label><label><span>Đội 2 / Team 2</span><select name="entry_2" defaultValue={String(away?.entry_id ?? "")} required><option value="">Chọn / Select</option>{tournamentEntries.map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={String(away?.score ?? "")}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={String(fixture.status ?? "scheduled")}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label><label><span>Đội thắng (nếu khác auto) / Winner</span><select name="winner_entry_id" defaultValue={String(fixture.winner_entry_id ?? "")}><option value="">Tự tính / Auto</option>{tournamentEntries.map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select></label><label><span>Ghi chú</span><input name="note" defaultValue={resultNote(home)}/></label></div><button className="gold-button"><Save size={15}/>Lưu kết quả / Save result</button></form>}
+              {Boolean(fixture.next_fixture_id) && <form action={previewFixtureReset} className="reset-preview"><input type="hidden" name="fixture_id" value={fixture.id}/><input type="hidden" name="sport_slug" value={slug}/><button className="archive-button">Xem ảnh hưởng khi mở lại vòng sau</button></form>}
+              {slots.length > 0 && <details className="slot-editor"><summary>Cấu trúc nhánh {tournamentLocked.get(String(fixture.tournament_id)) ? "— đã khóa" : "— chỉnh trước khi thi đấu"}</summary>{!tournamentLocked.get(String(fixture.tournament_id)) && slots.map((slot) => <form action={saveFixtureSlot} key={slot.id}><input type="hidden" name="slot_id" value={slot.id}/><b>{String(slot.side) === "home" ? "Ô trên" : "Ô dưới"}</b><select name="source_kind" defaultValue={String(slot.source_kind)}><option value="entry">Đội/cặp/cá nhân</option><option value="group_rank">Thứ hạng bảng</option><option value="fixture_winner">Thắng trận</option><option value="fixture_loser">Thua trận</option><option value="bye">Bye</option></select><select name="source_entry_id" defaultValue={String(slot.source_entry_id ?? "")}><option value="">Chọn đội</option>{tournamentEntries.map((entry) => <option key={entry.id} value={entry.id}>{summary(entry)}</option>)}</select><select name="source_group_id" defaultValue={String(slot.source_group_id ?? "")}><option value="">Chọn bảng</option>{scopedRows.groups.filter((group) => group.tournament_id === fixture.tournament_id).map((group) => <option key={group.id} value={group.id}>{summary(group)}</option>)}</select><input name="source_rank" type="number" min="1" placeholder="Hạng" defaultValue={String(slot.source_rank ?? "")}/><select name="source_fixture_id" defaultValue={String(slot.source_fixture_id ?? "")}><option value="">Chọn trận nguồn</option>{scopedRows.fixtures.filter((item) => item.tournament_id === fixture.tournament_id && item.id !== fixture.id).map((item) => <option key={item.id} value={item.id}>{String(item.source_code ?? item.round_vi ?? item.id)}</option>)}</select><input name="label_vi" placeholder="Nhãn VI" defaultValue={String(slot.label_vi ?? "")}/><input name="label_en" placeholder="Label EN" defaultValue={String(slot.label_en ?? "")}/><button className="gold-button">Lưu ô nhánh</button></form>)}</details>}
+            </details>;
+          })}</div>}</details><CrudSection entity="standings" rows={scopedRows.standings} allRows={scopedRows} section="results" editTarget={editTarget}/><CrudSection entity="awards" rows={scopedRows.awards} allRows={scopedRows} section="results" editTarget={editTarget}/>
+        </section>
         <section id="gallery" className="admin-card"><h2>Thư viện ảnh / Gallery</h2><p className="upload-help">Chọn nhiều ảnh cùng lúc. PNG, JPEG, WebP; tối đa 10MB mỗi ảnh.</p><MediaUploadForm action={uploadMedia} sportId={sport.id} multiple albumFields/><MediaGrid rows={scopedRows.media} allRows={scopedRows} editTarget={editTarget} publicUrl={(path) => supabase.storage.from("event-media").getPublicUrl(path).data.publicUrl}/></section>
       </div>
     </div>
