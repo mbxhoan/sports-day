@@ -26,3 +26,7 @@ npm run build
 ```
 
 Seed chạy theo thứ tự trong `../supabase/seeds/`. File lịch PTSC cũ chỉ lưu manifest, không import. Production dùng user/mật khẩu riêng; không chạy `040_local_admin.sql` trên project online.
+
+## Hướng dẫn vận hành
+
+Xem [bộ hướng dẫn vận hành duy nhất cho người xem và admin](./docs/HUONG-DAN-VAN-HANH.md). File có mục lục anchor và hướng dẫn riêng cho đủ 8 môn.
