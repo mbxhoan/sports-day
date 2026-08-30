@@ -258,6 +258,10 @@ tbody tr:last-child td { border: 0; }
 .board-heading h2 { margin: 0; color: var(--primary); font-size: 18px; }
 .board-heading span, .board-source { color: var(--muted-foreground); font-size: 10px; }
 .board-source { display: block; margin-top: 5px; }
+.drive-gallery { min-height: 240px; display: grid; place-items: center; align-content: center; gap: 16px; text-align: center; }
+.drive-gallery p { color: var(--muted-foreground); }
+.drive-gallery .gold-button { width: fit-content; text-decoration: none; }
+.manual-results table { min-width: 560px; }
 .board-warning { margin: -5px 0 14px; color: #ffd992; font-size: 11px; }
 .competition-board .group-grid { margin-bottom: 18px; }
 .source-bracket { position: relative; min-width: 100%; margin-bottom: 10px; }
@@ -337,8 +341,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .admin-sport-panels { min-width: 0; }
 .admin-sport-panels > section { display: none; scroll-margin-top: 78px; }
 .admin-sport-panels > section:first-child { display: block; }
-.admin-sport-panels:has(> section:target) > section:first-child { display: none; }
-.admin-sport-panels > section:target { display: block; }
+.admin-sport-panels:has(> section:target, > section:has(:target)) > section:first-child { display: none; }
+.admin-sport-panels > section:target, .admin-sport-panels > section:has(:target) { display: block; }
 .admin-sport-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .admin-sport-grid a { min-width: 0; min-height: 88px; padding: 14px; display: grid; align-content: center; gap: 5px; }
 .admin-sport-grid a:hover, .admin-sport-nav a:hover { border-color: var(--primary); background: #0874a6; }
@@ -393,6 +397,13 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .admin-media-edit > summary { padding: 8px 11px; cursor: pointer; color: #b8c2d2; font-size: 11px; }
 .admin-media-edit > summary::-webkit-details-marker { display: none; }
 .admin-media-edit form { padding: 11px; border-top: 1px solid #2f9fc3; }
+.leaderboard-admin-list, .manual-standings-list { display: grid; gap: 8px; margin-bottom: 16px; }
+.leaderboard-admin-row, .manual-standings-row { display: grid; grid-template-columns: minmax(180px, 1fr) repeat(4, minmax(76px, 100px)); align-items: end; gap: 8px; padding: 10px; border: 1px solid #2f6681; border-radius: 6px; background: #064a78; }
+.manual-standings-row { grid-template-columns: minmax(180px, 1fr) repeat(2, minmax(90px, 120px)); }
+.leaderboard-admin-row b, .manual-standings-row b { align-self: center; color: #fff; font-size: 12px; }
+.leaderboard-admin-row label, .manual-standings-row label { display: grid; gap: 4px; color: #b8c2d2; font-size: 10px; }
+.leaderboard-admin-row span { align-self: center; color: var(--primary); font-size: 11px; }
+.confirm-standings { margin-top: 8px; }
 .section-label { margin: 28px 0 12px; font-size: 17px; }
 .admin-section > summary { min-height: 52px; padding: 0 17px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; }
 .admin-section > summary::-webkit-details-marker, .record-form > summary::-webkit-details-marker, .record > summary::-webkit-details-marker { display: none; }
@@ -460,6 +471,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 
 @media (max-width: 600px) {
   body { font-size: 13px; }
+  .manual-results table { min-width: 0; }
   .container, .header-inner { width: min(100% - 24px, 1280px); }
   .brand b { font-size: 12px; }
   .brand small { font-size: 8px; }
@@ -556,6 +568,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .group-grid td:nth-child(6)::before { content: "L"; }
   .group-grid td:nth-child(7)::before { content: "Điểm"; }
   .race-result-list > div, .slot-editor form { grid-template-columns: 1fr; }
+  .leaderboard-admin-row, .manual-standings-row { grid-template-columns: 1fr 1fr; }
+  .leaderboard-admin-row b, .manual-standings-row b, .leaderboard-admin-row span { grid-column: 1 / -1; }
 }
 
 @media print {

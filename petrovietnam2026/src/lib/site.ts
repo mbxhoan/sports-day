@@ -51,11 +51,11 @@ export type Fixture = {
   winner_entry_id: string | null;
   source_code: string | null;
 };
-export type Organization = { id: string; code: string; name_vi: string; name_en: string; logo_path: string | null; sort_order: number };
+export type Organization = { id: string; code: string; name_vi: string; name_en: string; logo_path: string | null; sort_order: number; leaderboard_rank?: number | null; gold_medals?: number; silver_medals?: number; bronze_medals?: number };
 export type Participant = { id: string; organization_id: string | null; full_name: string; full_name_en: string | null };
 export type Entry = { id: string; tournament_id: string; organization_id: string | null; kind: string; name_vi: string; name_en: string };
 export type EntryMember = { id: string; entry_id: string; participant_id: string; role_vi: string; role_en: string; sort_order: number };
-export type Group = { id: string; tournament_id: string; name_vi: string; name_en: string; sort_order: number };
+export type Group = { id: string; tournament_id: string; name_vi: string; name_en: string; sort_order: number; standings_confirmed_at?: string | null };
 export type GroupEntry = { id: string; group_id: string; entry_id: string; seed_order: number | null };
 export type Venue = { id: string; name_vi: string; name_en: string; address_vi: string; address_en: string; sort_order: number };
 export type Court = { id: string; venue_id: string; name_vi: string; name_en: string; sort_order: number };
@@ -81,6 +81,7 @@ export type SiteData = {
     hero_mobile_path: string;
     start_at: string | null;
     end_at: string | null;
+    gallery_drive_url: string;
   };
   sports: Sport[];
   tournaments: Tournament[];
@@ -113,7 +114,7 @@ export const copy = {
     description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
     filterSport: "Tất cả môn", filterCategory: "Tất cả hạng mục", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", board: "Bảng đấu", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
-    organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương",
+    organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương", athlete: "VĐV", lane: "Làn", performance: "Thành tích", status: "Trạng thái", openDrive: "Mở thư mục Google Drive",
     venue: "Địa điểm", court: "Sân / làn", time: "Giờ", match: "Trận đấu", round: "Vòng", result: "Kết quả",
   },
   en: {
@@ -125,7 +126,7 @@ export const copy = {
     description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
     filterSport: "All sports", filterCategory: "All categories", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", board: "Competition board", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
-    organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals",
+    organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals", athlete: "Athlete", lane: "Lane", performance: "Performance", status: "Status", openDrive: "Open Google Drive folder",
     venue: "Venue", court: "Court / lane", time: "Time", match: "Match", round: "Round", result: "Result",
   },
 } as const;
@@ -177,6 +178,7 @@ const fallback: SiteData = {
     about_en: "A sports festival connecting Petrovietnam employees in the Southern Region.",
     venue_vi: "", venue_en: "", hero_path: "/kv.png", hero_mobile_path: "/kv-mobile.png",
     start_at: "2026-09-04T00:00:00.000Z", end_at: "2026-09-06T11:00:00.000Z",
+    gallery_drive_url: "",
   },
   sports: sportRows,
   tournaments,
@@ -209,14 +211,14 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   if (tenantError || !tenant) return fallback;
   const tenantId = tenant.id;
   const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
-    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
+    db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,source_metadata,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).order("full_name"),
     db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).order("name_vi"),
     db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order,standings_confirmed_at").eq("tenant_id", tenantId).order("sort_order"),
     db.from("group_entries").select("id,group_id,entry_id,seed_order").eq("tenant_id", tenantId).order("seed_order"),
     db.from("venues").select("id,name_vi,name_en,address_vi,address_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("courts").select("id,venue_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
@@ -269,6 +271,11 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
 });
 
 export function rankOrganizations(awards: Award[], organizations: Organization[], entries: Entry[], participants: Participant[] = []): LeaderboardRow[] {
+  if (organizations.some((organization) => organization.gold_medals !== undefined || organization.leaderboard_rank !== undefined)) {
+    return [...organizations]
+      .map((organization) => ({ organization, gold: organization.gold_medals ?? 0, silver: organization.silver_medals ?? 0, bronze: organization.bronze_medals ?? 0, special: 0, total: (organization.gold_medals ?? 0) + (organization.silver_medals ?? 0) + (organization.bronze_medals ?? 0) }))
+      .sort((a, b) => (a.organization.leaderboard_rank ?? Number.MAX_SAFE_INTEGER) - (b.organization.leaderboard_rank ?? Number.MAX_SAFE_INTEGER) || b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || a.organization.sort_order - b.organization.sort_order);
+  }
   const entriesById = new Map(entries.map((entry) => [entry.id, entry.organization_id]));
   const participantsById = new Map(participants.map((participant) => [participant.id, participant.organization_id]));
   const rows = new Map(organizations.map((organization) => [organization.id, { organization, gold: 0, silver: 0, bronze: 0, special: 0 }]));

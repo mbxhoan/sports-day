@@ -25,10 +25,7 @@ function ZoomableBracket({ layout, children, locale }: { layout: BracketLayout; 
   const [zoom, setZoom] = useState(1);
   const fit = () => setZoom(Math.min(1, Math.max(0.25, ((viewportRef.current?.clientWidth ?? window.innerWidth) - 16) / layout.width)));
   useEffect(() => {
-    const update = () => {
-      const width = viewportRef.current?.clientWidth ?? window.innerWidth;
-      setZoom(Math.min(1, Math.max(0.25, (width - 16) / layout.width)));
-    };
+    const update = () => setZoom(Math.min(1, Math.max(0.25, ((viewportRef.current?.clientWidth ?? window.innerWidth) - 16) / layout.width)));
     const frame = window.requestAnimationFrame(update);
     window.addEventListener("resize", update);
     return () => { window.cancelAnimationFrame(frame); window.removeEventListener("resize", update); };
@@ -48,22 +45,24 @@ function sourceNote(tournament: Tournament, locale: Locale) {
 
 export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref }: Props) {
   const t = copy[locale];
-  const available = tournaments.filter((tournament) => fixtures.some((fixture) => fixture.tournament_id === tournament.id) || groups.some((group) => group.tournament_id === tournament.id) || entries.some((entry) => entry.tournament_id === tournament.id));
-  const [selectedId, setSelectedId] = useState(available[0]?.id ?? "");
-  useEffect(() => { if (!available.some((item) => item.id === selectedId)) setSelectedId(available[0]?.id ?? ""); }, [available, selectedId]);
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
+  const fixturesByTournament = Map.groupBy(fixtures, (fixture) => fixture.tournament_id);
+  const entriesByTournament = Map.groupBy(entries, (entry) => entry.tournament_id);
+  const groupsByTournament = Map.groupBy(groups, (group) => group.tournament_id);
+  const groupEntriesByGroup = Map.groupBy(groupEntries, (item) => item.group_id);
+  const standingsByGroup = Map.groupBy(standings, (row) => row.group_id ?? `tournament:${row.tournament_id}`);
   const fixtureRows = Map.groupBy(fixtureEntries, (row) => row.fixture_id);
   const fixtureSlotsById = Map.groupBy(fixtureSlots, (slot) => slot.fixture_id);
-  const groupsByTournament = Map.groupBy(groups, (group) => group.tournament_id);
+  const sourceCodes = Map.groupBy(fixtures.filter((fixture) => fixture.source_code), (fixture) => `${fixture.tournament_id}:${fixture.source_code}`);
+  const available = tournaments.filter((tournament) => (fixturesByTournament.get(tournament.id)?.length ?? 0) > 0 || (groupsByTournament.get(tournament.id)?.length ?? 0) > 0 || (entriesByTournament.get(tournament.id)?.length ?? 0) > 0);
 
   const matchLabel = (fixture: Fixture) => {
     if (!fixture.source_code) return localized(fixture, "round", locale) || t.updating;
-    const sameCode = fixtures.filter((item) => item.tournament_id === fixture.tournament_id && item.source_code === fixture.source_code);
+    const sameCode = sourceCodes.get(`${fixture.tournament_id}:${fixture.source_code}`) ?? [];
     const occurrence = sameCode.findIndex((item) => item.id === fixture.id) + 1;
     return `${locale === "vi" ? "Trận" : "Match"} ${fixture.source_code}${sameCode.length > 1 ? ` (${occurrence})` : ""}`;
   };
-
   const entryName = (id: string | null | undefined) => id ? localized(entriesById.get(id) ?? {}, "name", locale) : "";
   const matchRows = (fixture: Fixture) => {
     const rows = fixtureRows.get(fixture.id) ?? [];
@@ -77,27 +76,36 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   };
 
   const table = (tournament: Tournament, tournamentGroups: Group[]) => {
-    const standingsFor = (groupId: string | null) => standings.filter((row) => row.tournament_id === tournament.id && row.group_id === groupId).sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
     const groupTables = tournamentGroups.length ? tournamentGroups : [{ id: "", tournament_id: tournament.id, name_vi: "Bảng xếp hạng", name_en: "Standings", sort_order: 0 }];
     return <div className="group-grid">{groupTables.map((group) => {
-      const seeded = group.id ? groupEntries.filter((item) => item.group_id === group.id).map((item) => item.entry_id) : entries.filter((item) => item.tournament_id === tournament.id).map((item) => item.id);
-      const standingRows = standingsFor(group.id || null);
+      const seeded = group.id ? (groupEntriesByGroup.get(group.id) ?? []).map((item) => item.entry_id) : (entriesByTournament.get(tournament.id) ?? []).map((item) => item.id);
+      const standingRows = [...(standingsByGroup.get(group.id || `tournament:${tournament.id}`) ?? [])].sort((a, b) => (a.rank ?? 999999) - (b.rank ?? 999999));
       const ids = [...new Set([...standingRows.map((row) => row.entry_id), ...seeded])];
-      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3><table><thead><tr><th>#</th><th>{t.teams}</th><th>P</th><th>W</th><th>D</th><th>L</th><th>{t.points}</th></tr></thead><tbody>{ids.map((id, index) => { const row = standingRows.find((item) => item.entry_id === id); return <tr key={id}><td>{row?.rank ?? index + 1}</td><td>{entryName(id)}</td><td>{row?.played ?? 0}</td><td>{row?.won ?? 0}</td><td>{row?.drawn ?? 0}</td><td>{row?.lost ?? 0}</td><td><b>{row?.points ?? 0}</b></td></tr>; })}</tbody></table></div>;
+      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.points}</th></tr></thead><tbody>{ids.map((id) => { const row = standingRows.find((item) => item.entry_id === id); return <tr key={id}><td>{row?.rank ?? "—"}</td><td>{entryName(id)}</td><td><b>{row?.points ?? 0}</b></td></tr>; })}</tbody></table></div>;
     })}</div>;
+  };
+
+  const manualTable = (tournament: Tournament) => {
+    const tournamentEntries = entriesByTournament.get(tournament.id) ?? [];
+    const standingRows = standingsByGroup.get(`tournament:${tournament.id}`) ?? [];
+    const standingsByEntry = new Map(standingRows.map((row) => [row.entry_id, row]));
+    const raceRows = (fixturesByTournament.get(tournament.id) ?? []).flatMap((fixture) => fixtureRows.get(fixture.id) ?? []);
+    const raceByEntry = new Map(raceRows.map((row) => [row.entry_id, row]));
+    const ids = [...new Set([...standingRows.map((row) => row.entry_id), ...tournamentEntries.map((entry) => entry.id)])];
+    const raceMode = tournament.competition_mode === "race";
+    return <div className="panel table-scroll manual-results"><table><thead><tr><th>{t.rank}</th><th>{t.athlete}</th>{raceMode && <><th>{t.lane}</th><th>{t.performance}</th><th>{t.status}</th></>}</tr></thead><tbody>{ids.map((id) => { const standing = standingsByEntry.get(id); const race = raceByEntry.get(id); return <tr key={id}><td>{standing?.rank ?? race?.rank ?? "—"}</td><td>{entryName(id)}</td>{raceMode && <><td>{race?.lane ?? "—"}</td><td>{race?.score ?? "—"}</td><td>{race?.result_status?.toUpperCase() ?? t.updating}</td></>}</tr>; })}</tbody></table></div>;
   };
 
   const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); return <tr key={fixture.id}><td>{matchLabel(fixture)}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td>{rows.map((row) => row.label).join(" — ")}</td><td>{rows.map((row) => row.row?.score ?? "—").join(" : ")}</td></tr>; })}</tbody></table></div>;
 
   if (!available.length) return <section className="panel empty-state"><h2>{t.empty}</h2></section>;
-  const selectedTournament = available.find((tournament) => tournament.id === selectedId) ?? available[0];
-  return <div className="competition-board"><div className="board-selector"><label htmlFor="board-tournament">{locale === "vi" ? "Hạng mục" : "Category"}<select id="board-tournament" value={selectedTournament.id} onChange={(event) => setSelectedId(event.target.value)}>{available.map((tournament) => <option key={tournament.id} value={tournament.id}>{localized(tournament, "name", locale)}</option>)}</select></label></div><div className="tournament-stack">{[selectedTournament].map((tournament) => {
-    const tournamentFixtures = fixtures.filter((fixture) => fixture.tournament_id === tournament.id);
+  return <div className="competition-board"><div className="tournament-stack">{available.map((tournament) => {
+    const tournamentFixtures = fixturesByTournament.get(tournament.id) ?? [];
     const tournamentGroups = groupsByTournament.get(tournament.id) ?? [];
     const knockout = tournamentFixtures.filter((fixture) => fixture.round_order !== null && fixture.bracket_position !== null);
     const warnings = tournament.source_metadata?.warnings ?? [];
     const isBracket = tournament.competition_mode === "knockout" || tournament.competition_mode === "group_knockout";
-    return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id}>
+    return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id} style={{ contentVisibility: "auto", containIntrinsicSize: "0 560px" }}>
       <header className="board-heading"><div><h2>{localized(tournament, "name", locale)}</h2>{sourceNote(tournament, locale)}</div><span>{localized(tournament, "format", locale)}</span></header>
       {warnings.map((warning) => <p className="board-warning" key={warning}>⚠ {warning}</p>)}
       {isBracket && knockout.length > 0 && (() => {
@@ -108,9 +116,9 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         })}</ZoomableBracket>;
       })()}
       {tournament.competition_mode === "group_knockout" && table(tournament, tournamentGroups)}
-      {(tournament.competition_mode === "round_robin" || tournament.competition_mode === "swiss") && <>{table(tournament, tournamentGroups)}{matchesTable(tournamentFixtures)}</>}
-      {tournament.competition_mode === "race" && <div className="panel table-scroll board-race"><table><thead><tr><th>{t.rank}</th><th>{t.court}</th><th>{t.teams}</th><th>{locale === "vi" ? "Thành tích" : "Performance"}</th><th>{locale === "vi" ? "Trạng thái" : "Status"}</th></tr></thead><tbody>{tournamentFixtures.flatMap((fixture) => (fixtureRows.get(fixture.id) ?? []).sort((a, b) => (a.lane ?? a.seed_order ?? 999) - (b.lane ?? b.seed_order ?? 999))).map((row) => <tr key={row.id}><td>{row.rank ?? "—"}</td><td>{row.lane ?? "—"}</td><td>{entryName(row.entry_id)}</td><td>{row.score ?? row.score_numeric ?? "—"}</td><td>{row.result_status?.toUpperCase() ?? t.updating}</td></tr>)}</tbody></table></div>}
-      {!tournamentFixtures.length && !tournamentGroups.length && <div className="panel board-empty">{t.empty}</div>}
+      {tournament.competition_mode === "round_robin" && <>{table(tournament, tournamentGroups)}{matchesTable(tournamentFixtures)}</>}
+      {(tournament.competition_mode === "race" || tournament.competition_mode === "swiss") && manualTable(tournament)}
+      {!tournamentFixtures.length && !tournamentGroups.length && !entriesByTournament.get(tournament.id)?.length && <div className="panel board-empty">{t.empty}</div>}
     </section>;
   })}</div></div>;
 }

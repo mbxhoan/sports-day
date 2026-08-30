@@ -12,6 +12,7 @@ import { eventFieldNames } from "../src/lib/admin-event.ts";
 import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
+import { isManualSport, orderManualStandings, validateGalleryDriveUrl } from "../src/lib/manual-competition.ts";
 
 const supabaseRoot = new URL("../../supabase/", import.meta.url);
 const competition = readFileSync(new URL("seeds/020_competition.sql", supabaseRoot), "utf8");
@@ -41,6 +42,7 @@ const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .join("\n");
 const bracketMigration = readFileSync(new URL("migrations/20260828170000_source_driven_brackets.sql", supabaseRoot), "utf8");
 const bracketControlsMigration = readFileSync(new URL("migrations/20260828173024_source_bracket_admin_controls.sql", supabaseRoot), "utf8");
+const feedbackMigration = readFileSync(new URL("migrations/20260830090000_feedback_safe_admin_flow.sql", supabaseRoot), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 
 test("database models source-driven competition slots", () => {
@@ -139,9 +141,10 @@ test("hero upload paths keep desktop and mobile files separate", () => {
   assert.throws(() => heroStoragePath("wide", "image/png", "fixed"), /Hero không hợp lệ/);
 });
 
-test("sport gallery accepts multiple images but rejects images over 10MB", () => {
+test("sport gallery keeps legacy media but removes new uploads", () => {
   const gallery = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
-  assert.match(gallery, /MediaUploadForm[\s\S]*multiple/);
+  assert.doesNotMatch(gallery, /MediaUploadForm/);
+  assert.match(gallery, /Media cũ \/ Legacy media/);
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024)], "ok.png", { type: "image/png" }), 2 * 1024 * 1024));
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024)], "large.png", { type: "image/png" }), 10 * 1024 * 1024));
   assert.throws(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024 + 1)], "too-large.png", { type: "image/png" }), 10 * 1024 * 1024), /tối đa 10MB/);
@@ -230,6 +233,7 @@ test("sport admin results show readable match cards that open their editor", () 
   assert.match(adminSportPage, /resultTeam\(/);
   assert.match(adminSportPage, /form action=\{saveFixtureResult\}/);
   assert.doesNotMatch(adminSportPage, /editTarget === target && <form action=\{saveFixtureResult\}/);
+  assert.match(adminCss, /\.admin-sport-panels > section:has\(:target\)/);
 });
 
 test("route loading clears after query-only navigation", () => {
@@ -247,9 +251,9 @@ test("admin auth has a bounded wait instead of an infinite loading shell", async
 test("admin results scope database reads before loading competition data", () => {
   assert.match(adminSportPage, /scoped\("entries", "tournament_id", tournamentIds\)/);
   assert.match(adminSportPage, /scoped\("fixtures", "tournament_id", tournamentIds\)/);
-  assert.match(adminSportPage, /scoped\("fixture_entries", "fixture_id", fixtureIds\)/);
-  assert.match(adminSportPage, /scoped\("group_entries", "group_id", groupIds\)/);
-  assert.match(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
+  assert.match(adminSportPage, /all\("fixture_entries"\)/);
+  assert.match(adminSportPage, /all\("group_entries"\)/);
+  assert.doesNotMatch(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
 });
 
 test("schedule uses grouped match rows for the global page and each sport", () => {
@@ -271,8 +275,9 @@ test("schedule labels unassigned teams and renders source-driven boards", () => 
   assert.match(sportTabs, /bracket-overview/);
   assert.match(publicPages, /schedule-page/);
   assert.match(adminCss, /\.schedule-page/);
-  assert.match(competitionBoard, /board-selector/);
-  assert.match(competitionBoard, /\[selectedTournament\]/);
+  assert.match(competitionBoard, /tournament-stack/);
+  assert.doesNotMatch(competitionBoard, /board-selector|selectedTournament/);
+  assert.match(competitionBoard, /contentVisibility/);
   assert.match(competitionBoard, /matchLabel/);
   assert.match(adminCss, /@media \(max-width: 600px\)/);
   assert.match(adminCss, /\.bracket-canvas-viewport \{/);
@@ -304,6 +309,49 @@ test("scoring rule accepts valid point values and keeps unknown formats manual",
   assert.deepEqual(headToHeadRule("head-to-head", "3", "1", "0"), { type: "head-to-head", win: 3, draw: 1, loss: 0 });
   assert.deepEqual(headToHeadRule("manual", "", "", ""), {});
   assert.throws(() => headToHeadRule("head-to-head", "bad", "1", "0"), /Điểm tính không hợp lệ/);
+});
+
+test("manual competition keeps source order while ranked rows move first", () => {
+  assert.equal(isManualSport("co-vua"), true);
+  assert.equal(isManualSport("pickleball"), false);
+  assert.deepEqual(orderManualStandings([
+    { entry_id: "b", rank: null },
+    { entry_id: "a", rank: 2 },
+    { entry_id: "c", rank: 1 },
+  ], ["b", "a", "c"]).map((row) => row.entry_id), ["c", "a", "b"]);
+  assert.match(sportTabs, /!manual \? \[\["times"/);
+  assert.match(sportTabs, /!manual && active === "brackets"/);
+  assert.match(scheduleView, /availableSports/);
+  assert.match(adminSportPage, /manual_mode/);
+  assert.match(adminSportPage, /name="lane"/);
+  assert.match(adminSportPage, /name="result_status"/);
+  assert.match(adminActions, /p_status: "scheduled"/);
+  assert.doesNotMatch(adminActions, /const ranks = new Map\(deriveRaceRanks/);
+});
+
+test("gallery Drive URL accepts only HTTPS drive.google.com folders", () => {
+  assert.equal(validateGalleryDriveUrl("https://drive.google.com/drive/folders/demo"), true);
+  assert.equal(validateGalleryDriveUrl("http://drive.google.com/drive/folders/demo"), false);
+  assert.equal(validateGalleryDriveUrl("https://docs.google.com/document/d/demo"), false);
+  assert.equal(validateGalleryDriveUrl(""), true);
+});
+
+test("feedback migration adds additive safe admin flow", () => {
+  assert.match(feedbackMigration, /gallery_drive_url text/);
+  assert.match(feedbackMigration, /leaderboard_rank/);
+  assert.match(feedbackMigration, /standings_confirmed_at/);
+  assert.match(feedbackMigration, /save_manual_standings/);
+  assert.match(feedbackMigration, /confirm_group_standings/);
+  assert.match(feedbackMigration, /save_manual_leaderboard/);
+  assert.match(feedbackMigration, /save_fixture_slot_and_sync/);
+  assert.match(feedbackMigration, /winner_entry_id is null/);
+  assert.match(feedbackMigration, /winner_entry_id[\s\S]*score_numeric/);
+});
+
+test("admin results avoid oversized fixture-id filters", () => {
+  const page = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(page, /scoped\("fixture_entries",\s*"fixture_id",\s*fixtureIds\)/);
+  assert.doesNotMatch(page, /fixtureSlotsQuery\.in\("fixture_id",\s*fixtureIds\)/);
 });
 
 test("PDF inventory tracks current source set", () => {
@@ -380,6 +428,15 @@ test("leaderboard ranks medal totals and resolves organization from entry", () =
     { organization: organizations[0], gold: 1, silver: 1, bronze: 0, special: 0, total: 2 },
     { organization: organizations[1], gold: 1, silver: 1, bronze: 0, special: 0, total: 2 },
   ]);
+});
+
+test("manual leaderboard keeps explicit rank and puts unranked units last", () => {
+  const organizations = [
+    { id: "a", name_vi: "A", name_en: "A", code: "A", logo_path: null, sort_order: 1, leaderboard_rank: 2, gold_medals: 1, silver_medals: 0, bronze_medals: 1 },
+    { id: "b", name_vi: "B", name_en: "B", code: "B", logo_path: null, sort_order: 2, leaderboard_rank: 1, gold_medals: 0, silver_medals: 2, bronze_medals: 0 },
+    { id: "c", name_vi: "C", name_en: "C", code: "C", logo_path: null, sort_order: 3, leaderboard_rank: null, gold_medals: 0, silver_medals: 0, bronze_medals: 0 },
+  ];
+  assert.deepEqual(rankOrganizations([], organizations, []).map((row) => [row.organization.id, row.total]), [["b", 2], ["a", 2], ["c", 0]]);
 });
 
 test("admin datetime-local round trips Asia/Ho_Chi_Minh without seven-hour drift", () => {

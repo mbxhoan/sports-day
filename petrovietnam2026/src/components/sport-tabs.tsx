@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CalendarDays, Clock3, GitBranch, Info, MapPin, Trophy, Users } from "lucide-react";
+import type { ComponentType } from "react";
 import {
   copy, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry, type FixtureSlot,
   type Group, type GroupEntry, type Locale, type Organization, type Participant,
@@ -8,6 +9,7 @@ import {
 import { formatVietnamDateTime } from "@/lib/datetime";
 import { ScheduleView } from "./schedule-view";
 import { CompetitionBoard } from "./competition-board";
+import { isManualSport } from "@/lib/manual-competition";
 
 type Props = {
   locale: Locale;
@@ -31,11 +33,13 @@ type Props = {
 };
 
 export type TabKey = "info" | "teams" | "times" | "fixtures" | "brackets";
+type SportTab = [TabKey, string, ComponentType<{ size?: number }>];
 
 export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, venues, courts }: Props) {
   const t = copy[locale];
   const tournamentIds = new Set(tournaments.map((item) => item.id));
-  const sportFixtures = fixtures.filter((fixture) => tournamentIds.has(fixture.tournament_id));
+  const manual = isManualSport(sport.slug);
+  const sportFixtures = manual ? [] : fixtures.filter((fixture) => tournamentIds.has(fixture.tournament_id));
   const sportEntries = entries.filter((entry) => tournamentIds.has(entry.tournament_id));
   const sportGroups = groups.filter((group) => tournamentIds.has(group.tournament_id));
   const organizationsById = new Map(organizations.map((item) => [item.id, item]));
@@ -57,13 +61,12 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
   const summaryDates = competitionDays.length > 2 ? `${competitionDays[0]} – ${competitionDays.at(-1)}` : competitionDays.join(" & ");
   const sportRules = localized(sport, "rules", locale);
   const tournamentRules = tournaments.find((item) => localized(item, "rules", locale))?.[locale === "en" ? "rules_en" : "rules_vi"] ?? "";
-  const tabs = [
+  const tabs: SportTab[] = [
     ["info", t.info, Info],
     ["teams", `${t.teams} (${sportEntries.length})`, Users],
-    ["times", t.times, CalendarDays],
-    ["fixtures", `${t.fixtures} (${sportFixtures.length})`, Clock3],
+    ...(!manual ? [["times", t.times, CalendarDays], ["fixtures", `${t.fixtures} (${sportFixtures.length})`, Clock3]] as SportTab[] : []),
     ["brackets", t.brackets, GitBranch],
-  ] as const;
+  ];
   const timeSlots = [...new Map(datedFixtures.map((fixture) => [`${fixture.tournament_id}|${fixture.starts_at}|${localized(fixture, "round", locale)}`, fixture])).values()];
   const slotsByDay = Map.groupBy(timeSlots, (fixture) => dateParts(fixture.starts_at).day);
 
@@ -73,7 +76,7 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
       <span><Users size={15}/>{sportEntries.length} {t.teams.toLocaleLowerCase()}</span>
       <span><CalendarDays size={15}/>{summaryDates || t.updating}</span>
     </div>
-    {active === "brackets" && <div className="bracket-overview" aria-label={`${t.fixtures} / ${t.categories}`}>
+    {!manual && active === "brackets" && <div className="bracket-overview" aria-label={`${t.fixtures} / ${t.categories}`}>
       <Link className="bracket-schedule-link" href={`${hrefBase}?tab=fixtures`}><CalendarDays size={15}/>{t.fixtures}</Link>
       <span className="bracket-overview-label">{t.categories} · {locale === "vi" ? "Chọn một hạng mục trong bảng" : "Choose one category in the board"}</span>
     </div>}

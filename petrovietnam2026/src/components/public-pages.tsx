@@ -2,11 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, CircleDot, Medal, Trophy, Users } from "lucide-react";
 import { Countdown } from "./countdown";
-import { GalleryGrid } from "./gallery-grid";
 import { ScheduleView } from "./schedule-view";
 import { SiteShell } from "./site-shell";
 import { SportTabs, type TabKey } from "./sport-tabs";
 import { copy, getSiteData, localized, rankOrganizations, type Locale, type SiteData, type Sport } from "@/lib/site";
+import { isManualSport, validateGalleryDriveUrl } from "@/lib/manual-competition";
 
 function PageTitle({ emoji, title, subtitle }: { emoji?: string; title: string; subtitle?: string }) {
   const mark = emoji?.startsWith("/") ? <Image className="page-heading-icon" src={emoji} alt="" width={42} height={42} /> : emoji ? <span>{emoji}</span> : null;
@@ -20,7 +20,7 @@ function SportIcon({ value }: { value: string }) {
 function SportCard({ locale, sport, data }: { locale: Locale; sport: Sport; data: SiteData }) {
   const prefix = locale === "en" ? "/en" : "";
   const tournaments = data.tournaments.filter((item) => item.sport_id === sport.id);
-  const fixtureCount = data.fixtures.filter((fixture) => data.tournaments.some((item) => item.id === fixture.tournament_id && item.sport_id === sport.id)).length;
+  const fixtureCount = isManualSport(sport.slug) ? 0 : data.fixtures.filter((fixture) => data.tournaments.some((item) => item.id === fixture.tournament_id && item.sport_id === sport.id)).length;
   return <Link className="sport-card" href={`${prefix}/sports/${sport.slug}`}>
     <SportIcon value={sport.emoji} />
     <h3>{localized(sport,"name",locale)}</h3>
@@ -65,7 +65,8 @@ export async function SportPage({ locale, slug, tab = "info" }: { locale: Locale
   const sport = data.sports.find((item) => item.slug === slug);
   if (!sport) return <SiteShell locale={locale}><div className="container page-container"><PageTitle title="404" subtitle={copy[locale].empty}/></div></SiteShell>;
   const tournaments = data.tournaments.filter((item) => item.sport_id === sport.id);
-  const active = (["info","teams","times","fixtures","brackets"] as TabKey[]).includes(tab as TabKey) ? tab as TabKey : "info";
+  const allowedTabs = ["info", "teams", ...(isManualSport(sport.slug) ? [] : ["times", "fixtures"]), "brackets"] as TabKey[];
+  const active = allowedTabs.includes(tab as TabKey) ? tab as TabKey : "info";
   const hrefBase = `${locale === "en" ? "/en" : ""}/sports/${sport.slug}`;
   return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
 }
@@ -89,5 +90,6 @@ export async function LeaderboardPage({ locale }: { locale: Locale }) {
 export async function GalleryPage({ locale }: { locale: Locale }) {
   const t = copy[locale];
   const data = await getSiteData();
-  return <SiteShell locale={locale}><div className="container page-container"><PageTitle emoji="📷" title={t.gallery}/><GalleryGrid locale={locale} media={data.media} sports={data.sports}/></div></SiteShell>;
+  const driveUrl = validateGalleryDriveUrl(data.event.gallery_drive_url) ? data.event.gallery_drive_url : "";
+  return <SiteShell locale={locale}><div className="container page-container"><PageTitle emoji="📷" title={t.gallery}/>{driveUrl ? <section className="panel drive-gallery"><p>{t.galleryEmpty}</p><a className="gold-button" href={driveUrl} target="_blank" rel="noreferrer">{t.openDrive} ↗</a></section> : <section className="panel empty-state gallery-empty"><p>{t.updating}</p></section>}</div></SiteShell>;
 }
