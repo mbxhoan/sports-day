@@ -36,6 +36,7 @@ const adminActions = readFileSync(new URL("../src/app/admin/actions.ts", import.
 const adminCss = readFileSync(new URL("../src/app/globals.css", import.meta.url), "utf8");
 const authTimeout = readFileSync(new URL("../src/lib/auth-timeout.ts", import.meta.url), "utf8");
 const tugIcon = new URL("../public/icons/tug-of-war.png", import.meta.url);
+const xiangqiIcon = new URL("../public/icons/xiangqi.png", import.meta.url);
 const migrations = readdirSync(new URL("migrations/", supabaseRoot))
   .sort()
   .map((file) => readFileSync(new URL(`migrations/${file}`, supabaseRoot), "utf8"))
@@ -86,10 +87,13 @@ test("seed keeps the approved eight sports", () => {
   assert.equal((competition.match(/'10000000-0000-0000-0000-00000000000[1-8]'/g) ?? []).length, 8);
 });
 
-test("tug of war uses a dedicated image icon", () => {
+test("sports with supplied artwork use dedicated image icons", () => {
   assert.equal(existsSync(tugIcon), true);
+  assert.equal(existsSync(xiangqiIcon), true);
   assert.match(competition, /'keo-co',[^\n]*'\/icons\/tug-of-war\.png'/);
-  assert.match(migrations, /tug-of-war\.png/);
+  assert.match(competition, /'co-tuong',[^\n]*'\/icons\/xiangqi\.png'/);
+  assert.match(siteLib, /"co-tuong", "Cờ tướng", "Xiangqi", "\/icons\/xiangqi\.png"/);
+  assert.match(migrations, /update public\.sports[\s\S]*set emoji = '\/icons\/xiangqi\.png'[\s\S]*where slug = 'co-tuong'/);
 });
 
 test("source manifest tracks both supplied master schedules", () => {
