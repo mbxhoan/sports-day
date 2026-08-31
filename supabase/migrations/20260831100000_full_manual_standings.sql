@@ -79,6 +79,9 @@ begin
     )
     where coalesce(row.played, 0) < 0 or coalesce(row.won, 0) < 0 or coalesce(row.drawn, 0) < 0 or coalesce(row.lost, 0) < 0
       or coalesce(row.score_for, 0) < 0 or coalesce(row.score_against, 0) < 0 or coalesce(row.points, 0) < 0
+      or coalesce(row.score_for, 0) in ('NaN'::numeric, 'Infinity'::numeric, '-Infinity'::numeric)
+      or coalesce(row.score_against, 0) in ('NaN'::numeric, 'Infinity'::numeric, '-Infinity'::numeric)
+      or coalesce(row.points, 0) in ('NaN'::numeric, 'Infinity'::numeric, '-Infinity'::numeric)
   ) then raise exception 'Chỉ số bảng xếp hạng không hợp lệ'; end if;
 
   if exists (

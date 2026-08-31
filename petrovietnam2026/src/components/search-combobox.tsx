@@ -19,15 +19,13 @@ export function SearchCombobox({ label, placeholder, suggestions, value, onChang
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const options = useMemo(() => suggestions.filter((item) => matchesSearch(`${item.label} ${item.detail}`, value)).slice(0, 8), [suggestions, value]);
+  const options = useMemo(() => suggestions.filter((item) => matchesSearch(item.searchText, value)).slice(0, 8), [suggestions, value]);
 
   useEffect(() => {
     const close = (event: MouseEvent) => { if (!rootRef.current?.contains(event.target as Node)) setOpen(false); };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, []);
-
-  useEffect(() => { setActiveIndex(-1); }, [value, suggestions]);
 
   const choose = (suggestion: SearchSuggestion) => {
     onSelect(suggestion);
@@ -38,7 +36,7 @@ export function SearchCombobox({ label, placeholder, suggestions, value, onChang
 
   return <div className="search-combobox" ref={rootRef}>
     <label htmlFor={listId}>{label}</label>
-    <div className="search-input-wrap"><Search size={16}/><input ref={inputRef} id={listId} role="combobox" value={value} placeholder={placeholder} autoComplete="off" aria-autocomplete="list" aria-controls={`${listId}-options`} aria-expanded={open && options.length > 0} aria-activedescendant={activeIndex >= 0 ? `${listId}-option-${activeIndex}` : ""} onFocus={() => setOpen(true)} onChange={(event) => { onChange(event.target.value); setOpen(true); }} onKeyDown={(event) => {
+    <div className="search-input-wrap"><Search size={16}/><input ref={inputRef} id={listId} role="combobox" value={value} placeholder={placeholder} autoComplete="off" aria-autocomplete="list" aria-controls={`${listId}-options`} aria-expanded={open && options.length > 0} aria-activedescendant={activeIndex >= 0 && activeIndex < options.length ? `${listId}-option-${activeIndex}` : ""} onFocus={() => setOpen(true)} onChange={(event) => { onChange(event.target.value); setOpen(true); setActiveIndex(-1); }} onKeyDown={(event) => {
       if (event.key === "ArrowDown") { event.preventDefault(); setOpen(true); setActiveIndex((index) => options.length ? (index + 1) % options.length : -1); }
       if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((index) => options.length ? (index <= 0 ? options.length - 1 : index - 1) : -1); }
       if (event.key === "Enter" && options[activeIndex]) { event.preventDefault(); choose(options[activeIndex]); }

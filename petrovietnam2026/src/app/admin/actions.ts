@@ -13,6 +13,7 @@ import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
+export type AdminActionState = import("@/lib/admin-action").AdminActionState;
 
 async function adminClient() {
   const supabase = await createSupabaseServerClient();
@@ -145,31 +146,50 @@ export async function uploadHero(formData: FormData) {
   revalidatePath("/admin");
 }
 
-export async function saveFixtureResult(formData: FormData) {
-  const fixtureId = String(formData.get("fixture_id") ?? "");
-  const status = String(formData.get("status") ?? "completed");
-  const selected = [1, 2].map((index) => ({ entry_id: String(formData.get(`entry_${index}`) ?? ""), score: String(formData.get(`score_${index}`) ?? "").trim() }));
-  if (!fixtureId || selected.some((item) => !item.entry_id) || selected[0].entry_id === selected[1].entry_id) throw new Error("Chọn hai đội khác nhau");
-  const note = String(formData.get("note") ?? "").trim();
-  const entries = selected.map((item, index) => {
-    const scoreNumeric = item.score === "" ? null : Number(item.score);
-    if (scoreNumeric !== null && (!Number.isFinite(scoreNumeric) || scoreNumeric < 0)) throw new Error("Tỷ số không hợp lệ");
-    return { entry_id: item.entry_id, side: index === 0 ? "home" : "away", score: item.score || null, score_numeric: scoreNumeric, rank: null, result_detail: note ? { note } : {} };
-  });
+function actionFailure(error: unknown): AdminActionState {
+  const message = error instanceof Error ? error.message : "Không thể lưu dữ liệu";
+  return { ok: false, message, code: /phụ thuộc|reset|vòng sau/i.test(message) ? "DEPENDENT_RESULTS" : "VALIDATION" };
+}
+
+export async function saveFixtureResult(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
   const { supabase, tenantId } = await adminClient();
-  const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
-  if (fixtureError || !fixture) throw new Error("Không tìm thấy trận đấu");
-  const requestedWinner = String(formData.get("winner_entry_id") ?? "");
-  if (status === "completed" && !requestedWinner) throw new Error("Chọn đúng một đội thắng");
-  if (status !== "completed" && requestedWinner) throw new Error("Trận chưa hoàn tất không được có đội thắng");
-  const winnerEntryId = requestedWinner || null;
-  const { data: labels } = await supabase.from("entries").select("id,name_vi,name_en").eq("tenant_id", tenantId).in("id", entries.map((item) => item.entry_id));
-  const labelsById = new Map((labels ?? []).map((item) => [item.id, item]));
-  const summary = (field: "name_vi" | "name_en") => entries.map((item) => `${labelsById.get(item.entry_id)?.[field] ?? ""} ${item.score ?? ""}`.trim()).join(" - ");
-  const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: winnerEntryId, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
-  if (error) throw new Error(error.message);
-  revalidatePath("/", "layout");
-  revalidatePath("/admin");
+  try {
+    const fixtureId = String(formData.get("fixture_id") ?? "");
+    const status = String(formData.get("status") ?? "completed");
+    if (!fixtureId) return actionFailure(new Error("Không tìm thấy trận đấu"));
+    if (!["scheduled", "live", "completed", "postponed", "cancelled"].includes(status)) return actionFailure(new Error("Trạng thái trận đấu không hợp lệ"));
+
+    const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
+    if (fixtureError || !fixture) return actionFailure(new Error("Không tìm thấy trận đấu"));
+    const { data: currentRows, error: rowsError } = await supabase.from("fixture_entries").select("entry_id,side,score,result_detail").eq("tenant_id", tenantId).eq("fixture_id", fixtureId).is("archived_at", null).in("side", ["home", "away"]);
+    if (rowsError) return actionFailure(new Error(rowsError.message));
+    const sides = (["home", "away"] as const).map((side) => currentRows?.find((row) => row.side === side));
+    if (sides.some((row) => !row) || new Set(sides.map((row) => row?.entry_id)).size !== 2) return actionFailure(new Error("Trận chưa đủ hai đội; hãy hoàn tất cấu trúc nguồn nhánh trước"));
+
+    const entryIds = sides.map((row) => row!.entry_id);
+    const { data: labels, error: labelsError } = await supabase.from("entries").select("id,name_vi,name_en").eq("tenant_id", tenantId).eq("tournament_id", fixture.tournament_id).is("archived_at", null).in("id", entryIds);
+    if (labelsError) return actionFailure(new Error(labelsError.message));
+    const labelsById = new Map((labels ?? []).map((item) => [item.id, item]));
+    if (entryIds.some((id) => !labelsById.has(id))) return actionFailure(new Error("Đội thi không thuộc hạng mục"));
+
+    const scores = [1, 2].map((index) => String(formData.get(`score_${index}`) ?? "").trim());
+    const parsedScores = scores.map((score) => score === "" ? null : Number(score));
+    if (parsedScores.some((score) => score !== null && (!Number.isFinite(score) || score < 0))) return actionFailure(new Error("Tỷ số không hợp lệ"));
+    const requestedWinner = String(formData.get("winner_entry_id") ?? "");
+    if (status === "completed" && !requestedWinner) return actionFailure(new Error("Chọn đúng một đội thắng"));
+    if (status !== "completed" && requestedWinner) return actionFailure(new Error("Trận chưa hoàn tất không được có đội thắng"));
+    if (requestedWinner && !entryIds.includes(requestedWinner)) return actionFailure(new Error("Đội thắng không thuộc trận đấu"));
+    const note = String(formData.get("note") ?? "").trim();
+    const entries = sides.map((row, index) => ({ entry_id: row!.entry_id, side: index === 0 ? "home" : "away", score: scores[index] || null, score_numeric: parsedScores[index], rank: null, result_detail: note ? { note } : row!.result_detail ?? {} }));
+    const summary = (field: "name_vi" | "name_en") => entries.map((item) => `${labelsById.get(item.entry_id)?.[field] ?? ""} ${item.score ?? ""}`.trim()).join(" - ");
+    const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: requestedWinner || null, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
+    if (error) return actionFailure(new Error(error.message));
+    revalidatePath("/", "layout");
+    revalidatePath("/admin");
+    return { ok: true, message: "Đã lưu kết quả" };
+  } catch (error) {
+    return actionFailure(error);
+  }
 }
 
 export async function saveRaceResult(formData: FormData) {
@@ -200,27 +220,42 @@ export async function saveRaceResult(formData: FormData) {
   revalidatePath("/admin");
 }
 
-export async function saveFixtureSlot(formData: FormData) {
-  const slotId = String(formData.get("slot_id") ?? "");
-  const sourceKind = String(formData.get("source_kind") ?? "");
-  if (!slotId || !["entry", "group_rank", "fixture_winner", "fixture_loser", "bye"].includes(sourceKind)) throw new Error("Nguồn nhánh không hợp lệ");
-  const payload = {
-    source_kind: sourceKind,
-    source_entry_id: sourceKind === "entry" ? String(formData.get("source_entry_id") ?? "") || null : null,
-    source_group_id: sourceKind === "group_rank" ? String(formData.get("source_group_id") ?? "") || null : null,
-    source_fixture_id: ["fixture_winner", "fixture_loser"].includes(sourceKind) ? String(formData.get("source_fixture_id") ?? "") || null : null,
-    source_rank: sourceKind === "group_rank" ? Number(formData.get("source_rank") ?? 0) || null : null,
-    label_vi: String(formData.get("label_vi") ?? "").trim(),
-    label_en: String(formData.get("label_en") ?? "").trim(),
-  };
-  if ((sourceKind === "entry" && !payload.source_entry_id) || (sourceKind === "group_rank" && (!payload.source_group_id || !payload.source_rank)) || (["fixture_winner", "fixture_loser"].includes(sourceKind) && !payload.source_fixture_id)) throw new Error("Chưa chọn nguồn nhánh");
+export async function saveFixtureSlot(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
   const { supabase, tenantId } = await adminClient();
-  const { data: slot, error: slotError } = await supabase.from("fixture_slots").select("id,fixture_id,fixtures!inner(tournament_id,tenant_id)").eq("id", slotId).eq("fixtures.tenant_id", tenantId).single();
-  if (slotError || !slot) throw new Error("Không tìm thấy ô nhánh");
-  const { error: syncError } = await supabase.rpc("save_fixture_slot_and_sync", { p_slot_id: slotId, p_source_kind: payload.source_kind, p_source_entry_id: payload.source_entry_id, p_source_group_id: payload.source_group_id, p_source_fixture_id: payload.source_fixture_id, p_source_rank: payload.source_rank, p_label_vi: payload.label_vi, p_label_en: payload.label_en });
-  if (syncError) throw new Error(syncError.message);
-  revalidatePath("/", "layout");
-  revalidatePath("/admin");
+  try {
+    const slotId = String(formData.get("slot_id") ?? "");
+    const sourceKind = String(formData.get("source_kind") ?? "");
+    if (!slotId || !["entry", "group_rank", "fixture_winner", "fixture_loser", "bye"].includes(sourceKind)) return actionFailure(new Error("Nguồn nhánh không hợp lệ"));
+    const sourceEntryId = sourceKind === "entry" ? String(formData.get("source_entry_id") ?? "") || null : null;
+    const sourceGroupId = sourceKind === "group_rank" ? String(formData.get("source_group_id") ?? "") || null : null;
+    const sourceFixtureId = ["fixture_winner", "fixture_loser"].includes(sourceKind) ? String(formData.get("source_fixture_id") ?? "") || null : null;
+    const sourceRankValue = String(formData.get("source_rank") ?? "").trim();
+    const sourceRank = sourceKind === "group_rank" && sourceRankValue ? Number(sourceRankValue) : null;
+    if ((sourceKind === "entry" && !sourceEntryId) || (sourceKind === "group_rank" && (!sourceGroupId || !Number.isInteger(sourceRank) || sourceRank! < 1)) || (["fixture_winner", "fixture_loser"].includes(sourceKind) && !sourceFixtureId)) return actionFailure(new Error("Chưa chọn nguồn nhánh"));
+    const { data: slot, error: slotError } = await supabase.from("fixture_slots").select("id,fixture_id").eq("tenant_id", tenantId).eq("id", slotId).is("archived_at", null).single();
+    if (slotError || !slot) return actionFailure(new Error("Không tìm thấy ô nhánh"));
+    const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id").eq("tenant_id", tenantId).eq("id", slot.fixture_id).is("archived_at", null).single();
+    if (fixtureError || !fixture) return actionFailure(new Error("Không tìm thấy trận đấu"));
+    if (sourceKind === "entry") {
+      const { data: sourceEntry } = await supabase.from("entries").select("id").eq("tenant_id", tenantId).eq("tournament_id", fixture.tournament_id).eq("id", sourceEntryId).is("archived_at", null).maybeSingle();
+      if (!sourceEntry) return actionFailure(new Error("Đội/cặp không thuộc hạng mục"));
+    }
+    if (sourceKind === "group_rank") {
+      const { data: sourceGroup } = await supabase.from("groups").select("id").eq("tenant_id", tenantId).eq("tournament_id", fixture.tournament_id).eq("id", sourceGroupId).is("archived_at", null).maybeSingle();
+      if (!sourceGroup) return actionFailure(new Error("Bảng nguồn không thuộc hạng mục"));
+    }
+    if (sourceFixtureId) {
+      const { data: sourceFixture } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("tournament_id", fixture.tournament_id).eq("id", sourceFixtureId).is("archived_at", null).maybeSingle();
+      if (!sourceFixture) return actionFailure(new Error("Trận nguồn không thuộc hạng mục"));
+    }
+    const { error: syncError } = await supabase.rpc("save_fixture_slot_and_sync", { p_slot_id: slotId, p_source_kind: sourceKind, p_source_entry_id: sourceEntryId, p_source_group_id: sourceGroupId, p_source_fixture_id: sourceFixtureId, p_source_rank: sourceRank, p_label_vi: String(formData.get("label_vi") ?? "").trim(), p_label_en: String(formData.get("label_en") ?? "").trim() });
+    if (syncError) return actionFailure(new Error(syncError.message));
+    revalidatePath("/", "layout");
+    revalidatePath("/admin");
+    return { ok: true, message: "Đã lưu cấu trúc nhánh" };
+  } catch (error) {
+    return actionFailure(error);
+  }
 }
 
 export async function saveManualStandings(formData: FormData) {

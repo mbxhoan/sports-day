@@ -1,10 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { layoutBracket, slotLabel } from "@/lib/brackets";
+import { initialAdminActionState, type AdminActionState } from "@/lib/admin-action";
 import { standingDifference } from "@/lib/competition-display";
+import { buildSearchSuggestions } from "@/lib/search";
 import { copy, localized, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Standing, type Tournament } from "@/lib/site";
+import { SearchCombobox } from "./search-combobox";
+
+type AdminAction = (previousState: AdminActionState, formData: FormData) => Promise<AdminActionState>;
+type PreviewAction = (formData: FormData) => void | Promise<void>;
 
 type Props = {
   locale: Locale;
@@ -17,10 +23,15 @@ type Props = {
   fixtureSlots: FixtureSlot[];
   standings: Standing[];
   adminHref?: string;
-  resultAction?: (formData: FormData) => void | Promise<void>;
+  resultAction?: AdminAction;
+  slotAction?: AdminAction;
+  previewAction?: PreviewAction;
+  sportSlug?: string;
 };
 
 type BracketLayout = ReturnType<typeof layoutBracket>;
+
+const noopAction: AdminAction = async () => initialAdminActionState;
 
 function ZoomableBracket({ layout, children, locale }: { layout: BracketLayout; children: React.ReactNode; locale: Locale }) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -45,7 +56,35 @@ function sourceNote(tournament: Tournament, locale: Locale) {
   return <small className="board-source">{source.file.split("/").at(-1)}{page}</small>;
 }
 
-export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction }: Props) {
+function SlotEditor({ slot, fixture, entries, groups, groupEntries, fixtures, action }: { slot: FixtureSlot; fixture: Fixture; entries: Entry[]; groups: Group[]; groupEntries: GroupEntry[]; fixtures: Fixture[]; action: AdminAction }) {
+  const [state, formAction, pending] = useActionState(action, initialAdminActionState);
+  const [sourceKind, setSourceKind] = useState(slot.source_kind);
+  const [entryId, setEntryId] = useState(slot.source_entry_id ?? "");
+  const [groupId, setGroupId] = useState(slot.source_group_id ?? "");
+  const [query, setQuery] = useState(entries.find((entry) => entry.id === slot.source_entry_id)?.name_vi ?? "");
+  const tournamentEntries = entries.filter((entry) => entry.tournament_id === fixture.tournament_id);
+  const groupEntryIds = new Set(groupEntries.filter((item) => item.group_id === fixture.group_id).map((item) => item.entry_id));
+  const entryCandidates = fixture.group_id ? tournamentEntries.filter((entry) => groupEntryIds.has(entry.id)) : tournamentEntries;
+  const suggestions = buildSearchSuggestions({ participants: [], entries: entryCandidates.map((entry) => ({ id: entry.id, name: entry.name_vi })), fixtures: [] });
+  const sourceFixtures = fixtures.filter((item) => item.tournament_id === fixture.tournament_id && item.id !== fixture.id);
+  const sourceGroups = groups.filter((group) => group.tournament_id === fixture.tournament_id);
+  const selectedGroup = sourceGroups.find((group) => group.id === groupId);
+  const selectedMembers = selectedGroup ? groupEntries.filter((item) => item.group_id === selectedGroup.id).map((item) => tournamentEntries.find((entry) => entry.id === item.entry_id)?.name_vi).filter(Boolean) : [];
+  return <form className="slot-source-form" action={formAction}>
+    <input type="hidden" name="slot_id" value={slot.id}/>
+    <b>{slot.side === "home" ? "Ô trên" : "Ô dưới"}</b>
+    <label><span>Nguồn</span><select name="source_kind" value={sourceKind} onChange={(event) => setSourceKind(event.target.value as FixtureSlot["source_kind"])}><option value="entry">Đội/cặp/cá nhân</option><option value="group_rank">Thứ hạng bảng</option><option value="fixture_winner">Thắng trận</option><option value="fixture_loser">Thua trận</option><option value="bye">Bye</option></select></label>
+    {sourceKind === "entry" && <><SearchCombobox label="Tìm đội/cặp" placeholder="Nhập tên đội hoặc cặp..." suggestions={suggestions} value={query} onChange={(value) => { setQuery(value); setEntryId(""); }} onSelect={(suggestion) => { setQuery(suggestion.label); setEntryId(suggestion.id); }}/><input type="hidden" name="source_entry_id" value={entryId}/></>}
+    {sourceKind === "group_rank" && <><label><span>Bảng nguồn</span><select name="source_group_id" value={groupId} onChange={(event) => setGroupId(event.target.value)}><option value="">Chọn bảng</option>{sourceGroups.map((group) => <option key={group.id} value={group.id}>{group.name_vi}</option>)}</select></label><label><span>Hạng</span><input name="source_rank" type="number" min="1" defaultValue={slot.source_rank ?? ""}/></label>{selectedMembers.length > 0 && <small className="slot-candidates">Thành viên: {selectedMembers.join(" · ")}</small>}</>}
+    {(["fixture_winner", "fixture_loser"] as const).includes(sourceKind as "fixture_winner" | "fixture_loser") && <label><span>Trận nguồn</span><select name="source_fixture_id" defaultValue={slot.source_fixture_id ?? ""}><option value="">Chọn trận</option>{sourceFixtures.map((item) => <option key={item.id} value={item.id}>{(item.source_code ?? item.round_vi) || item.id}</option>)}</select></label>}
+    {sourceKind === "bye" && <p className="slot-candidates">Ô trống, tự resolve theo cấu trúc nhánh.</p>}
+    <label><span>Nhãn VI</span><input name="label_vi" defaultValue={slot.label_vi}/></label><label><span>Label EN</span><input name="label_en" defaultValue={slot.label_en}/></label>
+    {!state.ok && <p className="form-error" role="alert">{state.message}</p>}
+    <button className="gold-button" disabled={pending}>{pending ? "Đang lưu..." : "Lưu cấu trúc"}</button>
+  </form>;
+}
+
+export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, sportSlug }: Props) {
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
@@ -57,11 +96,14 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const fixtureRows = Map.groupBy(fixtureEntries, (row) => row.fixture_id);
   const fixtureSlotsById = Map.groupBy(fixtureSlots, (slot) => slot.fixture_id);
   const [editingFixture, setEditingFixture] = useState<Fixture | null>(null);
+  const [submittedFixtureId, setSubmittedFixtureId] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [resultState, resultFormAction, resultPending] = useActionState(resultAction ?? noopAction, initialAdminActionState);
   useEffect(() => {
     if (editingFixture && !dialogRef.current?.open) dialogRef.current?.showModal();
     if (!editingFixture && dialogRef.current?.open) dialogRef.current.close();
-  }, [editingFixture]);
+    if (editingFixture && submittedFixtureId === editingFixture.id && resultState.ok && resultState.message) dialogRef.current?.close();
+  }, [editingFixture, resultState, submittedFixtureId]);
   const sourceCodes = Map.groupBy(fixtures.filter((fixture) => fixture.source_code), (fixture) => `${fixture.tournament_id}:${fixture.source_code}`);
   const available = tournaments.filter((tournament) => (fixturesByTournament.get(tournament.id)?.length ?? 0) > 0 || (groupsByTournament.get(tournament.id)?.length ?? 0) > 0 || (entriesByTournament.get(tournament.id)?.length ?? 0) > 0);
 
@@ -85,7 +127,9 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const editingRows = editingFixture ? matchRows(editingFixture) : [];
   const editingHome = editingRows[0]?.row;
   const editingAway = editingRows[1]?.row;
-  const editingEntries = editingFixture ? entriesByTournament.get(editingFixture.tournament_id) ?? [] : [];
+  const editingSlots = editingFixture ? fixtureSlotsById.get(editingFixture.id) ?? [] : [];
+  const closeDialog = () => { setSubmittedFixtureId(null); setEditingFixture(null); };
+  const tournamentHasResults = (tournamentId: string) => (fixturesByTournament.get(tournamentId) ?? []).some((fixture) => ["live", "completed"].includes(fixture.status) || fixture.winner_entry_id || (fixtureRows.get(fixture.id) ?? []).some((row) => row.score !== null || row.score_numeric !== null || row.rank !== null || row.result_status !== null));
 
   const table = (tournament: Tournament, tournamentGroups: Group[]) => {
     const groupTables = tournamentGroups.length ? tournamentGroups : [{ id: "", tournament_id: tournament.id, name_vi: "Bảng xếp hạng", name_en: "Standings", sort_order: 0 }];
@@ -124,7 +168,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
         const layout = layoutBracket(knockout, slots);
         return <ZoomableBracket key={`${tournament.id}-${layout.width}`} locale={locale} layout={layout}><svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>{layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className="bracket-match source-bracket-match"><small>{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small><div className="bracket-teams">{rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{row?.score ?? "—"}</b></div>)}</div></article>;
-          const editButton = resultAction ? <button type="button" className="bracket-edit-button" onClick={() => setEditingFixture(fixture)}>Sửa kết quả</button> : null;
+          const editButton = resultAction ? <button type="button" className="bracket-edit-button" onClick={() => { setSubmittedFixtureId(null); setEditingFixture(fixture); }}>Sửa kết quả</button> : null;
           return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{resultAction ? <>{card}{editButton}</> : adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
         })}</ZoomableBracket>;
       })()}
@@ -133,5 +177,11 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       {(tournament.competition_mode === "race" || tournament.competition_mode === "swiss") && manualTable(tournament)}
       {!tournamentFixtures.length && !tournamentGroups.length && !entriesByTournament.get(tournament.id)?.length && <div className="panel board-empty">{t.empty}</div>}
     </section>;
-  })}</div>{resultAction && <dialog ref={dialogRef} className="result-dialog" onClose={() => setEditingFixture(null)}><form action={resultAction}><header><div><h2>Sửa kết quả trận đấu</h2><p>{editingFixture ? `${matchLabel(editingFixture)} · ${localized(editingFixture, "round", locale) || t.updating}` : ""}</p></div><button type="button" className="dialog-close" onClick={() => setEditingFixture(null)} aria-label="Đóng">×</button></header>{editingFixture && <><input type="hidden" name="fixture_id" value={editingFixture.id}/><div className="admin-fields"><label><span>Đội 1 / Team 1</span><select name="entry_1" defaultValue={editingHome?.entry_id ?? ""} required><option value="">Chọn / Select</option>{editingEntries.map((entry) => <option value={entry.id} key={entry.id}>{localized(entry, "name", locale)}</option>)}</select></label><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={editingHome?.score ?? ""}/></label><label><span>Đội 2 / Team 2</span><select name="entry_2" defaultValue={editingAway?.entry_id ?? ""} required><option value="">Chọn / Select</option>{editingEntries.map((entry) => <option value={entry.id} key={entry.id}>{localized(entry, "name", locale)}</option>)}</select></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={editingAway?.score ?? ""}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={editingFixture.status}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label><fieldset className="winner-options"><legend>Đội thắng / Winner</legend>{[editingHome, editingAway].filter(Boolean).map((entry) => <label key={entry!.entry_id}><input type="radio" name="winner_entry_id" value={entry!.entry_id} defaultChecked={entry!.entry_id === editingFixture.winner_entry_id}/>{localized(entriesById.get(entry!.entry_id) ?? {}, "name", locale)}</label>)}</fieldset><label><span>Ghi chú / Note</span><input name="note" defaultValue={editingHome?.result_detail?.note ?? ""}/></label></div><div className="dialog-actions"><button type="button" className="archive-button" onClick={() => setEditingFixture(null)}>Huỷ</button><button className="gold-button">Lưu kết quả / Save result</button></div></>}</form></dialog>}</div>;
+  })}</div>{resultAction && <dialog ref={dialogRef} className="result-dialog" onClick={(event) => { if (event.target === event.currentTarget) closeDialog(); }} onClose={closeDialog}>
+    <header><div><h2>Sửa kết quả trận đấu</h2><p>{editingFixture ? `${matchLabel(editingFixture)} · ${localized(editingFixture, "round", locale) || t.updating}` : ""}</p></div><button type="button" className="dialog-close" onClick={closeDialog} aria-label="Đóng">×</button></header>
+    {editingFixture && <div className="result-dialog-body">
+      <section className="dialog-source-section"><h3>Cấu trúc nguồn nhánh</h3>{editingSlots.length ? editingSlots.map((slot) => slotAction && !tournamentHasResults(editingFixture.tournament_id) ? <SlotEditor key={slot.id} slot={slot} fixture={editingFixture} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} action={slotAction}/> : <div className="slot-readonly" key={slot.id}><b>{slot.side === "home" ? "Ô trên" : "Ô dưới"}</b><span>{slotLabel(slot, slot.source_entry_id ? entriesById.get(slot.source_entry_id) : undefined, locale)}</span></div>) : <p className="slot-candidates">Chưa cấu hình nguồn nhánh.</p>}</section>
+      <section className="dialog-result-section"><h3>Nhập kết quả</h3><form key={editingFixture.id} action={resultFormAction} onSubmit={() => setSubmittedFixtureId(editingFixture.id)}><input type="hidden" name="fixture_id" value={editingFixture.id}/><div className="result-side-readonly"><div><span>Đội 1 / Team 1</span><output>{editingRows[0]?.label}</output></div><div><span>Đội 2 / Team 2</span><output>{editingRows[1]?.label}</output></div></div><div className="admin-fields"><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={editingHome?.score ?? ""}/></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={editingAway?.score ?? ""}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={editingFixture.status}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label><fieldset className="winner-options"><legend>Đội thắng / Winner</legend>{[editingHome, editingAway].filter((entry): entry is FixtureEntry => Boolean(entry?.entry_id)).map((entry) => <label key={entry.entry_id}><input type="radio" name="winner_entry_id" value={entry.entry_id} defaultChecked={entry.entry_id === editingFixture.winner_entry_id}/>{entryName(entry.entry_id)}</label>)}</fieldset><label><span>Ghi chú / Note</span><input name="note" defaultValue={editingHome?.result_detail?.note ?? ""}/></label></div>{!editingHome || !editingAway || editingHome.entry_id === editingAway.entry_id ? <p className="form-error" role="alert">Trận chưa đủ hai đội khác nhau. Hoàn tất cấu trúc nguồn nhánh trước khi lưu.</p> : resultState.message && !resultState.ok && submittedFixtureId === editingFixture.id ? <p className="form-error" role="alert">{resultState.message}</p> : null}<div className="dialog-actions"><button type="button" className="archive-button" onClick={closeDialog}>Huỷ</button><button className="gold-button" disabled={resultPending || !editingHome || !editingAway || editingHome.entry_id === editingAway.entry_id}>{resultPending ? "Đang lưu..." : "Lưu kết quả / Save result"}</button></div></form>{resultState.code === "DEPENDENT_RESULTS" && submittedFixtureId === editingFixture.id && previewAction && sportSlug && <form className="reset-preview" action={previewAction}><input type="hidden" name="fixture_id" value={editingFixture.id}/><input type="hidden" name="sport_slug" value={sportSlug}/><button className="archive-button">Xem ảnh hưởng khi mở lại vòng sau</button></form>}</section>
+    </div>}
+  </dialog>}</div>;
 }

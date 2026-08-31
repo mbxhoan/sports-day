@@ -225,7 +225,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     db.from("fixtures").select("id,tournament_id,group_id,venue_id,court_id,starts_at,ends_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id,source_code").eq("tenant_id", tenantId).order("starts_at"),
     db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,seed_order,score,score_numeric,rank,result_status").eq("tenant_id", tenantId).order("seed_order"),
     db.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en").eq("tenant_id", tenantId),
-    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,points,rank").eq("tenant_id", tenantId).order("rank"),
+    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,score_for,score_against,points,rank").eq("tenant_id", tenantId).order("rank"),
     db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).order("sort_order"),
     db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("tenant_id", tenantId).eq("kind", "gallery").order("sort_order"),
     db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").eq("tenant_id", tenantId).order("sort_order"),

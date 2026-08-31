@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { CalendarDays, Clock3, GitBranch, MapPin, Printer } from "lucide-react";
 import { copy, localized, type Court, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Sport, type Standing, type Tournament, type Venue } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
@@ -51,6 +51,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
   const tournamentsById = useMemo(() => new Map(tournaments.map((item) => [item.id, item])), [tournaments]);
   const sportsById = useMemo(() => new Map(sports.map((item) => [item.id, item])), [sports]);
   const entriesById = useMemo(() => new Map(entries.map((item) => [item.id, item])), [entries]);
+  const entriesByTournament = useMemo(() => Map.groupBy(entries, (item) => item.tournament_id), [entries]);
   const groupsById = useMemo(() => new Map(groups.map((item) => [item.id, item])), [groups]);
   const venuesById = useMemo(() => new Map(venues.map((item) => [item.id, item])), [venues]);
   const courtsById = useMemo(() => new Map(courts.map((item) => [item.id, item])), [courts]);
@@ -65,7 +66,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     for (const item of fixtureEntries) rows.set(item.fixture_id, [...(rows.get(item.fixture_id) ?? []), item]);
     return rows;
   }, [fixtureEntries]);
-  const fixtureSearchText = (fixture: Fixture) => {
+  const fixtureSearchText = useCallback((fixture: Fixture) => {
     const teamNames = (fixtureEntriesById.get(fixture.id) ?? []).flatMap((item) => {
       const entry = entriesById.get(item.entry_id);
       const members = (membersByEntryId.get(item.entry_id) ?? []).map((id) => participantsById.get(id)?.full_name ?? "");
@@ -74,19 +75,19 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     const tournament = tournamentsById.get(fixture.tournament_id);
     const sport = tournament ? sportsById.get(tournament.sport_id) : undefined;
     return [localized(sport ?? {}, "name", locale), localized(tournament ?? {}, "name", locale), ...teamNames, localized(fixture, "round", locale), localized(fixture, "result_summary", locale)].filter(Boolean).join(" ");
-  };
+  }, [entriesById, fixtureEntriesById, membersByEntryId, participantsById, sportsById, tournamentsById, locale]);
   const searchSuggestions = useMemo(() => buildSearchSuggestions({
     participants: participants.map((item) => ({ id: item.id, full_name: item.full_name })),
     entries: entries.map((item) => ({ id: item.id, name: localized(item, "name", locale), tournament: localized(tournamentsById.get(item.tournament_id) ?? {}, "name", locale) })),
     fixtures: fixtures.map((item) => ({ id: item.id, label: localized(item, "round", locale) || t.match, detail: fixtureSearchText(item) })),
-  }), [entries, fixtures, locale, participants, t.match, tournamentsById, fixtureEntriesById, membersByEntryId, participantsById, sportsById]);
+  }), [entries, fixtures, locale, participants, t.match, tournamentsById, fixtureSearchText]);
   const visibleFixtures = useMemo(() => fixtures, [fixtures]);
   const availableSports = useMemo(() => sports, [sports]);
   const availableTournaments = useMemo(() => tournaments.filter((item) => (!sportId || item.sport_id === sportId) && (selectedSport === "all" || item.sport_id === selectedSport)), [tournaments, sportId, selectedSport]);
   const filtered = useMemo(() => visibleFixtures.filter((fixture) => {
     const tournament = tournamentsById.get(fixture.tournament_id);
     return (!sportId || tournament?.sport_id === sportId) && (selectedSport === "all" || tournament?.sport_id === selectedSport) && (selectedTournament === "all" || fixture.tournament_id === selectedTournament) && (status === "all" || fixture.status === status) && matchesSearch(fixtureSearchText(fixture), searchTerm);
-  }).sort((a, b) => a.starts_at && b.starts_at ? Date.parse(a.starts_at) - Date.parse(b.starts_at) : a.starts_at ? -1 : b.starts_at ? 1 : 0), [visibleFixtures, sportId, selectedSport, selectedTournament, status, searchTerm, tournamentsById, sportsById, entriesById, fixtureEntriesById, membersByEntryId, participantsById, locale]);
+  }).sort((a, b) => a.starts_at && b.starts_at ? Date.parse(a.starts_at) - Date.parse(b.starts_at) : a.starts_at ? -1 : b.starts_at ? 1 : 0), [visibleFixtures, sportId, selectedSport, selectedTournament, status, searchTerm, tournamentsById, fixtureSearchText]);
   const byDay = useMemo(() => Map.groupBy(filtered, (fixture) => dayLabel(fixture.starts_at, locale, t.updating)), [filtered, locale, t.updating]);
   const statusText = (value: string) => statusKeys.includes(value as typeof statusKeys[number]) ? t[value as typeof statusKeys[number]] : value;
   const matchNames = (fixture: Fixture) => (fixtureEntriesById.get(fixture.id) ?? []).map((item) => {
@@ -98,7 +99,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     <div className="schedule-toolbar no-print">
       <SearchCombobox label={t.searchLabel} placeholder={t.searchPlaceholder} suggestions={searchSuggestions} value={searchTerm} onChange={setSearchTerm} onSelect={(suggestion) => setSearchTerm(suggestion.label)}/>
       {!sportId && <select value={selectedSport} onChange={(event) => { setSelectedSport(event.target.value); setSelectedTournament("all"); }} aria-label={t.filterSport}><option value="all">{t.filterSport}</option>{availableSports.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)}</option>)}</select>}
-      <select value={selectedTournament} onChange={(event) => setSelectedTournament(event.target.value)} aria-label={t.filterCategory}><option value="all">{t.filterCategory}</option>{availableTournaments.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)}</option>)}</select>
+      <select value={selectedTournament} onChange={(event) => setSelectedTournament(event.target.value)} aria-label={t.filterCategory}><option value="all">{t.filterCategory}</option>{availableTournaments.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)} ({entriesByTournament.get(item.id)?.length ?? 0} {locale === "vi" ? "đội/VĐV" : "teams/athletes"})</option>)}</select>
       <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label={t.filterStatus}><option value="all">{t.filterStatus}</option>{statusKeys.map((key) => <option key={key} value={key}>{t[key]}</option>)}</select>
       <div className="segmented"><button className={mode === "calendar" ? "active" : ""} onClick={() => setMode("calendar")}><CalendarDays size={16}/>{t.calendar}</button><button className={mode === "board" ? "active" : ""} onClick={() => setMode("board")}><GitBranch size={16}/>{t.board}</button></div>
       <button className="gold-button" onClick={() => window.print()}><Printer size={16}/>{t.print}</button>

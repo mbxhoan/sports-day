@@ -287,6 +287,30 @@ tbody tr:last-child td { border: 0; }
 .bracket-edit-button:hover, .bracket-edit-button:focus-visible { background: var(--primary); color: var(--primary-foreground); }
 .result-dialog { width: min(640px, calc(100% - 24px)); max-height: calc(100% - 24px); padding: 0; border: 1px solid var(--border); border-radius: 8px; background: #07527f; color: #fff; box-shadow: 0 24px 70px #001a35cc; }
 .result-dialog::backdrop { background: #00142eb8; }
+.result-dialog > header { padding: 22px 22px 0; }
+.result-dialog-body { max-height: calc(100vh - 116px); padding: 0 22px 22px; overflow-y: auto; }
+.dialog-source-section, .dialog-result-section { border: 1px solid #2f6681; border-radius: 6px; background: #064a78; }
+.dialog-source-section > h3, .dialog-result-section > h3 { margin: 0; padding: 13px 14px; border-bottom: 1px solid #2f6681; color: var(--primary); font-size: 12px; }
+.result-dialog .dialog-result-section form { padding: 14px; }
+.result-side-readonly { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.result-side-readonly div { display: grid; gap: 5px; }
+.result-side-readonly span, .slot-source-form label > span { color: #b8c2d2; font-size: 10px; }
+.result-side-readonly output { min-height: 40px; padding: 10px 12px; display: flex; align-items: center; border: 1px solid #2f6681; border-radius: 6px; background: #082b61; color: #fff; font-size: 12px; }
+.winner-options { display: grid; gap: 7px; margin: 0 0 13px; padding: 10px 12px; border: 1px solid #2f6681; border-radius: 6px; }
+.winner-options legend { padding: 0 4px; color: #b8c2d2; font-size: 10px; }
+.winner-options label { display: flex; align-items: center; gap: 7px; color: #fff; font-size: 11px; }
+.winner-options input { width: 16px; min-height: 16px; accent-color: var(--primary); }
+.slot-source-form { display: grid; grid-template-columns: 90px repeat(2, minmax(0, 1fr)); align-items: end; gap: 9px; padding: 14px; border-bottom: 1px solid #2f6681; }
+.slot-source-form:last-child { border-bottom: 0; }
+.slot-source-form > b { align-self: center; color: #fff; font-size: 11px; }
+.slot-source-form label { min-width: 0; display: grid; gap: 5px; }
+.slot-source-form input, .slot-source-form select { min-width: 0; min-height: 36px; padding: 0 9px; }
+.slot-source-form .search-combobox, .slot-source-form > .slot-candidates, .slot-source-form > .form-error, .slot-source-form > .gold-button { grid-column: 1 / -1; }
+.slot-candidates { margin: 0; color: var(--muted-foreground); font-size: 10px; }
+.slot-readonly { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 10px; padding: 14px; border-bottom: 1px solid #2f6681; font-size: 11px; }
+.slot-readonly:last-child { border-bottom: 0; }
+.slot-readonly b { color: var(--primary); }
+.slot-readonly span { color: #fff; }
 .result-dialog form { padding: 22px; }
 .result-dialog header { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .result-dialog header h2 { margin: 0; color: var(--primary); font-size: 18px; }
@@ -590,7 +614,26 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .group-grid td:nth-child(4)::before { content: "W"; }
   .group-grid td:nth-child(5)::before { content: "D"; }
   .group-grid td:nth-child(6)::before { content: "L"; }
-  .group-grid td:nth-child(7)::before { content: "Điểm"; }
+  .group-grid td:nth-child(7)::before { content: "+/-"; }
+  .group-grid td:nth-child(8)::before { content: "Điểm"; }
+  .manual-results td:nth-child(1)::before { content: "Hạng"; }
+  .manual-results td:nth-child(2)::before { content: "Đội / VĐV"; }
+  .manual-results td:nth-child(3)::before { content: "P"; }
+  .manual-results td:nth-child(4)::before { content: "W"; }
+  .manual-results td:nth-child(5)::before { content: "D"; }
+  .manual-results td:nth-child(6)::before { content: "L"; }
+  .manual-results td:nth-child(7)::before { content: "+/-"; }
+  .manual-results td:nth-child(8)::before { content: "Điểm"; }
+  .manual-results td:nth-child(9)::before { content: "Làn"; }
+  .manual-results td:nth-child(10)::before { content: "Thành tích"; }
+  .manual-results td:nth-child(11)::before { content: "Trạng thái"; }
+  .result-dialog { width: calc(100% - 16px); max-height: calc(100% - 16px); }
+  .result-dialog > header { padding: 16px 16px 0; }
+  .result-dialog-body { max-height: calc(100vh - 92px); padding: 0 16px 16px; }
+  .result-side-readonly { grid-template-columns: 1fr; }
+  .slot-source-form { grid-template-columns: 1fr; }
+  .slot-source-form > b, .slot-source-form .search-combobox, .slot-source-form > .slot-candidates, .slot-source-form > .form-error, .slot-source-form > .gold-button { grid-column: auto; }
+  .slot-readonly { grid-template-columns: 1fr; gap: 4px; }
   .race-result-list > div, .slot-editor form { grid-template-columns: 1fr; }
   .leaderboard-admin-row, .manual-standings-row { grid-template-columns: 1fr 1fr; }
   .leaderboard-admin-row b, .manual-standings-row b, .leaderboard-admin-row span { grid-column: 1 / -1; }

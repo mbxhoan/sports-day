@@ -46,6 +46,7 @@ const migrations = readdirSync(new URL("migrations/", supabaseRoot))
 const bracketMigration = readFileSync(new URL("migrations/20260828170000_source_driven_brackets.sql", supabaseRoot), "utf8");
 const bracketControlsMigration = readFileSync(new URL("migrations/20260828173024_source_bracket_admin_controls.sql", supabaseRoot), "utf8");
 const feedbackMigration = readFileSync(new URL("migrations/20260830090000_feedback_safe_admin_flow.sql", supabaseRoot), "utf8");
+const fullStandingsMigration = readFileSync(new URL("migrations/20260831100000_full_manual_standings.sql", supabaseRoot), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 
@@ -102,6 +103,29 @@ test("sports with supplied artwork use dedicated image icons", () => {
 test("standing difference uses score for minus score against", () => {
   assert.equal(standingDifference({ score_for: 8, score_against: 3 }), 5);
   assert.equal(standingDifference({ score_for: null, score_against: null }), 0);
+});
+
+test("public standings query includes both score sources", () => {
+  assert.match(siteLib, /standings.*select\([^\n]*score_for,score_against/);
+});
+
+test("fixture actions use database sides and return inline state", () => {
+  assert.match(adminActions, /export type AdminActionState/);
+  assert.match(adminActions, /saveFixtureResult\(_previousState: AdminActionState, formData: FormData\)/);
+  assert.match(adminActions, /fixture_entries/);
+  assert.match(adminActions, /return \{ ok: false, message[,}]/);
+  assert.doesNotMatch(adminActions, /formData\.get\(`entry_\$\{index\}`\)/);
+});
+
+test("bracket has one read-only-side dialog and no duplicate result form", () => {
+  assert.doesNotMatch(competitionBoard, /name="entry_1"|name="entry_2"/);
+  assert.match(competitionBoard, /source_kind/);
+  assert.doesNotMatch(adminSportPage, /form action=\{saveFixtureResult\}/);
+});
+
+test("full standings migration rejects non-finite numeric values", () => {
+  assert.match(fullStandingsMigration, /NaN/);
+  assert.match(fullStandingsMigration, /Infinity/);
 });
 
 test("search suggestions cover participants, entries, and fixtures", () => {
@@ -292,10 +316,10 @@ test("sport admin gallery renders as a media grid and highlights the active sect
 });
 
 test("sport admin results show readable match cards that open their editor", () => {
-  assert.match(adminSportPage, /result-match-summary/);
-  assert.match(adminSportPage, /resultTeam\(/);
-  assert.match(adminSportPage, /form action=\{saveFixtureResult\}/);
-  assert.doesNotMatch(adminSportPage, /editTarget === target && <form action=\{saveFixtureResult\}/);
+  assert.match(competitionBoard, /source-bracket-match/);
+  assert.match(competitionBoard, /resultAction/);
+  assert.match(competitionBoard, /form key=\{editingFixture\.id\} action=\{resultFormAction\}/);
+  assert.doesNotMatch(adminSportPage, /form action=\{saveFixtureResult\}/);
   assert.match(adminCss, /\.admin-sport-panels > section:has\(:target\)/);
 });
 
