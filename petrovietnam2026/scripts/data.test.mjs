@@ -13,6 +13,8 @@ import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
 import { isManualSport, orderManualStandings, validateGalleryDriveUrl } from "../src/lib/manual-competition.ts";
+import { standingDifference } from "../src/lib/competition-display.ts";
+import { buildSearchSuggestions, matchesSearch } from "../src/lib/search.ts";
 
 const supabaseRoot = new URL("../../supabase/", import.meta.url);
 const competition = readFileSync(new URL("seeds/020_competition.sql", supabaseRoot), "utf8");
@@ -45,6 +47,7 @@ const bracketMigration = readFileSync(new URL("migrations/20260828170000_source_
 const bracketControlsMigration = readFileSync(new URL("migrations/20260828173024_source_bracket_admin_controls.sql", supabaseRoot), "utf8");
 const feedbackMigration = readFileSync(new URL("migrations/20260830090000_feedback_safe_admin_flow.sql", supabaseRoot), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
+const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 
 test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
@@ -94,6 +97,62 @@ test("sports with supplied artwork use dedicated image icons", () => {
   assert.match(competition, /'co-tuong',[^\n]*'\/icons\/xiangqi\.png'/);
   assert.match(siteLib, /"co-tuong", "Cờ tướng", "Xiangqi", "\/icons\/xiangqi\.png"/);
   assert.match(migrations, /update public\.sports[\s\S]*set emoji = '\/icons\/xiangqi\.png'[\s\S]*where slug = 'co-tuong'/);
+});
+
+test("standing difference uses score for minus score against", () => {
+  assert.equal(standingDifference({ score_for: 8, score_against: 3 }), 5);
+  assert.equal(standingDifference({ score_for: null, score_against: null }), 0);
+});
+
+test("search suggestions cover participants, entries, and fixtures", () => {
+  const suggestions = buildSearchSuggestions({
+    participants: [{ id: "p1", full_name: "Nguyễn An", organization: "PVN" }],
+    entries: [{ id: "e1", name: "Nguyễn An / Trần Bình", tournament: "Bảng A" }],
+    fixtures: [{ id: "f1", label: "Trận 1", detail: "Bảng A · Nguyễn An / Trần Bình" }],
+  });
+  assert.deepEqual(suggestions.map((item) => item.kind), ["participant", "entry", "fixture"]);
+  assert.equal(matchesSearch("Nguyễn An / Trần Bình", "nguyen an"), true);
+});
+
+test("search controls expose accessible autocomplete on public and admin views", () => {
+  assert.match(searchCombobox, /role="combobox"/);
+  assert.match(searchCombobox, /aria-activedescendant/);
+  assert.match(searchCombobox, /role="option"/);
+  assert.match(scheduleView, /SearchCombobox/);
+  assert.match(adminSportPage, /AdminSearch/);
+});
+
+test("admin bracket opens an inline result editor", () => {
+  assert.match(competitionBoard, /resultAction/);
+  assert.match(competitionBoard, /<dialog/);
+  assert.match(competitionBoard, /name="score_1"/);
+  assert.match(competitionBoard, /name="score_2"/);
+  assert.match(adminSportPage, /resultAction=\{saveFixtureResult\}/);
+});
+
+test("manual standings RPC accepts and persists all display fields", () => {
+  const rpc = [...migrations.matchAll(/create or replace function public\.save_manual_standings\([\s\S]*?revoke execute on function public\.save_manual_standings/g)].at(-1)?.[0] ?? "";
+  assert.match(rpc, /entry_id uuid,\s*played integer/);
+  assert.match(rpc, /score_for numeric/);
+  assert.match(rpc, /score_against numeric/);
+  assert.match(rpc, /points numeric/);
+  assert.match(rpc, /rank integer/);
+});
+
+test("standings tables expose complete manual score columns", () => {
+  for (const source of [competitionBoard, adminSportPage]) {
+    assert.match(source, /played/);
+    assert.match(source, /score_for/);
+    assert.match(source, /score_against/);
+    assert.match(source, /standingDifference/);
+  }
+});
+
+test("all sports keep schedule visibility", () => {
+  assert.doesNotMatch(scheduleView, /visibleFixtures = useMemo\(.*isManualSport/s);
+  assert.doesNotMatch(sportTabs, /const sportFixtures = manual \? \[\] :/);
+  assert.doesNotMatch(sportTabs, /\.\.\.\(!manual \?/);
+  assert.doesNotMatch(adminSportPage, /\{!manual && <SportNavLink[\s\S]*Lịch & trận/);
 });
 
 test("source manifest tracks both supplied master schedules", () => {
@@ -323,8 +382,8 @@ test("manual competition keeps source order while ranked rows move first", () =>
     { entry_id: "a", rank: 2 },
     { entry_id: "c", rank: 1 },
   ], ["b", "a", "c"]).map((row) => row.entry_id), ["c", "a", "b"]);
-  assert.match(sportTabs, /!manual \? \[\["times"/);
-  assert.match(sportTabs, /!manual && active === "brackets"/);
+  assert.doesNotMatch(sportTabs, /const sportFixtures = manual \? \[\] :/);
+  assert.doesNotMatch(sportTabs, /!manual && active === "brackets"/);
   assert.match(scheduleView, /availableSports/);
   assert.match(adminSportPage, /manual_mode/);
   assert.match(adminSportPage, /name="lane"/);

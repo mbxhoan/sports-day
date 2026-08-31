@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { layoutBracket, slotLabel } from "@/lib/brackets";
+import { standingDifference } from "@/lib/competition-display";
 import { copy, localized, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Standing, type Tournament } from "@/lib/site";
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
   fixtureSlots: FixtureSlot[];
   standings: Standing[];
   adminHref?: string;
+  resultAction?: (formData: FormData) => void | Promise<void>;
 };
 
 type BracketLayout = ReturnType<typeof layoutBracket>;
@@ -43,7 +45,7 @@ function sourceNote(tournament: Tournament, locale: Locale) {
   return <small className="board-source">{source.file.split("/").at(-1)}{page}</small>;
 }
 
-export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref }: Props) {
+export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction }: Props) {
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
@@ -54,6 +56,12 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const standingsByGroup = Map.groupBy(standings, (row) => row.group_id ?? `tournament:${row.tournament_id}`);
   const fixtureRows = Map.groupBy(fixtureEntries, (row) => row.fixture_id);
   const fixtureSlotsById = Map.groupBy(fixtureSlots, (slot) => slot.fixture_id);
+  const [editingFixture, setEditingFixture] = useState<Fixture | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (editingFixture && !dialogRef.current?.open) dialogRef.current?.showModal();
+    if (!editingFixture && dialogRef.current?.open) dialogRef.current.close();
+  }, [editingFixture]);
   const sourceCodes = Map.groupBy(fixtures.filter((fixture) => fixture.source_code), (fixture) => `${fixture.tournament_id}:${fixture.source_code}`);
   const available = tournaments.filter((tournament) => (fixturesByTournament.get(tournament.id)?.length ?? 0) > 0 || (groupsByTournament.get(tournament.id)?.length ?? 0) > 0 || (entriesByTournament.get(tournament.id)?.length ?? 0) > 0);
 
@@ -74,6 +82,10 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       return { row, entry, label: slot ? slotLabel(slot, entry, locale) : entry ? localized(entry, "name", locale) : t.teamsNotAssigned };
     });
   };
+  const editingRows = editingFixture ? matchRows(editingFixture) : [];
+  const editingHome = editingRows[0]?.row;
+  const editingAway = editingRows[1]?.row;
+  const editingEntries = editingFixture ? entriesByTournament.get(editingFixture.tournament_id) ?? [] : [];
 
   const table = (tournament: Tournament, tournamentGroups: Group[]) => {
     const groupTables = tournamentGroups.length ? tournamentGroups : [{ id: "", tournament_id: tournament.id, name_vi: "Bảng xếp hạng", name_en: "Standings", sort_order: 0 }];
@@ -81,7 +93,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       const seeded = group.id ? (groupEntriesByGroup.get(group.id) ?? []).map((item) => item.entry_id) : (entriesByTournament.get(tournament.id) ?? []).map((item) => item.id);
       const standingRows = [...(standingsByGroup.get(group.id || `tournament:${tournament.id}`) ?? [])].sort((a, b) => (a.rank ?? 999999) - (b.rank ?? 999999));
       const ids = [...new Set([...standingRows.map((row) => row.entry_id), ...seeded])];
-      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.points}</th></tr></thead><tbody>{ids.map((id) => { const row = standingRows.find((item) => item.entry_id === id); return <tr key={id}><td>{row?.rank ?? "—"}</td><td>{entryName(id)}</td><td><b>{row?.points ?? 0}</b></td></tr>; })}</tbody></table></div>;
+      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>+/-</th><th>{t.points}</th></tr></thead><tbody>{ids.map((id) => { const row = standingRows.find((item) => item.entry_id === id); const stats = row ?? { played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0 }; return <tr key={id}><td>{row?.rank ?? "—"}</td><td>{entryName(id)}</td><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{standingDifference(stats)}</td><td><b>{stats.points}</b></td></tr>; })}</tbody></table></div>;
     })}</div>;
   };
 
@@ -93,7 +105,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     const raceByEntry = new Map(raceRows.map((row) => [row.entry_id, row]));
     const ids = [...new Set([...standingRows.map((row) => row.entry_id), ...tournamentEntries.map((entry) => entry.id)])];
     const raceMode = tournament.competition_mode === "race";
-    return <div className="panel table-scroll manual-results"><table><thead><tr><th>{t.rank}</th><th>{t.athlete}</th>{raceMode && <><th>{t.lane}</th><th>{t.performance}</th><th>{t.status}</th></>}</tr></thead><tbody>{ids.map((id) => { const standing = standingsByEntry.get(id); const race = raceByEntry.get(id); return <tr key={id}><td>{standing?.rank ?? race?.rank ?? "—"}</td><td>{entryName(id)}</td>{raceMode && <><td>{race?.lane ?? "—"}</td><td>{race?.score ?? "—"}</td><td>{race?.result_status?.toUpperCase() ?? t.updating}</td></>}</tr>; })}</tbody></table></div>;
+    return <div className="panel table-scroll manual-results"><table><thead><tr><th>{t.rank}</th><th>{t.athlete}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>+/-</th><th>{t.points}</th>{raceMode && <><th>{t.lane}</th><th>{t.performance}</th><th>{t.status}</th></>}</tr></thead><tbody>{ids.map((id) => { const standing = standingsByEntry.get(id); const race = raceByEntry.get(id); const stats = standing ?? { played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0 }; return <tr key={id}><td>{standing?.rank ?? race?.rank ?? "—"}</td><td>{entryName(id)}</td><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{standingDifference(stats)}</td><td><b>{stats.points}</b></td>{raceMode && <><td>{race?.lane ?? "—"}</td><td>{race?.score ?? "—"}</td><td>{race?.result_status?.toUpperCase() ?? t.updating}</td></>}</tr>; })}</tbody></table></div>;
   };
 
   const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); return <tr key={fixture.id}><td>{matchLabel(fixture)}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td>{rows.map((row) => row.label).join(" — ")}</td><td>{rows.map((row) => row.row?.score ?? "—").join(" : ")}</td></tr>; })}</tbody></table></div>;
@@ -112,7 +124,8 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
         const layout = layoutBracket(knockout, slots);
         return <ZoomableBracket key={`${tournament.id}-${layout.width}`} locale={locale} layout={layout}><svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>{layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className="bracket-match source-bracket-match"><small>{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small><div className="bracket-teams">{rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{row?.score ?? "—"}</b></div>)}</div></article>;
-          return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
+          const editButton = resultAction ? <button type="button" className="bracket-edit-button" onClick={() => setEditingFixture(fixture)}>Sửa kết quả</button> : null;
+          return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{resultAction ? <>{card}{editButton}</> : adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
         })}</ZoomableBracket>;
       })()}
       {tournament.competition_mode === "group_knockout" && table(tournament, tournamentGroups)}
@@ -120,5 +133,5 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       {(tournament.competition_mode === "race" || tournament.competition_mode === "swiss") && manualTable(tournament)}
       {!tournamentFixtures.length && !tournamentGroups.length && !entriesByTournament.get(tournament.id)?.length && <div className="panel board-empty">{t.empty}</div>}
     </section>;
-  })}</div></div>;
+  })}</div>{resultAction && <dialog ref={dialogRef} className="result-dialog" onClose={() => setEditingFixture(null)}><form action={resultAction}><header><div><h2>Sửa kết quả trận đấu</h2><p>{editingFixture ? `${matchLabel(editingFixture)} · ${localized(editingFixture, "round", locale) || t.updating}` : ""}</p></div><button type="button" className="dialog-close" onClick={() => setEditingFixture(null)} aria-label="Đóng">×</button></header>{editingFixture && <><input type="hidden" name="fixture_id" value={editingFixture.id}/><div className="admin-fields"><label><span>Đội 1 / Team 1</span><select name="entry_1" defaultValue={editingHome?.entry_id ?? ""} required><option value="">Chọn / Select</option>{editingEntries.map((entry) => <option value={entry.id} key={entry.id}>{localized(entry, "name", locale)}</option>)}</select></label><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={editingHome?.score ?? ""}/></label><label><span>Đội 2 / Team 2</span><select name="entry_2" defaultValue={editingAway?.entry_id ?? ""} required><option value="">Chọn / Select</option>{editingEntries.map((entry) => <option value={entry.id} key={entry.id}>{localized(entry, "name", locale)}</option>)}</select></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={editingAway?.score ?? ""}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={editingFixture.status}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label><fieldset className="winner-options"><legend>Đội thắng / Winner</legend>{[editingHome, editingAway].filter(Boolean).map((entry) => <label key={entry!.entry_id}><input type="radio" name="winner_entry_id" value={entry!.entry_id} defaultChecked={entry!.entry_id === editingFixture.winner_entry_id}/>{localized(entriesById.get(entry!.entry_id) ?? {}, "name", locale)}</label>)}</fieldset><label><span>Ghi chú / Note</span><input name="note" defaultValue={editingHome?.result_detail?.note ?? ""}/></label></div><div className="dialog-actions"><button type="button" className="archive-button" onClick={() => setEditingFixture(null)}>Huỷ</button><button className="gold-button">Lưu kết quả / Save result</button></div></>}</form></dialog>}</div>;
 }

@@ -59,9 +59,9 @@ export type Group = { id: string; tournament_id: string; name_vi: string; name_e
 export type GroupEntry = { id: string; group_id: string; entry_id: string; seed_order: number | null };
 export type Venue = { id: string; name_vi: string; name_en: string; address_vi: string; address_en: string; sort_order: number };
 export type Court = { id: string; venue_id: string; name_vi: string; name_en: string; sort_order: number };
-export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; seed_order: number | null; score: string | null; score_numeric: number | null; rank: number | null; result_status: string | null };
+export type FixtureEntry = { id: string; fixture_id: string; entry_id: string; side: string | null; lane: number | null; seed_order: number | null; score: string | null; score_numeric: number | null; rank: number | null; result_status: string | null; result_detail?: { note?: string } };
 export type FixtureSlot = { id: string; fixture_id: string; side: "home" | "away"; source_kind: "entry" | "group_rank" | "fixture_winner" | "fixture_loser" | "bye"; source_entry_id: string | null; source_group_id: string | null; source_fixture_id: string | null; source_rank: number | null; label_vi: string; label_en: string };
-export type Standing = { id: string; tournament_id: string; group_id: string | null; entry_id: string; played: number; won: number; drawn: number; lost: number; points: number; rank: number | null };
+export type Standing = { id: string; tournament_id: string; group_id: string | null; entry_id: string; played: number; won: number; drawn: number; lost: number; score_for: number; score_against: number; points: number; rank: number | null };
 export type Award = { id: string; organization_id: string | null; entry_id: string | null; participant_id: string | null; medal: "gold" | "silver" | "bronze" | "special"; title_vi: string; title_en: string };
 export type Media = { id: string; storage_path: string; public_url: string; sport_id: string | null; title_vi: string; title_en: string; alt_vi: string; alt_en: string; filter_tag: string; album_vi: string; album_en: string; sort_order: number };
 export type Contact = { id: string; label_vi: string; label_en: string; value: string; href: string; sort_order: number };
@@ -114,7 +114,7 @@ export const copy = {
     description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
     filterSport: "Tất cả môn", filterCategory: "Tất cả hạng mục", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", board: "Bảng đấu", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
-    organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", points: "Điểm", total: "Tổng", medals: "huy chương", athlete: "VĐV", lane: "Làn", performance: "Thành tích", status: "Trạng thái", openDrive: "Mở thư mục Google Drive",
+    organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", played: "P", wins: "Thắng", draws: "Hòa", losses: "Thua", points: "Điểm", total: "Tổng", medals: "huy chương", athlete: "VĐV", lane: "Làn", performance: "Thành tích", status: "Trạng thái", openDrive: "Mở thư mục Google Drive", searchLabel: "Tìm nhanh", searchPlaceholder: "Nhập tên VĐV, đội hoặc trận đấu...",
     venue: "Địa điểm", court: "Sân / làn", time: "Giờ", match: "Trận đấu", round: "Vòng", result: "Kết quả",
   },
   en: {
@@ -126,7 +126,7 @@ export const copy = {
     description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
     filterSport: "All sports", filterCategory: "All categories", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", board: "Competition board", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
-    organization: "Organization", members: "Members", group: "Group", rank: "Rank", points: "Points", total: "Total", medals: "medals", athlete: "Athlete", lane: "Lane", performance: "Performance", status: "Status", openDrive: "Open Google Drive folder",
+    organization: "Organization", members: "Members", group: "Group", rank: "Rank", played: "P", wins: "Wins", draws: "Draws", losses: "Losses", points: "Points", total: "Total", medals: "medals", athlete: "Athlete", lane: "Lane", performance: "Performance", status: "Status", openDrive: "Open Google Drive folder", searchLabel: "Quick search", searchPlaceholder: "Search athlete, team or match...",
     venue: "Venue", court: "Court / lane", time: "Time", match: "Match", round: "Round", result: "Result",
   },
 } as const;

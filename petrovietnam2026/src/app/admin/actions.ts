@@ -228,18 +228,35 @@ export async function saveManualStandings(formData: FormData) {
   const groupId = String(formData.get("group_id") ?? "") || null;
   const entryIds = formData.getAll("entry_id").map(String);
   const ranks = formData.getAll("rank").map(String);
+  const played = formData.getAll("played").map(String);
+  const won = formData.getAll("won").map(String);
+  const drawn = formData.getAll("drawn").map(String);
+  const lost = formData.getAll("lost").map(String);
+  const scoreFor = formData.getAll("score_for").map(String);
+  const scoreAgainst = formData.getAll("score_against").map(String);
   const points = formData.getAll("points").map(String);
   const race = formData.get("manual_mode") === "race";
   const lanes = formData.getAll("lane").map(String);
   const performances = formData.getAll("score").map(String);
   const statuses = formData.getAll("result_status").map(String);
-  if (!tournamentId || entryIds.length !== ranks.length || entryIds.length !== points.length || (race && [lanes, performances, statuses].some((items) => items.length !== entryIds.length))) throw new Error("Bảng xếp hạng không hợp lệ");
+  if (!tournamentId || !entryIds.length || [ranks, played, won, drawn, lost, scoreFor, scoreAgainst, points].some((items) => items.length !== entryIds.length) || (race && [lanes, performances, statuses].some((items) => items.length !== entryIds.length))) throw new Error("Bảng xếp hạng không hợp lệ");
+  const integerValue = (value: string) => value.trim() ? Number(value) : 0;
+  const numericValue = (value: string) => value.trim() ? Number(value) : 0;
   const rows = entryIds.map((entryId, index) => {
     const rank = ranks[index].trim();
-    const point = points[index].trim();
-    return { entry_id: entryId, rank: rank ? Number(rank) : null, points: point ? Number(point) : 0 };
+    return {
+      entry_id: entryId,
+      played: integerValue(played[index]),
+      won: integerValue(won[index]),
+      drawn: integerValue(drawn[index]),
+      lost: integerValue(lost[index]),
+      score_for: numericValue(scoreFor[index]),
+      score_against: numericValue(scoreAgainst[index]),
+      points: numericValue(points[index]),
+      rank: rank ? Number(rank) : null,
+    };
   });
-  if (rows.some((row) => !row.entry_id || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)) || !Number.isFinite(row.points))) throw new Error("Hạng hoặc điểm không hợp lệ");
+  if (rows.some((row) => !row.entry_id || [row.played, row.won, row.drawn, row.lost].some((value) => !Number.isInteger(value) || value < 0) || [row.score_for, row.score_against, row.points].some((value) => !Number.isFinite(value) || value < 0) || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)))) throw new Error("Hạng hoặc chỉ số bảng không hợp lệ");
   const { supabase, tenantId } = await adminClient();
   const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: rows });
   if (error) throw new Error(error.message);

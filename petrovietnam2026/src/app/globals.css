@@ -123,7 +123,19 @@ th { color: var(--primary); font-size: 12px; text-transform: uppercase; letter-s
 td { color: #e4fbff; }
 tbody tr:last-child td { border: 0; }
 .schedule-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.schedule-toolbar > .search-combobox { flex: 1 1 280px; }
 .schedule-toolbar select { min-width: 180px; padding: 0 38px 0 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: #fff; }
+.search-combobox { position: relative; min-width: 0; }
+.search-combobox > label { display: block; margin-bottom: 5px; color: var(--muted-foreground); font-size: 10px; }
+.search-input-wrap { min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--primary); }
+.search-input-wrap input { width: 100%; min-width: 0; min-height: 36px; border: 0; outline: 0; background: transparent; color: #fff; }
+.search-input-wrap input::placeholder { color: #b8c9d7; }
+.search-clear { min-height: 28px; padding: 0 3px; border: 0; background: transparent; color: var(--muted-foreground); }
+.search-suggestions { position: absolute; z-index: 30; inset: 66px 0 auto; max-height: 300px; margin: 0; padding: 4px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; background: #064067; box-shadow: 0 12px 24px #001a3588; list-style: none; }
+.search-suggestions li { display: grid; gap: 2px; padding: 8px 10px; border-radius: 4px; cursor: pointer; }
+.search-suggestions li:hover, .search-suggestions li[aria-selected="true"] { background: var(--muted); }
+.search-suggestions b { color: #fff; font-size: 11px; }
+.search-suggestions small { overflow: hidden; color: var(--muted-foreground); text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
 .segmented { display: flex; margin-left: auto; padding: 3px; border: 1px solid var(--border); border-radius: 7px; background: var(--card); }
 .segmented button, .gold-button { padding: 0 12px; display: flex; align-items: center; gap: 6px; border-radius: 5px; font-size: 12px; }
 .gold-button { border: 0; background: var(--primary); color: var(--primary-foreground); font-weight: 700; }
@@ -271,6 +283,16 @@ tbody tr:last-child td { border: 0; }
 .source-bracket-node > a { display: block; color: inherit; }
 .source-bracket-match { min-height: 82px; padding: 10px; display: grid; align-content: center; gap: 5px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); box-shadow: 0 5px 18px #001b3b99; }
 .source-bracket-match > small { color: var(--muted-foreground); font-size: 9px; }
+.bracket-edit-button { width: 100%; min-height: 28px; margin-top: 5px; padding: 0 8px; border: 1px solid var(--primary); border-radius: 4px; background: transparent; color: var(--primary); font-size: 10px; font-weight: 700; }
+.bracket-edit-button:hover, .bracket-edit-button:focus-visible { background: var(--primary); color: var(--primary-foreground); }
+.result-dialog { width: min(640px, calc(100% - 24px)); max-height: calc(100% - 24px); padding: 0; border: 1px solid var(--border); border-radius: 8px; background: #07527f; color: #fff; box-shadow: 0 24px 70px #001a35cc; }
+.result-dialog::backdrop { background: #00142eb8; }
+.result-dialog form { padding: 22px; }
+.result-dialog header { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.result-dialog header h2 { margin: 0; color: var(--primary); font-size: 18px; }
+.result-dialog header p { margin: 4px 0 0; color: var(--muted-foreground); font-size: 11px; }
+.dialog-close { min-height: 30px; padding: 0 8px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: #fff; font-size: 20px; line-height: 1; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .bracket-canvas { min-width: 0; }
 .tournament-block > .bracket-canvas + .group-grid { margin-top: 34px; }
 .bracket-canvas-toolbar { min-height: 38px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--primary); font-size: 11px; font-weight: 700; }
@@ -354,6 +376,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .admin-card, .admin-section { margin-bottom: 14px; border: 1px solid var(--border); border-radius: 8px; background: #07527f; }
 .admin-card { padding: 22px; }
 .admin-card h2 { margin: 0 0 18px; display: flex; align-items: center; gap: 7px; color: #fff; font-size: 15px; }
+.admin-search-card { position: relative; z-index: 4; }
 .admin-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-bottom: 16px; }
 .admin-fields label { min-width: 0; display: grid; align-content: start; gap: 6px; color: #b8c2d2; font-size: 11px; }
 .admin-fields input, .admin-fields textarea { background: #064a78; }
@@ -508,6 +531,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .panel { padding: 18px; }
   .table-scroll { padding: 0; }
   .schedule-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+  .schedule-toolbar > .search-combobox { grid-column: 1 / -1; }
   .schedule-toolbar select { width: 100%; min-width: 0; }
   .schedule-toolbar .segmented, .schedule-toolbar > .gold-button { grid-column: 1 / -1; width: 100%; margin: 0; }
   .segmented button { flex: 1; justify-content: center; }
