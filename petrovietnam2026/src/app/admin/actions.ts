@@ -1,6 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { adminEntities, type AdminEntity } from "@/lib/admin-config";
@@ -13,6 +14,7 @@ import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
+import { buildOperations, parseSportWorkbook, previewOperations, SPORT_EXCEL_MAX_BYTES, SPORT_EXCEL_VERSION, type SportExcelSnapshot } from "@/lib/sport-excel";
 export type AdminActionState = import("@/lib/admin-action").AdminActionState;
 
 async function adminClient() {
@@ -369,6 +371,76 @@ export async function saveScoringRule(formData: FormData) {
   const { error } = await supabase.from("tournaments").update({ scoring_rule: rule }).eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+}
+
+function excelAdminPath(slug: string, params: string) { return `/admin/sports/${encodeURIComponent(slug)}?section=excel&${params}#excel`; }
+
+export async function prepareSportExcelImport(formData: FormData) {
+  const slug = String(formData.get("sport_slug") ?? "").trim();
+  const fail = (message: string): never => redirect(excelAdminPath(slug || "", `error=${encodeURIComponent(message)}`));
+  let importId = "";
+  try {
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) fail("Môn thể thao không hợp lệ");
+    const file = formData.get("file");
+    if (!(file instanceof File) || !file.size || file.size > SPORT_EXCEL_MAX_BYTES || !file.name.toLowerCase().endsWith(".xlsx")) fail("Chỉ nhận file .xlsx từ 1 byte đến 10 MB");
+    const uploadFile = file as File;
+    const { supabase, tenantId } = await adminClient();
+    const { data: sport, error: sportError } = await supabase.from("sports").select("id,slug").eq("tenant_id", tenantId).eq("slug", slug).is("archived_at", null).maybeSingle();
+    if (sportError || !sport) fail("Môn thể thao không hợp lệ");
+    const currentSport = sport as { id: string; slug: string };
+    const buffer = Buffer.from(await uploadFile.arrayBuffer());
+    const parsed = await parseSportWorkbook(buffer);
+    if (parsed.meta.tenant_slug !== tenantSlug || parsed.meta.sport_slug !== slug || parsed.meta.sport_id !== currentSport.id) fail("Workbook không thuộc tenant hoặc môn đang mở");
+    const exportId = parsed.meta.export_id;
+    const { data: exportRow, error: exportError } = await supabase.from("sport_excel_exports").select("id,sport_id,template_version,mode,payload").eq("tenant_id", tenantId).eq("id", exportId).eq("sport_id", currentSport.id).is("archived_at", null).maybeSingle();
+    if (exportError || !exportRow || exportRow.template_version !== SPORT_EXCEL_VERSION || exportRow.mode !== parsed.meta.mode) fail("Snapshot export không hợp lệ hoặc đã hết hiệu lực");
+    const currentExport = exportRow as { payload: unknown; mode: string; template_version: number };
+    const snapshot = currentExport.payload as SportExcelSnapshot;
+    const operationPayload = buildOperations(parsed, snapshot, currentSport.id);
+    const preview = previewOperations(operationPayload.operations);
+    const { data, error } = await supabase.rpc("prepare_sport_excel_import", { p_sport_id: currentSport.id, p_export_id: exportId, p_template_version: SPORT_EXCEL_VERSION, p_mode: parsed.meta.mode, p_file_sha256: createHash("sha256").update(buffer).digest("hex"), p_payload: operationPayload, p_preview: preview });
+    if (error) fail(error.message);
+    importId = String((data as { import_id?: string } | null)?.import_id ?? "");
+    if (!importId) fail("Không tạo được phiên import");
+  } catch (error) {
+    if (error instanceof Error && error.message) fail(error.message);
+    fail("Không thể đọc file Excel");
+  }
+  redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}`));
+}
+
+export async function applySportExcelImport(formData: FormData) {
+  const slug = String(formData.get("sport_slug") ?? "").trim();
+  const importId = String(formData.get("import_id") ?? "").trim();
+  try {
+    if (!importId || !/^[a-z0-9]+(?:-[a-z0-9]*[a-z0-9])?$/.test(slug)) throw new Error("Yêu cầu import không hợp lệ");
+    const { supabase } = await adminClient();
+    const { error } = await supabase.rpc("apply_sport_excel_import", { p_import_id: importId, p_confirm: formData.get("confirm") === "yes" });
+    if (error) throw new Error(error.message);
+    revalidatePath("/", "layout");
+    revalidatePath(`/admin/sports/${slug}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Không thể áp dụng import";
+    redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}&error=${encodeURIComponent(message)}`));
+  }
+  redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}`));
+}
+
+export async function rollbackSportExcelImport(formData: FormData) {
+  const slug = String(formData.get("sport_slug") ?? "").trim();
+  const importId = String(formData.get("import_id") ?? "").trim();
+  try {
+    if (!importId || !/^[a-z0-9]+(?:-[a-z0-9]*[a-z0-9])?$/.test(slug)) throw new Error("Yêu cầu rollback không hợp lệ");
+    const { supabase } = await adminClient();
+    const { error } = await supabase.rpc("rollback_sport_excel_import", { p_import_id: importId });
+    if (error) throw new Error(error.message);
+    revalidatePath("/", "layout");
+    revalidatePath(`/admin/sports/${slug}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Không thể rollback import";
+    redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}&error=${encodeURIComponent(message)}`));
+  }
+  redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}`));
 }
 
 export async function logout() {

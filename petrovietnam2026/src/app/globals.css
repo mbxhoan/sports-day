@@ -409,6 +409,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .markdown-field summary { cursor: pointer; }
 .markdown-preview { margin-top: 6px; padding: 10px; white-space: pre-wrap; border: 1px dashed #31415e; border-radius: 5px; color: #d0d7e2; }
 .admin-card .gold-button, .record-form .gold-button, .record .gold-button { width: fit-content; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .hero-upload-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
 .hero-upload { min-width: 0; display: grid; gap: 9px; padding: 12px; border: 1px solid #2f6681; border-radius: var(--radius); background: #064a78; }
 .hero-upload b { color: #fff; font-size: 12px; }

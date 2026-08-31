@@ -47,6 +47,7 @@ const bracketMigration = readFileSync(new URL("migrations/20260828170000_source_
 const bracketControlsMigration = readFileSync(new URL("migrations/20260828173024_source_bracket_admin_controls.sql", supabaseRoot), "utf8");
 const feedbackMigration = readFileSync(new URL("migrations/20260830090000_feedback_safe_admin_flow.sql", supabaseRoot), "utf8");
 const fullStandingsMigration = readFileSync(new URL("migrations/20260831100000_full_manual_standings.sql", supabaseRoot), "utf8");
+const sportExcelMigration = readFileSync(new URL("migrations/20260831120000_sport_excel_admin.sql", supabaseRoot), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 
@@ -128,6 +129,15 @@ test("full standings migration rejects non-finite numeric values", () => {
   assert.match(fullStandingsMigration, /Infinity/);
 });
 
+test("Excel admin keeps imports atomic and bracket sources read-only", () => {
+  assert.match(sportExcelMigration, /create table public\.sport_excel_exports/);
+  assert.match(sportExcelMigration, /create table public\.sport_excel_imports/);
+  assert.match(sportExcelMigration, /create or replace function public\.apply_sport_excel_import/);
+  assert.match(sportExcelMigration, /create or replace function public\.rollback_sport_excel_import/);
+  assert.match(sportExcelMigration, /NGUỒN_NHÁNH chỉ đọc trong Excel/);
+  assert.match(sportExcelMigration, /Rollback không khôi phục đúng snapshot ban đầu/);
+});
+
 test("search suggestions cover participants, entries, and fixtures", () => {
   const suggestions = buildSearchSuggestions({
     participants: [{ id: "p1", full_name: "Nguyễn An", organization: "PVN" }],
@@ -144,6 +154,14 @@ test("search controls expose accessible autocomplete on public and admin views",
   assert.match(searchCombobox, /role="option"/);
   assert.match(scheduleView, /SearchCombobox/);
   assert.match(adminSportPage, /AdminSearch/);
+});
+
+test("admin schedule renders relationship labels instead of UUIDs", () => {
+  assert.match(adminSportPage, /function summary\(row: Row, entity\?: AdminEntity/);
+  assert.match(adminSportPage, /entity === "fixture_entries"/);
+  assert.match(adminSportPage, /all\("entries"\)/);
+  assert.match(adminSportPage, /summary\(item, relation, rows\)/);
+  assert.doesNotMatch(adminSportPage, /\{summary\(item\)\}<\/option>/);
 });
 
 test("admin bracket opens an inline result editor", () => {
