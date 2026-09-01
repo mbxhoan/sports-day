@@ -1864,13 +1864,17 @@ join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_sl
 left join public.organizations o on o.code = source.organization_code
 where not exists (
   select 1 from public.entries existing
-  where existing.tournament_id = t.id and regexp_replace(lower(coalesce(existing.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.name_vi,'')), '[^[:alnum:]]', '', 'g')
+  where existing.tournament_id = t.id
+    and existing.kind = source.kind
+    and private.entry_identity(existing.name_vi, existing.kind) = private.entry_identity(source.name_vi, source.kind)
 );
-update public.entries existing set organization_id = coalesce(existing.organization_id, o.id), seed_number = coalesce(existing.seed_number, source.seed_number), bib_number = coalesce(existing.bib_number, source.bib_number), archived_at = null
+update public.entries existing set name_vi = source.name_vi, name_en = source.name_vi, organization_id = coalesce(o.id, existing.organization_id), seed_number = coalesce(existing.seed_number, source.seed_number), bib_number = coalesce(existing.bib_number, source.bib_number), archived_at = null
 from seed_update_entries source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
 join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug and t.tenant_id = s.tenant_id
 left join public.organizations o on o.code = source.organization_code
-where existing.tournament_id = t.id and regexp_replace(lower(coalesce(existing.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.name_vi,'')), '[^[:alnum:]]', '', 'g');
+where existing.tournament_id = t.id
+  and existing.kind = source.kind
+  and private.entry_identity(existing.name_vi, existing.kind) = private.entry_identity(source.name_vi, source.kind);
 
 create temporary table seed_update_members (sport_slug text, tournament_slug text, entry_name text, full_name text, sort_order integer) on commit drop;
 insert into seed_update_members values

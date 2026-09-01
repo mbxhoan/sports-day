@@ -244,6 +244,13 @@ test("entry variants are merged without leaving duplicate group rows", () => {
   assert.match(source, /select distinct on \(member\.group_id, merge\.keeper_id\)/);
 });
 
+test("workbook updates reuse pair identity instead of creating suffix variants", () => {
+  assert.match(migrations, /create or replace function private\.entry_identity/);
+  assert.match(updateWorkbookSeed, /private\.entry_identity\(existing\.name_vi, existing\.kind\)/);
+  assert.match(updateWorkbookSeed, /private\.entry_identity\(source\.name_vi, source\.kind\)/);
+  assert.match(updateWorkbookSeed, /name_vi = source\.name_vi/);
+});
+
 test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(migrations, /create or replace function private\.recalculate_group_standings\(/);
   assert.match(migrations, /row_number\(\) over \(order by/);

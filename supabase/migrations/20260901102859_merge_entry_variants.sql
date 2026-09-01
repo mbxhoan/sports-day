@@ -1,5 +1,36 @@
 -- Merge the same competitor when source files spell its organization differently.
 -- Keep the row with the most live result data, move references, archive the duplicate.
+create or replace function private.entry_identity(p_name text, p_kind text)
+returns text
+language plpgsql
+stable
+set search_path = public, pg_temp
+as $$
+declare
+  normalized text := lower(trim(coalesce(p_name, '')));
+  organization_code text;
+begin
+  if p_kind in ('pair', 'team') then
+    normalized := regexp_replace(normalized, '\s*-[^-]*$', '');
+    for organization_code in
+      select lower(trim(code))
+      from public.organizations
+      where archived_at is null
+      order by length(code) desc
+    loop
+      if length(normalized) > length(organization_code)
+        and right(normalized, length(organization_code)) = organization_code then
+        normalized := rtrim(left(normalized, length(normalized) - length(organization_code)));
+        exit;
+      end if;
+    end loop;
+  end if;
+  return regexp_replace(normalized, '[^[:alnum:]]', '', 'g');
+end
+$$;
+
+revoke all on function private.entry_identity(text, text) from public;
+
 create or replace function private.merge_entry_variants(p_tenant_id uuid)
 returns integer
 language plpgsql
@@ -19,10 +50,7 @@ begin
       entry.id,
       entry.tournament_id,
       entry.kind,
-      case
-        when entry.kind in ('pair', 'team') then regexp_replace(lower(trim(entry.name_vi)), '\s*-[^-]*$', '')
-        else lower(trim(entry.name_vi))
-      end as identity,
+      private.entry_identity(entry.name_vi, entry.kind) as identity,
       length(entry.name_vi) as name_length,
       (select count(*) from public.fixture_entries item where item.entry_id = entry.id and item.archived_at is null) as fixture_refs,
       (select count(*) from public.standings item where item.entry_id = entry.id and item.archived_at is null) as standing_refs,
