@@ -29,6 +29,7 @@ export type Tournament = {
   rules_vi: string;
   rules_en: string;
   competition_mode: CompetitionMode;
+  scoring_rule?: { type?: string; win?: number; draw?: number; loss?: number };
   source_metadata: { file?: string; page_or_sheet?: number | string; warnings?: string[] };
   sort_order: number;
 };
@@ -213,7 +214,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,source_metadata,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).order("sort_order"),
     db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).order("full_name"),
     db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).order("name_vi"),

@@ -28,6 +28,8 @@ const publicPages = readFileSync(new URL("../src/components/public-pages.tsx", i
 const galleryGrid = readFileSync(new URL("../src/components/gallery-grid.tsx", import.meta.url), "utf8");
 const sportTabs = readFileSync(new URL("../src/components/sport-tabs.tsx", import.meta.url), "utf8");
 const scheduleView = readFileSync(new URL("../src/components/schedule-view.tsx", import.meta.url), "utf8");
+const adminSearch = readFileSync(new URL("../src/components/admin-search.tsx", import.meta.url), "utf8");
+const searchLib = readFileSync(new URL("../src/lib/search.ts", import.meta.url), "utf8");
 const siteLib = readFileSync(new URL("../src/lib/site.ts", import.meta.url), "utf8");
 const nextConfig = readFileSync(new URL("../next.config.ts", import.meta.url), "utf8");
 const mediaUploadForm = readFileSync(new URL("../src/components/media-upload-form.tsx", import.meta.url), "utf8");
@@ -78,6 +80,16 @@ test("started brackets lock structure and admin board uses source slots", () => 
   assert.ok(competitionBoard.indexOf("{isBracket &&") < competitionBoard.indexOf("{tournament.competition_mode === \"group_knockout\" && table"));
   assert.match(adminActions, /saveFixtureSlot/);
   assert.match(adminActions, /previewFixtureReset/);
+});
+
+test("admin bracket exposes mapped names and inline score editing", () => {
+  assert.match(competitionBoard, /slotCandidateLabel/);
+  assert.match(competitionBoard, /bracket-inline-result/);
+  assert.match(competitionBoard, /name="score_1"/);
+  assert.match(competitionBoard, /name="score_2"/);
+  assert.match(competitionBoard, /bracket-round-headings/);
+  assert.match(competitionBoard, /bracket-round-heading/);
+  assert.match(competitionBoard, /auto-winner-note/);
 });
 
 test("source topology covers every supplied category", () => {
@@ -148,6 +160,22 @@ test("search suggestions cover participants, entries, and fixtures", () => {
   assert.equal(matchesSearch("Nguyễn An / Trần Bình", "nguyen an"), true);
 });
 
+test("admin quick search includes competition categories and toolbar label stays accessible", () => {
+  const suggestions = buildSearchSuggestions({
+    participants: [],
+    entries: [],
+    fixtures: [],
+    tournaments: [{ id: "t1", name: "Đôi nam dưới 45", detail: "Hạng mục" }],
+  });
+  assert.deepEqual(suggestions.map((item) => item.kind), ["tournament"]);
+  assert.match(adminSearch, /suggestion\.kind === "tournament"/);
+  assert.match(adminSportPage, /tournaments: scopedRows\.tournaments\.map/);
+  assert.match(searchCombobox, /hideLabel/);
+  assert.match(scheduleView, /hideLabel/);
+  assert.match(adminCss, /search-combobox-compact/);
+  assert.match(searchLib, /kind: "tournament"/);
+});
+
 test("search controls expose accessible autocomplete on public and admin views", () => {
   assert.match(searchCombobox, /role="combobox"/);
   assert.match(searchCombobox, /aria-activedescendant/);
@@ -170,6 +198,32 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(competitionBoard, /name="score_1"/);
   assert.match(competitionBoard, /name="score_2"/);
   assert.match(adminSportPage, /resultAction=\{saveFixtureResult\}/);
+  assert.match(adminCss, /\.source-bracket-node\s*\{[^}]*z-index:\s*1/);
+  assert.match(adminCss, /\.bracket-edit-button\s*\{[^}]*position:\s*relative[^}]*background:\s*var\(--primary\)[^}]*color:\s*var\(--primary-foreground\)/);
+});
+
+test("results derive winners and recalculate unique standings ranks", () => {
+  assert.match(migrations, /create or replace function private\.recalculate_group_standings\(/);
+  assert.match(migrations, /row_number\(\) over \(order by/);
+  assert.match(migrations, /winner_entry_id := case/);
+  assert.match(migrations, /Hạng trong bảng không được trùng/);
+  assert.match(competitionBoard, /name="winner_entry_id"/);
+  assert.match(competitionBoard, /tỷ số.*đội thắng|đội thắng.*tỷ số/i);
+  assert.match(adminActions, /p_winner_entry_id: winnerEntryId/);
+  assert.match(adminActions, /winner_entry_id/);
+  assert.match(competitionBoard, /sportSlug === "keo-co"/);
+  assert.match(competitionBoard, /manualWinner/);
+  assert.match(migrations, /keo-co/);
+  assert.doesNotMatch(adminSportPage, /Không tự tính lại/);
+  assert.match(adminActions, /Hạng trong bảng không được trùng/);
+  assert.match(migrations, /update public\.standings existing\s+set rank = null/);
+  assert.match(adminSportPage, /auto-rank-cell/);
+});
+
+test("bracket resolves mapped names and exposes standings editing below", () => {
+  assert.match(competitionBoard, /resolveSlotEntry/);
+  assert.match(competitionBoard, /standingsAction/);
+  assert.match(adminSportPage, /standingsAction: saveManualStandings/);
 });
 
 test("manual standings RPC accepts and persists all display fields", () => {
@@ -414,6 +468,7 @@ test("scoring rule accepts valid point values and keeps unknown formats manual",
   assert.deepEqual(headToHeadRule("head-to-head", "3", "1", "0"), { type: "head-to-head", win: 3, draw: 1, loss: 0 });
   assert.deepEqual(headToHeadRule("manual", "", "", ""), {});
   assert.throws(() => headToHeadRule("head-to-head", "bad", "1", "0"), /Điểm tính không hợp lệ/);
+  assert.throws(() => headToHeadRule("head-to-head", "-1", "1", "0"), /Điểm tính không hợp lệ/);
 });
 
 test("manual competition keeps source order while ranked rows move first", () => {

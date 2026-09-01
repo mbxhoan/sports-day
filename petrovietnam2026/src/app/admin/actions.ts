@@ -161,8 +161,13 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     if (!fixtureId) return actionFailure(new Error("Không tìm thấy trận đấu"));
     if (!["scheduled", "live", "completed", "postponed", "cancelled"].includes(status)) return actionFailure(new Error("Trạng thái trận đấu không hợp lệ"));
 
-    const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
+    const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id,bracket_position").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
     if (fixtureError || !fixture) return actionFailure(new Error("Không tìm thấy trận đấu"));
+    const { data: tournament, error: tournamentError } = await supabase.from("tournaments").select("sport_id").eq("tenant_id", tenantId).eq("id", fixture.tournament_id).is("archived_at", null).single();
+    if (tournamentError || !tournament) return actionFailure(new Error("Không tìm thấy hạng mục"));
+    const { data: sport, error: sportError } = await supabase.from("sports").select("slug").eq("tenant_id", tenantId).eq("id", tournament.sport_id).is("archived_at", null).single();
+    if (sportError || !sport) return actionFailure(new Error("Không tìm thấy môn thi"));
+    const manualWinner = sport.slug === "keo-co";
     const { data: currentRows, error: rowsError } = await supabase.from("fixture_entries").select("entry_id,side,score,result_detail").eq("tenant_id", tenantId).eq("fixture_id", fixtureId).is("archived_at", null).in("side", ["home", "away"]);
     if (rowsError) return actionFailure(new Error(rowsError.message));
     const sides = (["home", "away"] as const).map((side) => currentRows?.find((row) => row.side === side));
@@ -177,14 +182,18 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     const scores = [1, 2].map((index) => String(formData.get(`score_${index}`) ?? "").trim());
     const parsedScores = scores.map((score) => score === "" ? null : Number(score));
     if (parsedScores.some((score) => score !== null && (!Number.isFinite(score) || score < 0))) return actionFailure(new Error("Tỷ số không hợp lệ"));
-    const requestedWinner = String(formData.get("winner_entry_id") ?? "");
-    if (status === "completed" && !requestedWinner) return actionFailure(new Error("Chọn đúng một đội thắng"));
-    if (status !== "completed" && requestedWinner) return actionFailure(new Error("Trận chưa hoàn tất không được có đội thắng"));
+    if (status === "completed" && parsedScores.some((score) => score === null)) return actionFailure(new Error("Trận hoàn tất phải có đủ hai tỷ số"));
+    const isKnockout = fixture.group_id === null && fixture.bracket_position !== null;
+    if (status === "completed" && parsedScores[0] !== null && parsedScores[0] === parsedScores[1] && isKnockout) return actionFailure(new Error("Vòng loại trực tiếp không được hòa; hãy nhập tỷ số phân định"));
+    const requestedWinner = String(formData.get("winner_entry_id") ?? "").trim() || null;
+    if (manualWinner && status === "completed" && !requestedWinner) return actionFailure(new Error("Kéo co phải chọn đội thắng"));
     if (requestedWinner && !entryIds.includes(requestedWinner)) return actionFailure(new Error("Đội thắng không thuộc trận đấu"));
+    const derivedWinner = status === "completed" && parsedScores[0] !== null && parsedScores[1] !== null && parsedScores[0] !== parsedScores[1] ? entryIds[parsedScores[0] > parsedScores[1] ? 0 : 1] : null;
+    const winnerEntryId = manualWinner ? (status === "completed" ? requestedWinner : null) : derivedWinner;
     const note = String(formData.get("note") ?? "").trim();
     const entries = sides.map((row, index) => ({ entry_id: row!.entry_id, side: index === 0 ? "home" : "away", score: scores[index] || null, score_numeric: parsedScores[index], rank: null, result_detail: note ? { note } : row!.result_detail ?? {} }));
     const summary = (field: "name_vi" | "name_en") => entries.map((item) => `${labelsById.get(item.entry_id)?.[field] ?? ""} ${item.score ?? ""}`.trim()).join(" - ");
-    const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: requestedWinner || null, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
+    const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: winnerEntryId, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
     if (error) return actionFailure(new Error(error.message));
     revalidatePath("/", "layout");
     revalidatePath("/admin");
@@ -276,11 +285,11 @@ export async function saveManualStandings(formData: FormData) {
   const lanes = formData.getAll("lane").map(String);
   const performances = formData.getAll("score").map(String);
   const statuses = formData.getAll("result_status").map(String);
-  if (!tournamentId || !entryIds.length || [ranks, played, won, drawn, lost, scoreFor, scoreAgainst, points].some((items) => items.length !== entryIds.length) || (race && [lanes, performances, statuses].some((items) => items.length !== entryIds.length))) throw new Error("Bảng xếp hạng không hợp lệ");
+  if (!tournamentId || !entryIds.length || [played, won, drawn, lost, scoreFor, scoreAgainst, points].some((items) => items.length !== entryIds.length) || (race && [ranks, lanes, performances, statuses].some((items) => items.length !== entryIds.length))) throw new Error("Bảng xếp hạng không hợp lệ");
   const integerValue = (value: string) => value.trim() ? Number(value) : 0;
   const numericValue = (value: string) => value.trim() ? Number(value) : 0;
   const rows = entryIds.map((entryId, index) => {
-    const rank = ranks[index].trim();
+    const rank = race ? ranks[index].trim() : "";
     return {
       entry_id: entryId,
       played: integerValue(played[index]),
@@ -294,8 +303,12 @@ export async function saveManualStandings(formData: FormData) {
     };
   });
   if (rows.some((row) => !row.entry_id || [row.played, row.won, row.drawn, row.lost].some((value) => !Number.isInteger(value) || value < 0) || [row.score_for, row.score_against, row.points].some((value) => !Number.isFinite(value) || value < 0) || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)))) throw new Error("Hạng hoặc chỉ số bảng không hợp lệ");
+  const explicitRanks = rows.filter((row) => row.rank !== null).map((row) => row.rank);
+  if (new Set(explicitRanks).size !== explicitRanks.length) throw new Error("Hạng trong bảng không được trùng");
+  const automaticRanks = new Map([...rows].sort((a, b) => b.points - a.points || (b.score_for - b.score_against) - (a.score_for - a.score_against) || b.score_for - a.score_for || a.entry_id.localeCompare(b.entry_id)).map((row, index) => [row.entry_id, index + 1]));
+  const persistedRows = race ? rows : rows.map((row) => ({ ...row, rank: automaticRanks.get(row.entry_id) ?? null }));
   const { supabase, tenantId } = await adminClient();
-  const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: rows });
+  const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: persistedRows });
   if (error) throw new Error(error.message);
   if (race) {
     const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("tournament_id", tournamentId).is("archived_at", null).order("round_order").limit(1).maybeSingle();

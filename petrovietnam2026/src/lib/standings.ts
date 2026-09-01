@@ -6,7 +6,7 @@ type Standing = { entry_id: string; played: number; won: number; drawn: number; 
 export function headToHeadRule(type: string, win: string, draw: string, loss: string): Rule {
   if (type !== "head-to-head") return {};
   const values = [win, draw, loss].map(Number);
-  if (values.some((value) => !Number.isFinite(value))) throw new Error("Điểm tính không hợp lệ");
+  if (values.some((value) => !Number.isFinite(value) || value < 0)) throw new Error("Điểm tính không hợp lệ");
   return { type, win: values[0], draw: values[1], loss: values[2] };
 }
 

@@ -77,10 +77,11 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     return [localized(sport ?? {}, "name", locale), localized(tournament ?? {}, "name", locale), ...teamNames, localized(fixture, "round", locale), localized(fixture, "result_summary", locale)].filter(Boolean).join(" ");
   }, [entriesById, fixtureEntriesById, membersByEntryId, participantsById, sportsById, tournamentsById, locale]);
   const searchSuggestions = useMemo(() => buildSearchSuggestions({
+    tournaments: tournaments.map((item) => ({ id: item.id, name: localized(item, "name", locale), detail: t.categories })),
     participants: participants.map((item) => ({ id: item.id, full_name: item.full_name })),
     entries: entries.map((item) => ({ id: item.id, name: localized(item, "name", locale), tournament: localized(tournamentsById.get(item.tournament_id) ?? {}, "name", locale) })),
     fixtures: fixtures.map((item) => ({ id: item.id, label: localized(item, "round", locale) || t.match, detail: fixtureSearchText(item) })),
-  }), [entries, fixtures, locale, participants, t.match, tournamentsById, fixtureSearchText]);
+  }), [entries, fixtures, locale, participants, t.categories, t.match, tournaments, tournamentsById, fixtureSearchText]);
   const visibleFixtures = useMemo(() => fixtures, [fixtures]);
   const availableSports = useMemo(() => sports, [sports]);
   const availableTournaments = useMemo(() => tournaments.filter((item) => (!sportId || item.sport_id === sportId) && (selectedSport === "all" || item.sport_id === selectedSport)), [tournaments, sportId, selectedSport]);
@@ -97,7 +98,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
 
   return <>
     <div className="schedule-toolbar no-print">
-      <SearchCombobox label={t.searchLabel} placeholder={t.searchPlaceholder} suggestions={searchSuggestions} value={searchTerm} onChange={setSearchTerm} onSelect={(suggestion) => setSearchTerm(suggestion.label)}/>
+      <SearchCombobox label={t.searchLabel} hideLabel placeholder={t.searchPlaceholder} suggestions={searchSuggestions} value={searchTerm} onChange={setSearchTerm} onSelect={(suggestion) => setSearchTerm(suggestion.label)}/>
       {!sportId && <select value={selectedSport} onChange={(event) => { setSelectedSport(event.target.value); setSelectedTournament("all"); }} aria-label={t.filterSport}><option value="all">{t.filterSport}</option>{availableSports.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)}</option>)}</select>}
       <select value={selectedTournament} onChange={(event) => setSelectedTournament(event.target.value)} aria-label={t.filterCategory}><option value="all">{t.filterCategory}</option>{availableTournaments.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)} ({entriesByTournament.get(item.id)?.length ?? 0} {locale === "vi" ? "đội/VĐV" : "teams/athletes"})</option>)}</select>
       <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label={t.filterStatus}><option value="all">{t.filterStatus}</option>{statusKeys.map((key) => <option key={key} value={key}>{t[key]}</option>)}</select>

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { deriveRaceRanks, layoutBracket, slotLabel } from "../src/lib/brackets.ts";
+import { deriveRaceRanks, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotLabel, slotSourceLabel } from "../src/lib/brackets.ts";
 
 const fixtures = [
   { id: "semi-1", round_order: 1, bracket_position: 1 },
@@ -15,12 +15,32 @@ const slots = [
 
 test("layout centers parent between source matches", () => {
   const result = layoutBracket(fixtures, slots);
-  assert.equal(result.nodes.find((node) => node.id === "final").y, 100);
+  assert.equal(result.nodes.find((node) => node.id === "final").y, 132);
   assert.equal(result.connectors.length, 2);
 });
 
 test("slot label preserves unresolved source", () => {
   assert.equal(slotLabel({ source_kind: "group_rank", label_vi: "Nhất A", label_en: "Group A winner" }, undefined, "vi"), "Nhất A");
+});
+
+test("slot resolution replaces group rank with the mapped entry", () => {
+  const entry = { id: "entry-a", tournament_id: "tournament-1", organization_id: null, kind: "pair", name_vi: "Đội A / Đội B", name_en: "Team A / Team B" };
+  const resolved = resolveSlotEntry(
+    { source_kind: "group_rank", source_group_id: "group-k", source_rank: 2, source_entry_id: null, source_fixture_id: null },
+    { entries: [entry], standings: [{ id: "standing-1", tournament_id: "tournament-1", group_id: "group-k", entry_id: "entry-a", played: 3, won: 2, drawn: 0, lost: 1, score_for: 6, score_against: 2, points: 6, rank: 2 }], fixtures: [], fixtureEntries: [] },
+  );
+  assert.equal(resolved?.name_vi, "Đội A / Đội B");
+});
+
+test("slot candidate label shows the real teams behind an unresolved group rank", () => {
+  assert.equal(slotCandidateLabel([
+    { name_vi: "Đội A / VĐV A", name_en: "Team A / Athlete A" },
+    { name_vi: "Đội B / VĐV B", name_en: "Team B / Athlete B" },
+  ], "vi"), "Đội A / VĐV A · Đội B / VĐV B");
+});
+
+test("group rank label explains the source without opaque bracket codes", () => {
+  assert.equal(slotSourceLabel({ source_kind: "group_rank", source_rank: 2 }, "Bảng K", "vi"), "Nhì Bảng K");
 });
 
 test("race ranks valid times before non-finishers", () => {

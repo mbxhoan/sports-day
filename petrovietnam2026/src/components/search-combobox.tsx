@@ -6,6 +6,7 @@ import { matchesSearch, type SearchSuggestion } from "@/lib/search";
 
 type Props = {
   label: string;
+  hideLabel?: boolean;
   placeholder: string;
   suggestions: SearchSuggestion[];
   value: string;
@@ -13,7 +14,7 @@ type Props = {
   onSelect: (suggestion: SearchSuggestion) => void;
 };
 
-export function SearchCombobox({ label, placeholder, suggestions, value, onChange, onSelect }: Props) {
+export function SearchCombobox({ label, hideLabel = false, placeholder, suggestions, value, onChange, onSelect }: Props) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,8 +35,8 @@ export function SearchCombobox({ label, placeholder, suggestions, value, onChang
     inputRef.current?.focus();
   };
 
-  return <div className="search-combobox" ref={rootRef}>
-    <label htmlFor={listId}>{label}</label>
+  return <div className={`search-combobox${hideLabel ? " search-combobox-compact" : ""}`} ref={rootRef}>
+    <label className={hideLabel ? "visually-hidden" : undefined} htmlFor={listId}>{label}</label>
     <div className="search-input-wrap"><Search size={16}/><input ref={inputRef} id={listId} role="combobox" value={value} placeholder={placeholder} autoComplete="off" aria-autocomplete="list" aria-controls={`${listId}-options`} aria-expanded={open && options.length > 0} aria-activedescendant={activeIndex >= 0 && activeIndex < options.length ? `${listId}-option-${activeIndex}` : ""} onFocus={() => setOpen(true)} onChange={(event) => { onChange(event.target.value); setOpen(true); setActiveIndex(-1); }} onKeyDown={(event) => {
       if (event.key === "ArrowDown") { event.preventDefault(); setOpen(true); setActiveIndex((index) => options.length ? (index + 1) % options.length : -1); }
       if (event.key === "ArrowUp") { event.preventDefault(); setActiveIndex((index) => options.length ? (index <= 0 ? options.length - 1 : index - 1) : -1); }

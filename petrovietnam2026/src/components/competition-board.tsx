@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { layoutBracket, slotLabel } from "@/lib/brackets";
+import { CARD_WIDTH, COLUMN_GAP, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotGroupCandidates, slotLabel, slotSourceLabel } from "@/lib/brackets";
 import { initialAdminActionState, type AdminActionState } from "@/lib/admin-action";
 import { standingDifference } from "@/lib/competition-display";
 import { buildSearchSuggestions } from "@/lib/search";
@@ -26,10 +26,12 @@ type Props = {
   resultAction?: AdminAction;
   slotAction?: AdminAction;
   previewAction?: PreviewAction;
+  standingsAction?: PreviewAction;
   sportSlug?: string;
 };
 
 type BracketLayout = ReturnType<typeof layoutBracket>;
+type MatchRow = { row: FixtureEntry | undefined; entry: Entry | undefined; slot: FixtureSlot | undefined; candidates: Entry[]; label: string; candidateLabel: string };
 
 const noopAction: AdminAction = async () => initialAdminActionState;
 
@@ -84,7 +86,25 @@ function SlotEditor({ slot, fixture, entries, groups, groupEntries, fixtures, ac
   </form>;
 }
 
-export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, sportSlug }: Props) {
+function InlineBracketResult({ fixture, rows, action, manualWinner }: { fixture: Fixture; rows: MatchRow[]; action: AdminAction; manualWinner: boolean }) {
+  const [state, formAction, pending] = useActionState(action, initialAdminActionState);
+  const ready = Boolean(rows[0]?.row && rows[1]?.row && rows[0]?.entry && rows[1]?.entry && rows[0].entry.id !== rows[1].entry.id);
+  return <form className="bracket-inline-result" action={formAction}>
+    <input type="hidden" name="fixture_id" value={fixture.id}/>
+    <input type="hidden" name="status" value="completed"/>
+    {rows.map((item, index) => <div className="bracket-inline-score" key={item.row?.id ?? item.slot?.id ?? index}>
+      <span title={item.label}>{item.label}</span>
+      {item.entry ? <input name={`score_${index + 1}`} type="number" min="0" step="any" defaultValue={item.row?.score ?? ""} aria-label={`Tỷ số ${item.label}`}/> : <small title={item.candidateLabel}>{item.candidateLabel ? `Có thể: ${item.candidateLabel}` : "Chưa xác định"}</small>}
+    </div>)}
+    {manualWinner && <label className="bracket-inline-winner">Đội thắng<select name="winner_entry_id" required={ready} disabled={!ready} defaultValue={fixture.winner_entry_id ?? ""}><option value="">Chọn đội thắng</option>{rows.filter((item) => item.entry).map((item) => <option key={item.entry!.id} value={item.entry!.id}>{item.label}</option>)}</select></label>}
+    {!ready && <small className="bracket-inline-help">Chưa có đủ hai đội cụ thể để nhập kết quả.</small>}
+    <small className="bracket-inline-help">{manualWinner ? "Kéo co: chọn đội thắng theo biên bản trọng tài." : "Đội thắng tự động theo tỷ số."}</small>
+    {!state.ok && state.message && <small className="form-error" role="alert">{state.message}</small>}
+    <button className="gold-button" disabled={pending || !ready}>{pending ? "Đang lưu..." : "Lưu điểm"}</button>
+  </form>;
+}
+
+export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, standingsAction, sportSlug }: Props) {
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
@@ -114,14 +134,19 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     return `${locale === "vi" ? "Trận" : "Match"} ${fixture.source_code}${sameCode.length > 1 ? ` (${occurrence})` : ""}`;
   };
   const entryName = (id: string | null | undefined) => id ? localized(entriesById.get(id) ?? {}, "name", locale) : "";
-  const matchRows = (fixture: Fixture) => {
+  const slotDisplayLabel = (slot: FixtureSlot) => {
+    const group = slot.source_group_id ? groups.find((item) => item.id === slot.source_group_id) : undefined;
+    return slotSourceLabel(slot, group ? localized(group, "name", locale) : "", locale) || slotLabel(slot, undefined, locale);
+  };
+  const matchRows = (fixture: Fixture): MatchRow[] => {
     const rows = fixtureRows.get(fixture.id) ?? [];
     const slots = fixtureSlotsById.get(fixture.id) ?? [];
     return (["home", "away"] as const).map((side, index) => {
       const row = rows.find((item) => item.side === side) ?? rows[index];
       const slot = slots.find((item) => item.side === side);
-      const entry = row ? entriesById.get(row.entry_id) : slot?.source_entry_id ? entriesById.get(slot.source_entry_id) : undefined;
-      return { row, entry, label: slot ? slotLabel(slot, entry, locale) : entry ? localized(entry, "name", locale) : t.teamsNotAssigned };
+      const entry = row ? entriesById.get(row.entry_id) : slot ? resolveSlotEntry(slot, { entries, standings, fixtures, fixtureEntries }) : undefined;
+      const candidates = slot && !entry ? slotGroupCandidates(slot, groupEntries, entries) : [];
+      return { row, entry, slot, candidates, label: entry ? localized(entry, "name", locale) : slot ? slotDisplayLabel(slot) : t.teamsNotAssigned, candidateLabel: !entry && candidates.length ? slotCandidateLabel(candidates, locale) : "" };
     });
   };
   const editingRows = editingFixture ? matchRows(editingFixture) : [];
@@ -137,7 +162,9 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       const seeded = group.id ? (groupEntriesByGroup.get(group.id) ?? []).map((item) => item.entry_id) : (entriesByTournament.get(tournament.id) ?? []).map((item) => item.id);
       const standingRows = [...(standingsByGroup.get(group.id || `tournament:${tournament.id}`) ?? [])].sort((a, b) => (a.rank ?? 999999) - (b.rank ?? 999999));
       const ids = [...new Set([...standingRows.map((row) => row.entry_id), ...seeded])];
-      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>+/-</th><th>{t.points}</th></tr></thead><tbody>{ids.map((id) => { const row = standingRows.find((item) => item.entry_id === id); const stats = row ?? { played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0 }; return <tr key={id}><td>{row?.rank ?? "—"}</td><td>{entryName(id)}</td><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{standingDifference(stats)}</td><td><b>{stats.points}</b></td></tr>; })}</tbody></table></div>;
+      const rows = ids.map((id) => { const row = standingRows.find((item) => item.entry_id === id); const stats = row ?? { played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0 }; return { id, row, stats }; });
+      const content = <><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>+/-</th><th>{t.points}</th></tr></thead><tbody>{rows.map(({ id, row, stats }) => standingsAction ? <tr key={id}><td><output className="auto-rank-cell">{row?.rank ?? "Tự động"}</output></td><td><input type="hidden" name="entry_id" value={id}/>{entryName(id)}</td><td><input name="played" type="number" min="0" defaultValue={stats.played} aria-label={`Số trận ${entryName(id)}`}/></td><td><input name="won" type="number" min="0" defaultValue={stats.won} aria-label={`Thắng ${entryName(id)}`}/></td><td><input name="drawn" type="number" min="0" defaultValue={stats.drawn} aria-label={`Hòa ${entryName(id)}`}/></td><td><input name="lost" type="number" min="0" defaultValue={stats.lost} aria-label={`Thua ${entryName(id)}`}/></td><td><span className="standings-score-pair"><label>Ghi<input name="score_for" type="number" min="0" step="any" defaultValue={stats.score_for} aria-label={`Điểm ghi ${entryName(id)}`}/></label><label>Thua<input name="score_against" type="number" min="0" step="any" defaultValue={stats.score_against} aria-label={`Điểm thua ${entryName(id)}`}/></label></span><output className="standings-difference">Hiệu số: {standingDifference(stats)}</output></td><td><input name="points" type="number" min="0" step="any" defaultValue={stats.points} aria-label={`Điểm ${entryName(id)}`}/></td></tr> : <tr key={id}><td>{row?.rank ?? "—"}</td><td>{entryName(id)}</td><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{standingDifference(stats)}</td><td><b>{stats.points}</b></td></tr>)}</tbody></table>{standingsAction && <button className="gold-button" type="submit">Lưu bảng / Save standings</button>}</>;
+      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3>{standingsAction ? <form className="standings-inline-form" action={standingsAction}><input type="hidden" name="tournament_id" value={tournament.id}/><input type="hidden" name="group_id" value={group.id}/><input type="hidden" name="manual_mode" value="standings"/>{content}</form> : content}</div>;
     })}</div>;
   };
 
@@ -166,8 +193,11 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       {warnings.map((warning) => <p className="board-warning" key={warning}>⚠ {warning}</p>)}
       {isBracket && knockout.length > 0 && (() => {
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
-        const layout = layoutBracket(knockout, slots);
-        return <ZoomableBracket key={`${tournament.id}-${layout.width}`} locale={locale} layout={layout}><svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>{layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className="bracket-match source-bracket-match"><small>{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small><div className="bracket-teams">{rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{row?.score ?? "—"}</b></div>)}</div></article>;
+        const layout = layoutBracket(knockout, slots, resultAction ? 184 : undefined);
+        const roundCount = Math.max(1, ...knockout.map((fixture) => fixture.round_order ?? 1));
+        const roundLabels = new Map<number, string>();
+        knockout.forEach((fixture) => { if (fixture.round_order !== null && !roundLabels.has(fixture.round_order)) roundLabels.set(fixture.round_order, localized(fixture, "round", locale) || `${locale === "vi" ? "Vòng" : "Round"} ${fixture.round_order}`); });
+        return <ZoomableBracket key={`${tournament.id}-${layout.width}`} locale={locale} layout={layout}><div className="bracket-round-headings">{Array.from({ length: roundCount }, (_, index) => <div className="bracket-round-heading" key={index} style={{ left: index * (CARD_WIDTH + COLUMN_GAP), width: CARD_WIDTH }}>{roundLabels.get(index + 1) ?? `${locale === "vi" ? "Vòng" : "Round"} ${index + 1}`}</div>)}</div><svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>{layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className={`bracket-match source-bracket-match${resultAction ? " admin-bracket-match" : ""}`}><small>{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small>{resultAction ? <InlineBracketResult fixture={fixture} rows={rows} action={resultAction} manualWinner={sportSlug === "keo-co"}/> : <div className="bracket-teams">{rows.map(({ row, entry, label, candidateLabel }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}{candidateLabel && <small className="bracket-candidates">{candidateLabel}</small>}</span><b>{row?.score ?? "—"}</b></div>)}</div>}</article>;
           const editButton = resultAction ? <button type="button" className="bracket-edit-button" onClick={() => { setSubmittedFixtureId(null); setEditingFixture(fixture); }}>Sửa kết quả</button> : null;
           return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{resultAction ? <>{card}{editButton}</> : adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
         })}</ZoomableBracket>;
@@ -180,8 +210,8 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   })}</div>{resultAction && <dialog ref={dialogRef} className="result-dialog" onClick={(event) => { if (event.target === event.currentTarget) closeDialog(); }} onClose={closeDialog}>
     <header><div><h2>Sửa kết quả trận đấu</h2><p>{editingFixture ? `${matchLabel(editingFixture)} · ${localized(editingFixture, "round", locale) || t.updating}` : ""}</p></div><button type="button" className="dialog-close" onClick={closeDialog} aria-label="Đóng">×</button></header>
     {editingFixture && <div className="result-dialog-body">
-      <section className="dialog-source-section"><h3>Cấu trúc nguồn nhánh</h3>{editingSlots.length ? editingSlots.map((slot) => slotAction && !tournamentHasResults(editingFixture.tournament_id) ? <SlotEditor key={slot.id} slot={slot} fixture={editingFixture} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} action={slotAction}/> : <div className="slot-readonly" key={slot.id}><b>{slot.side === "home" ? "Ô trên" : "Ô dưới"}</b><span>{slotLabel(slot, slot.source_entry_id ? entriesById.get(slot.source_entry_id) : undefined, locale)}</span></div>) : <p className="slot-candidates">Chưa cấu hình nguồn nhánh.</p>}</section>
-      <section className="dialog-result-section"><h3>Nhập kết quả</h3><form key={editingFixture.id} action={resultFormAction} onSubmit={() => setSubmittedFixtureId(editingFixture.id)}><input type="hidden" name="fixture_id" value={editingFixture.id}/><div className="result-side-readonly"><div><span>Đội 1 / Team 1</span><output>{editingRows[0]?.label}</output></div><div><span>Đội 2 / Team 2</span><output>{editingRows[1]?.label}</output></div></div><div className="admin-fields"><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={editingHome?.score ?? ""}/></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={editingAway?.score ?? ""}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={editingFixture.status}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label><fieldset className="winner-options"><legend>Đội thắng / Winner</legend>{[editingHome, editingAway].filter((entry): entry is FixtureEntry => Boolean(entry?.entry_id)).map((entry) => <label key={entry.entry_id}><input type="radio" name="winner_entry_id" value={entry.entry_id} defaultChecked={entry.entry_id === editingFixture.winner_entry_id}/>{entryName(entry.entry_id)}</label>)}</fieldset><label><span>Ghi chú / Note</span><input name="note" defaultValue={editingHome?.result_detail?.note ?? ""}/></label></div>{!editingHome || !editingAway || editingHome.entry_id === editingAway.entry_id ? <p className="form-error" role="alert">Trận chưa đủ hai đội khác nhau. Hoàn tất cấu trúc nguồn nhánh trước khi lưu.</p> : resultState.message && !resultState.ok && submittedFixtureId === editingFixture.id ? <p className="form-error" role="alert">{resultState.message}</p> : null}<div className="dialog-actions"><button type="button" className="archive-button" onClick={closeDialog}>Huỷ</button><button className="gold-button" disabled={resultPending || !editingHome || !editingAway || editingHome.entry_id === editingAway.entry_id}>{resultPending ? "Đang lưu..." : "Lưu kết quả / Save result"}</button></div></form>{resultState.code === "DEPENDENT_RESULTS" && submittedFixtureId === editingFixture.id && previewAction && sportSlug && <form className="reset-preview" action={previewAction}><input type="hidden" name="fixture_id" value={editingFixture.id}/><input type="hidden" name="sport_slug" value={sportSlug}/><button className="archive-button">Xem ảnh hưởng khi mở lại vòng sau</button></form>}</section>
+      <section className="dialog-source-section"><h3>Cấu trúc nguồn nhánh</h3>{editingSlots.length ? editingSlots.map((slot) => slotAction && !tournamentHasResults(editingFixture.tournament_id) ? <SlotEditor key={slot.id} slot={slot} fixture={editingFixture} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} action={slotAction}/> : <div className="slot-readonly" key={slot.id}><b>{slot.side === "home" ? "Ô trên" : "Ô dưới"}</b><span>{slot.source_entry_id ? entryName(slot.source_entry_id) : slotDisplayLabel(slot)}</span></div>) : <p className="slot-candidates">Chưa cấu hình nguồn nhánh.</p>}</section>
+      <section className="dialog-result-section"><h3>Nhập kết quả</h3><form key={editingFixture.id} action={resultFormAction} onSubmit={() => setSubmittedFixtureId(editingFixture.id)}><input type="hidden" name="fixture_id" value={editingFixture.id}/><div className="result-side-readonly"><div><span>Đội 1 / Team 1</span><output>{editingRows[0]?.label}</output></div><div><span>Đội 2 / Team 2</span><output>{editingRows[1]?.label}</output></div></div><div className="admin-fields"><label><span>Tỷ số 1 / Score 1</span><input name="score_1" type="number" min="0" step="any" defaultValue={editingHome?.score ?? ""}/></label><label><span>Tỷ số 2 / Score 2</span><input name="score_2" type="number" min="0" step="any" defaultValue={editingAway?.score ?? ""}/></label><label><span>Trạng thái / Status</span><select name="status" defaultValue={editingFixture.status}><option value="scheduled">Scheduled</option><option value="live">Live</option><option value="completed">Completed</option><option value="postponed">Postponed</option><option value="cancelled">Cancelled</option></select></label>{sportSlug === "keo-co" ? <label><span>Đội thắng / Winner</span><select name="winner_entry_id" required={Boolean(editingHome && editingAway && editingHome.entry_id !== editingAway.entry_id)} defaultValue={editingFixture.winner_entry_id ?? ""}><option value="">Chọn đội thắng</option>{editingRows.filter((item) => item.entry).map((item) => <option key={item.entry!.id} value={item.entry!.id}>{item.label}</option>)}</select></label> : <p className="auto-winner-note">Đội thắng sẽ tự động theo tỷ số. Nếu tỷ số bằng nhau ở vòng loại trực tiếp, hệ thống sẽ yêu cầu tỷ số phân định.</p>}<label><span>Ghi chú / Note</span><input name="note" defaultValue={editingHome?.result_detail?.note ?? ""}/></label></div>{!editingHome || !editingAway || editingHome.entry_id === editingAway.entry_id ? <p className="form-error" role="alert">Trận chưa đủ hai đội khác nhau. Hoàn tất cấu trúc nguồn nhánh trước khi lưu.</p> : resultState.message && !resultState.ok && submittedFixtureId === editingFixture.id ? <p className="form-error" role="alert">{resultState.message}</p> : null}<div className="dialog-actions"><button type="button" className="archive-button" onClick={closeDialog}>Huỷ</button><button className="gold-button" disabled={resultPending || !editingHome || !editingAway || editingHome.entry_id === editingAway.entry_id}>{resultPending ? "Đang lưu..." : "Lưu kết quả / Save result"}</button></div></form>{resultState.code === "DEPENDENT_RESULTS" && submittedFixtureId === editingFixture.id && previewAction && sportSlug && <form className="reset-preview" action={previewAction}><input type="hidden" name="fixture_id" value={editingFixture.id}/><input type="hidden" name="sport_slug" value={sportSlug}/><button className="archive-button">Xem ảnh hưởng khi mở lại vòng sau</button></form>}</section>
     </div>}
   </dialog>}</div>;
 }
