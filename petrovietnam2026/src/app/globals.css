@@ -358,6 +358,7 @@ tbody tr:last-child td { border: 0; }
 .board-matches table, .board-race table { min-width: 660px; }
 .board-empty { color: var(--muted-foreground); }
 .admin-board-card { overflow: hidden; }
+.admin-board-card .group-grid { grid-template-columns: minmax(0, 1fr); }
 .admin-board-card .competition-board { margin-top: 22px; }
 .admin-result-editor > summary { cursor: pointer; list-style: none; }
 .admin-result-editor > summary::-webkit-details-marker { display: none; }

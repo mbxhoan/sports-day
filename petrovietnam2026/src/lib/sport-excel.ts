@@ -118,6 +118,8 @@ const tablePrefix: Record<SportExcelTable, string> = {
   sports: "MON", tournaments: "HM", organizations: "DV", participants: "VDV", entries: "DOI", entry_members: "TV", venues: "DD", courts: "SAN", groups: "BANG", group_entries: "BANGDOI", fixtures: "TRAN", fixture_entries: "KQ", fixture_slots: "NGUON", standings: "BXH", awards: "HC",
 };
 
+const hiddenColumns = new Set(["ref", "action", "source_metadata", "scoring_rule", "result_detail", "source_code"]);
+
 function slugPart(value: unknown) {
   return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "row";
 }
@@ -134,16 +136,35 @@ function relationKey(key: string) {
 function refsForSnapshot(snapshot: SportExcelSnapshot) {
   const byTable = new Map<SportExcelTable, Map<string, string>>();
   const byRef = new Map<string, { table: SportExcelTable; id: string }>();
+  const byLabel = new Map<string, Array<{ table: SportExcelTable; id: string }>>();
+  const labels = new Map<string, string>();
   for (const table of Object.keys(tableDefinitions) as SportExcelTable[]) {
     const map = new Map<string, string>();
-    for (const row of snapshot.tables[table] ?? []) {
+    const rows = snapshot.tables[table] ?? [];
+    const labelCounts = new Map<string, number>();
+    for (const row of rows) labelCounts.set(displayLabel(row), (labelCounts.get(displayLabel(row)) ?? 0) + 1);
+    const labelOccurrences = new Map<string, number>();
+    for (const row of rows) {
       const ref = rowRef(table, row);
+      const baseLabel = displayLabel(row);
+      const occurrence = (labelOccurrences.get(baseLabel) ?? 0) + 1;
+      labelOccurrences.set(baseLabel, occurrence);
+      const label = (labelCounts.get(baseLabel) ?? 0) > 1 ? `${baseLabel} (${occurrence})` : baseLabel;
       map.set(row.id, ref);
       byRef.set(`${table}:${ref}`, { table, id: row.id });
+      labels.set(`${table}:${ref}`, label);
+      const labelKey = `${table}:${label}`;
+      byLabel.set(labelKey, [...(byLabel.get(labelKey) ?? []), { table, id: row.id }]);
     }
     byTable.set(table, map);
   }
-  return { byTable, byRef };
+  return { byTable, byRef, byLabel, labels };
+}
+
+function relationDisplay(relatedTable: SportExcelTable, ref: string, refs: ReturnType<typeof refsForSnapshot>) {
+  const label = refs.labels.get(`${relatedTable}:${ref}`);
+  if (!label) return ref;
+  return (refs.byLabel.get(`${relatedTable}:${label}`)?.length ?? 0) === 1 ? label : `${label} [${ref}]`;
 }
 
 function exportValue(table: SportExcelTable, key: string, row: RawRow, refs: ReturnType<typeof refsForSnapshot>) {
@@ -151,7 +172,8 @@ function exportValue(table: SportExcelTable, key: string, row: RawRow, refs: Ret
   if (actualKey) {
     const relatedId = row[actualKey];
     const relatedTable = relations[actualKey];
-    return relatedId && relatedTable ? refs.byTable.get(relatedTable)?.get(String(relatedId)) ?? "" : "";
+    const ref = relatedId && relatedTable ? refs.byTable.get(relatedTable)?.get(String(relatedId)) ?? "" : "";
+    return relatedTable && ref ? relationDisplay(relatedTable, ref, refs) : "";
   }
   const value = row[key];
   if (value === null || value === undefined) return "";
@@ -165,7 +187,14 @@ function displayLabel(row: RawRow) {
 
 function configureDataSheet(sheet: ExcelJS.Worksheet, table: SportExcelTable, rows: RawRow[], refs: ReturnType<typeof refsForSnapshot>, editable: boolean) {
   const columns = tableDefinitions[table];
-  sheet.columns = [{ header: "Mã / Ref", key: "ref", width: 34 }, { header: "Thao tác / Action", key: "action", width: 14 }, ...columns.map((column) => ({ header: column.header, key: column.key, width: Math.min(32, Math.max(13, column.header.length + 3)) }))];
+  const visibleColumns = columns.filter((column) => !hiddenColumns.has(column.key));
+  const technicalColumns = columns.filter((column) => hiddenColumns.has(column.key));
+  sheet.columns = [
+    ...visibleColumns.map((column) => ({ header: column.header, key: column.key, width: Math.min(42, Math.max(15, column.header.length + 5)) })),
+    ...technicalColumns.map((column) => ({ header: column.header, key: column.key, width: 2 })),
+    { header: "Mã / Ref", key: "ref", width: 2 },
+    { header: "Thao tác / Action", key: "action", width: 2 },
+  ];
   for (const row of rows) {
     const values: Record<string, unknown> = { ref: rowRef(table, row), action: editable ? "UPDATE" : "KEEP" };
     for (const column of columns) values[column.key] = exportValue(table, column.key, row, refs);
@@ -184,6 +213,7 @@ function configureDataSheet(sheet: ExcelJS.Worksheet, table: SportExcelTable, ro
   sheet.autoFilter = { from: "A1", to: `${String.fromCharCode(65 + Math.min(25, columns.length + 1))}1` };
   sheet.getColumn("ref").font = { color: { argb: "FF9FDDEA" } };
   if (editable) sheet.getColumn("action").eachCell((cell, rowNumber) => { if (rowNumber > 1) cell.dataValidation = { type: "list", allowBlank: false, formulae: ["\"KEEP,UPDATE,UPSERT,ARCHIVE\""] }; });
+  for (const column of ["ref", "action", ...technicalColumns.map((column) => column.key)]) sheet.getColumn(column).hidden = true;
   sheet.eachRow((row, rowNumber) => { if (rowNumber > 1 && rowNumber % 2 === 0) row.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF2F8FA" } }; });
 }
 
@@ -200,12 +230,13 @@ export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: Spo
   guide.addRows([
     ["Workbook quản trị Excel · Petrovietnam 2026"],
     [`Môn: ${snapshot.sport_slug} · Chế độ: ${mode === "current" ? "Dữ liệu hiện tại" : "Mẫu trống"}`],
-    ["Chỉ sửa các sheet dữ liệu. Cột Mã / Ref dùng để nối dữ liệu; không đổi mã của dòng đã xuất."],
-    ["Dòng đã xuất: giữ UPDATE để cập nhật, KEEP để bỏ qua, ARCHIVE để lưu trữ. Dòng mới dùng mã NEW-* và UPSERT."],
-    ["Xóa dòng khỏi file không xóa dữ liệu. Không nhập công thức, macro, file .xls/.xlsm hoặc file có mật khẩu."],
-    ["Import luôn có bước xem trước. Một lỗi chặn sẽ làm toàn workbook không ghi gì; cảnh báo cần được xác nhận."],
-    ["NGUỒN_NHÁNH chỉ để xem. Muốn thay đổi đường đi/nhánh, dùng màn hình reset cấu trúc hiện có."],
-    ["Ngày giờ là ô ngày giờ Excel và được hiểu theo múi giờ Asia/Ho_Chi_Minh."],
+    ["Sửa dữ liệu ở các sheet tiếng Việt. Cột kỹ thuật đặt cuối và đã ẩn, không cần điền."],
+    ["Tên hạng mục, đơn vị, đội, bảng và trận hiển thị bằng tên dễ đọc; không cần nhớ mã."],
+    ["Thêm dòng ở cuối sheet, điền các cột tên/kết quả. Hệ thống tự tạo mã và nhận là dòng mới."],
+    ["Sửa tỷ số ở KẾT_QUẢ. Để trống cột không muốn đổi; không xóa dòng để xóa dữ liệu."],
+    ["Dòng cũ được cập nhật khi nạp. Dòng mới được thêm. ARCHIVE chỉ dùng khi muốn lưu trữ."],
+    ["Import có xem trước và kiểm tra toàn bộ; có lỗi chặn thì không ghi dở dang."],
+    ["NGUỒN_NHÁNH ẩn và chỉ đọc. Ngày giờ dùng múi giờ Asia/Ho_Chi_Minh."],
   ]);
   guide.getRow(1).font = { bold: true, size: 16, color: { argb: "FFFFFFFF" } };
   guide.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF07527F" } };
@@ -219,7 +250,10 @@ export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: Spo
   }
   const lookup = workbook.addWorksheet("_LOOKUP");
   lookup.columns = [{ header: "Loại / Type", key: "type", width: 24 }, { header: "Mã / Ref", key: "ref", width: 38 }, { header: "Tên / Label", key: "label", width: 70 }];
-  for (const table of allowed) for (const row of snapshot.tables[table] ?? []) lookup.addRow({ type: table, ref: rowRef(table, row), label: displayLabel(row) });
+  for (const table of allowed) for (const row of snapshot.tables[table] ?? []) {
+    const ref = rowRef(table, row);
+    lookup.addRow({ type: table, ref, label: refs.labels.get(`${table}:${ref}`) ?? displayLabel(row) });
+  }
   lookup.views = [{ state: "frozen", ySplit: 1 }];
   lookup.protect("sports-day-template", { selectLockedCells: true, selectUnlockedCells: true });
   const meta = workbook.addWorksheet("_META");
@@ -287,22 +321,21 @@ export async function parseSportWorkbook(buffer: Buffer | ArrayBuffer): Promise<
   for (const [sheetName, table] of sheets) {
     const sheet = workbook.getWorksheet(sheetName);
     if (!sheet) continue;
-    const expected = ["Mã / Ref", "Thao tác / Action", ...tableDefinitions[table].map((column) => column.header)];
+    const expected = [...tableDefinitions[table].map((column) => column.header), "Mã / Ref", "Thao tác / Action"];
     const headers = (sheet.getRow(1).values as unknown[]).slice(1).map((value) => String(value ?? "").trim());
-    if (headers.join("\u0000") !== expected.join("\u0000")) throw new Error(`Header sheet ${sheetName} không đúng template`);
+    if (headers.length !== expected.length || expected.some((header) => !headers.includes(header))) throw new Error(`Header sheet ${sheetName} không đúng template`);
     const indexes = new Map(headers.map((header, index) => [header, index + 1]));
     const rows: ParsedExcelRow[] = [];
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return;
       cellCount += headers.length;
       if (cellCount > SPORT_EXCEL_MAX_CELLS || rowNumber > SPORT_EXCEL_MAX_ROWS) throw new Error("Workbook vượt giới hạn dòng hoặc ô");
-      const values = headers.map((header) => row.getCell(indexes.get(header)!).value);
-      if (values.every((value) => value === null || value === undefined || value === "")) return;
-      const ref = String(row.getCell(1).value ?? "").trim();
-      const actionText = String(row.getCell(2).value ?? "").trim().toUpperCase();
-      if (!ref) throw new Error(`Thiếu Mã / Ref tại ${sheetName}!A${rowNumber}`);
+      if (tableDefinitions[table].every((column) => { const value = row.getCell(indexes.get(column.header)!).value; return value === null || value === undefined || value === ""; })) return;
+      const rawRef = String(row.getCell(indexes.get("Mã / Ref")!).value ?? "").trim();
+      const ref = rawRef || `NEW-${table}-${rowNumber}`;
+      const actionText = String(row.getCell(indexes.get("Thao tác / Action")!).value ?? "").trim().toUpperCase();
       if (!/^(NEW-[A-Z0-9][A-Z0-9_-]{0,60}|[A-Z0-9][A-Z0-9_-]{1,100})$/i.test(ref)) throw new Error(`Mã / Ref không hợp lệ tại ${sheetName}!A${rowNumber}`);
-      const action = (actionText || (ref.startsWith("NEW-") ? "UPSERT" : "UPDATE")) as SportExcelAction;
+      const action = (actionText || (rawRef ? "UPDATE" : "UPSERT")) as SportExcelAction;
       if (!( ["KEEP", "UPDATE", "UPSERT", "ARCHIVE"] as SportExcelAction[]).includes(action)) throw new Error(`Thao tác không hợp lệ tại ${sheetName}!B${rowNumber}`);
       const parsed: Record<string, unknown> = {};
       for (const column of tableDefinitions[table]) {
@@ -366,7 +399,17 @@ export function buildOperations(parsed: ParsedSportWorkbook, snapshot: SportExce
         if (!actual) continue;
         const relatedTable = relations[actual];
         const ref = String(data[column.key] ?? "").trim();
-        data[actual] = !ref ? null : ref.startsWith("NEW-") ? `@ref:${ref}` : refs.byRef.get(`${relatedTable}:${ref}`)?.id ?? (() => { throw new Error(`Không tìm thấy liên kết ${column.header}: ${ref}`); })();
+        if (!ref) data[actual] = null;
+        else if (ref.startsWith("NEW-")) data[actual] = `@ref:${ref}`;
+        else {
+          const direct = refs.byRef.get(`${relatedTable}:${ref}`);
+          if (direct) data[actual] = direct.id;
+          else {
+            const matches = refs.byLabel.get(`${relatedTable}:${ref}`) ?? [];
+            if (matches.length !== 1) throw new Error(`${matches.length > 1 ? "Tên liên kết bị trùng" : "Không tìm thấy liên kết"} ${column.header}: ${ref}`);
+            data[actual] = matches[0].id;
+          }
+        }
         delete data[column.key];
       }
       if (current && row.action !== "ARCHIVE" && tableDefinitions[table].every((column) => {

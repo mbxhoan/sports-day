@@ -402,6 +402,10 @@ test("sport admin results show readable match cards that open their editor", () 
   assert.match(adminCss, /\.admin-sport-panels > section:has\(:target\)/);
 });
 
+test("admin standings use full-width group panels", () => {
+  assert.match(adminCss, /\.admin-board-card \.group-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/);
+});
+
 test("route loading clears after query-only navigation", () => {
   assert.match(loadingFeedback, /useSearchParams/);
   assert.match(loadingFeedback, /searchParams\.toString\(\)/);

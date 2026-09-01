@@ -38,6 +38,26 @@ test("Excel export round-trips all eight sport configurations", async () => {
   assert.equal(previewOperations(changed.operations).blockers.length, 0);
 });
 
+test("Excel templates hide technical columns and show readable relation names", async () => {
+  const buffer = await buildSportWorkbook(snapshot, "current", "cccccccc-cccc-4ccc-8ccc-cccccccccccc");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
+  const entries = workbook.getWorksheet("ĐỘI");
+  const headers = entries.getRow(1).values;
+  const refColumn = headers.indexOf("Mã / Ref");
+  const actionColumn = headers.indexOf("Thao tác / Action");
+  const tournamentColumn = headers.indexOf("Hạng mục / Tournament");
+  assert.ok(refColumn > tournamentColumn);
+  assert.ok(actionColumn > tournamentColumn);
+  assert.equal(entries.getCell(2, tournamentColumn).value, "Nam");
+
+  entries.getCell(2, refColumn).value = null;
+  entries.getCell(2, actionColumn).value = null;
+  const parsed = await parseSportWorkbook(await workbook.xlsx.writeBuffer());
+  assert.match(parsed.tables.entries[0].ref, /^NEW-entries-2$/);
+  assert.equal(parsed.tables.entries[0].action, "UPSERT");
+});
+
 test("Excel import rejects formulas at the trust boundary", async () => {
   const buffer = await buildSportWorkbook(snapshot, "current", "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb");
   const workbook = new ExcelJS.Workbook();
