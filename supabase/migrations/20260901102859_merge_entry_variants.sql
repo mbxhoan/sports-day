@@ -56,10 +56,11 @@ begin
   where item.tenant_id = p_tenant_id and item.entry_id = merge.duplicate_id;
 
   insert into public.entry_members (tenant_id, entry_id, participant_id, role_vi, role_en, sort_order, archived_at)
-  select member.tenant_id, merge.keeper_id, member.participant_id, member.role_vi, member.role_en, member.sort_order, member.archived_at
+  select distinct on (merge.keeper_id, member.participant_id) member.tenant_id, merge.keeper_id, member.participant_id, member.role_vi, member.role_en, member.sort_order, member.archived_at
   from public.entry_members member
   join entry_variant_merges merge on merge.duplicate_id = member.entry_id
   where member.tenant_id = p_tenant_id
+  order by merge.keeper_id, member.participant_id, member.archived_at nulls first, member.sort_order, member.id
   on conflict (entry_id, participant_id) do update set
     sort_order = least(public.entry_members.sort_order, excluded.sort_order),
     archived_at = case when public.entry_members.archived_at is null or excluded.archived_at is null then null else excluded.archived_at end;
@@ -67,10 +68,11 @@ begin
   where item.tenant_id = p_tenant_id and item.entry_id = merge.duplicate_id;
 
   insert into public.group_entries (tenant_id, group_id, entry_id, seed_order, archived_at)
-  select member.tenant_id, member.group_id, merge.keeper_id, member.seed_order, member.archived_at
+  select distinct on (member.group_id, merge.keeper_id) member.tenant_id, member.group_id, merge.keeper_id, member.seed_order, member.archived_at
   from public.group_entries member
   join entry_variant_merges merge on merge.duplicate_id = member.entry_id
   where member.tenant_id = p_tenant_id
+  order by member.group_id, merge.keeper_id, member.archived_at nulls first, member.seed_order nulls last, member.id
   on conflict (group_id, entry_id) do update set
     seed_order = coalesce(public.group_entries.seed_order, excluded.seed_order),
     archived_at = case when public.group_entries.archived_at is null or excluded.archived_at is null then null else excluded.archived_at end;

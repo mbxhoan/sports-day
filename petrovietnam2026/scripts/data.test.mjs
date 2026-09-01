@@ -240,6 +240,8 @@ test("entry variants are merged without leaving duplicate group rows", () => {
   assert.match(source, /fixture_entries/);
   assert.match(source, /standings/);
   assert.match(source, /archived_at/);
+  assert.match(source, /select distinct on \(merge\.keeper_id, member\.participant_id\)/);
+  assert.match(source, /select distinct on \(member\.group_id, merge\.keeper_id\)/);
 });
 
 test("results derive winners and recalculate unique standings ranks", () => {
