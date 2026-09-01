@@ -209,6 +209,20 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(adminCss, /\.bracket-edit-button\s*\{[^}]*position:\s*relative[^}]*background:\s*var\(--primary\)[^}]*color:\s*var\(--primary-foreground\)/);
 });
 
+test("result editor accepts teams resolved from bracket slots", () => {
+  assert.match(competitionBoard, /const editingReady = Boolean\(editingRows\[0\]\?\.entry && editingRows\[1\]\?\.entry/);
+  assert.match(competitionBoard, /disabled=\{resultPending \|\| !editingReady\}/);
+  assert.match(adminActions, /rpc\("sync_tournament_slots"/);
+});
+
+test("runtime standings recalculation does not call seed-only tenant helper", () => {
+  const runtimeFix = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("runtime_tenant"));
+  assert.ok(runtimeFix, "missing runtime tenant migration");
+  const source = readFileSync(new URL(`migrations/${runtimeFix}`, supabaseRoot), "utf8");
+  assert.doesNotMatch(source, /seed_tenant_id\(\)/);
+  assert.match(source, /private\.current_tenant_id\(\)/);
+});
+
 test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(migrations, /create or replace function private\.recalculate_group_standings\(/);
   assert.match(migrations, /row_number\(\) over \(order by/);

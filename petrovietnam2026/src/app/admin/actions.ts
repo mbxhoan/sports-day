@@ -168,6 +168,8 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     const { data: sport, error: sportError } = await supabase.from("sports").select("slug").eq("tenant_id", tenantId).eq("id", tournament.sport_id).is("archived_at", null).single();
     if (sportError || !sport) return actionFailure(new Error("Không tìm thấy môn thi"));
     const manualWinner = sport.slug === "keo-co";
+    const { error: syncError } = await supabase.rpc("sync_tournament_slots", { p_tournament_id: fixture.tournament_id });
+    if (syncError) return actionFailure(new Error(syncError.message));
     const { data: currentRows, error: rowsError } = await supabase.from("fixture_entries").select("entry_id,side,score,result_detail").eq("tenant_id", tenantId).eq("fixture_id", fixtureId).is("archived_at", null).in("side", ["home", "away"]);
     if (rowsError) return actionFailure(new Error(rowsError.message));
     const sides = (["home", "away"] as const).map((side) => currentRows?.find((row) => row.side === side));
