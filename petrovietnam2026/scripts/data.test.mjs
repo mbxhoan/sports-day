@@ -92,6 +92,12 @@ test("admin bracket exposes mapped names and inline score editing", () => {
   assert.match(competitionBoard, /auto-winner-note/);
 });
 
+test("public bracket shows source rank labels without candidate predictions", () => {
+  assert.match(competitionBoard, /slotDisplayLabel/);
+  assert.doesNotMatch(competitionBoard, /label\}\{candidateLabel && <small className="bracket-candidates">\{candidateLabel\}<\/small>\}/);
+  assert.match(competitionBoard, /item\.candidateLabel \? `Có thể: \$\{item\.candidateLabel\}`/);
+});
+
 test("source topology covers every supplied category", () => {
   const manifest = JSON.parse(readFileSync(new URL("../data/source-brackets.json", import.meta.url), "utf8"));
   assert.deepEqual(new Set(manifest.tournaments.map((row) => row.competition_mode)), new Set(["knockout", "group_knockout", "round_robin", "swiss", "race"]));
@@ -173,6 +179,7 @@ test("admin quick search includes competition categories and toolbar label stays
   assert.match(searchCombobox, /hideLabel/);
   assert.match(scheduleView, /hideLabel/);
   assert.match(adminCss, /search-combobox-compact/);
+  assert.match(adminCss, /\.admin-search-card \.results-help\s*\{[^}]*margin:\s*10px 0 0/);
   assert.match(searchLib, /kind: "tournament"/);
 });
 
