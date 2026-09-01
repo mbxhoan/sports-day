@@ -98,7 +98,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
 
   return <>
     <div className="schedule-toolbar no-print">
-      <SearchCombobox label={t.searchLabel} hideLabel placeholder={t.searchPlaceholder} suggestions={searchSuggestions} value={searchTerm} onChange={setSearchTerm} onSelect={(suggestion) => setSearchTerm(suggestion.label)}/>
+      <SearchCombobox label={t.searchLabel} hideLabel placeholder={t.searchPlaceholder} suggestions={searchSuggestions} value={searchTerm} onChange={setSearchTerm} onSelect={(suggestion) => { setSearchTerm(suggestion.label); if (suggestion.kind === "tournament") setSelectedTournament(suggestion.id); }}/>
       {!sportId && <select value={selectedSport} onChange={(event) => { setSelectedSport(event.target.value); setSelectedTournament("all"); }} aria-label={t.filterSport}><option value="all">{t.filterSport}</option>{availableSports.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)}</option>)}</select>}
       <select value={selectedTournament} onChange={(event) => setSelectedTournament(event.target.value)} aria-label={t.filterCategory}><option value="all">{t.filterCategory}</option>{availableTournaments.map((item) => <option key={item.id} value={item.id}>{localized(item, "name", locale)} ({entriesByTournament.get(item.id)?.length ?? 0} {locale === "vi" ? "đội/VĐV" : "teams/athletes"})</option>)}</select>
       <select value={status} onChange={(event) => setStatus(event.target.value)} aria-label={t.filterStatus}><option value="all">{t.filterStatus}</option>{statusKeys.map((key) => <option key={key} value={key}>{t[key]}</option>)}</select>

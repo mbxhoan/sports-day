@@ -9,8 +9,14 @@ export function AdminSearch({ slug, suggestions }: { slug: string; suggestions: 
   const router = useRouter();
   const [value, setValue] = useState("");
   return <SearchCombobox label="Tìm nhanh trong môn" placeholder="Tên VĐV, đội hoặc trận đấu..." suggestions={suggestions} value={value} onChange={setValue} onSelect={(suggestion) => {
-    const section = suggestion.kind === "tournament" ? "categories" : suggestion.kind === "fixture" ? "results" : "teams";
-    const target = `${suggestion.kind === "tournament" ? "tournaments" : suggestion.kind === "fixture" ? "fixture-result" : suggestion.kind === "participant" ? "participants" : "entries"}:${suggestion.id}`;
-    router.push(`/admin/sports/${encodeURIComponent(slug)}?section=${section}&edit=${encodeURIComponent(target)}#${section === "results" ? `fixture-${suggestion.id}` : section}`);
+    const isTournament = suggestion.kind === "tournament";
+    const section = isTournament ? "results" : suggestion.kind === "fixture" ? "results" : "teams";
+    const params = new URLSearchParams({ section });
+    if (isTournament) params.set("tournament", suggestion.id);
+    else {
+      const target = `${suggestion.kind === "fixture" ? "fixture-result" : suggestion.kind === "participant" ? "participants" : "entries"}:${suggestion.id}`;
+      params.set("edit", target);
+    }
+    router.push(`/admin/sports/${encodeURIComponent(slug)}?${params}#${section === "results" && !isTournament ? `fixture-${suggestion.id}` : section}`);
   }}/>;
 }

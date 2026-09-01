@@ -95,7 +95,7 @@ function ManualStandingsEditor({ tournament, entries, standings, groupId }: { to
 
 function SportNavLink({ current, section, href, children }: { current: string; section: string; href: string; children: React.ReactNode }) { const active = current === section; return <a href={href} className={active ? "active" : undefined} aria-current={active ? "page" : undefined}>{children}</a>; }
 
-export default async function SportAdminPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ edit?: string; section?: string; reset?: string; affected?: string; import?: string; error?: string }> }) {
+export default async function SportAdminPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ edit?: string; section?: string; tournament?: string; reset?: string; affected?: string; import?: string; error?: string }> }) {
   const { slug } = await params;
   const requested = await searchParams;
   const editTarget = requested.edit;
@@ -116,7 +116,8 @@ export default async function SportAdminPage({ params, searchParams }: { params:
   const manual = isManualSport(String(sport.slug));
   const tournamentsResult = await supabase.from("tournaments").select(selectColumns("tournaments")).eq("tenant_id", tenantId).eq("sport_id", sport.id).order("archived_at", { ascending: true, nullsFirst: true }).order("sort_order").limit(2000);
   const tournamentRows = asRows(tournamentsResult.data);
-  const tournamentIds = tournamentRows.map((item) => item.id);
+  const selectedTournamentId = tournamentRows.some((item) => item.id === requested.tournament) ? requested.tournament : "";
+  const tournamentIds = tournamentRows.filter((item) => !selectedTournamentId || item.id === selectedTournamentId).map((item) => item.id);
   const tournamentIdSet = new Set(tournamentIds);
   const all = (entity: AdminEntity) => supabase.from(entity).select(selectColumns(entity)).eq("tenant_id", tenantId).order("archived_at", { ascending: true, nullsFirst: true }).limit(2000);
   const scoped = (entity: AdminEntity, column: string, ids: string[]) => { const query = all(entity); return ids.length ? query.in(column, ids) : query.limit(0); };
@@ -127,7 +128,7 @@ export default async function SportAdminPage({ params, searchParams }: { params:
   let excelImports: ExcelImport[] = [];
   let selectedExcelImport: ExcelImport | undefined;
   rows.sports = [sport];
-  rows.tournaments = tournamentRows;
+  rows.tournaments = tournamentRows.filter((item) => tournamentIds.includes(item.id));
   if (section === "teams") {
     const [entriesResult, organizationsResult, entryMembersResult, participantsResult] = await Promise.all([all("entries"), all("organizations"), all("entry_members"), all("participants")]);
     rows.entries = asRows(entriesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));

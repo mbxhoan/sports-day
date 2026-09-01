@@ -50,6 +50,7 @@ const bracketControlsMigration = readFileSync(new URL("migrations/20260828173024
 const feedbackMigration = readFileSync(new URL("migrations/20260830090000_feedback_safe_admin_flow.sql", supabaseRoot), "utf8");
 const fullStandingsMigration = readFileSync(new URL("migrations/20260831100000_full_manual_standings.sql", supabaseRoot), "utf8");
 const sportExcelMigration = readFileSync(new URL("migrations/20260831120000_sport_excel_admin.sql", supabaseRoot), "utf8");
+const updateWorkbookSeed = readFileSync(new URL("../../supabase/seeds/052_updates_workbooks.sql", import.meta.url), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 
@@ -221,6 +222,24 @@ test("runtime standings recalculation does not call seed-only tenant helper", ()
   const source = readFileSync(new URL(`migrations/${runtimeFix}`, supabaseRoot), "utf8");
   assert.doesNotMatch(source, /seed_tenant_id\(\)/);
   assert.match(source, /private\.current_tenant_id\(\)/);
+});
+
+test("category quick search filters the selected admin category context", () => {
+  assert.match(adminSearch, /params\.set\("tournament"/);
+  assert.match(adminSportPage, /tournament\?: string/);
+  assert.match(adminSportPage, /requested\.tournament/);
+  assert.match(adminSportPage, /tournamentRows\.filter/);
+});
+
+test("entry variants are merged without leaving duplicate group rows", () => {
+  const dedupeMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("merge_entry_variants"));
+  assert.ok(dedupeMigration, "missing entry variant migration");
+  const source = readFileSync(new URL(`migrations/${dedupeMigration}`, supabaseRoot), "utf8");
+  assert.match(updateWorkbookSeed, /merge_entry_variants/);
+  assert.match(source, /group_entries/);
+  assert.match(source, /fixture_entries/);
+  assert.match(source, /standings/);
+  assert.match(source, /archived_at/);
 });
 
 test("results derive winners and recalculate unique standings ranks", () => {
