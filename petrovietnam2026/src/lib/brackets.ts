@@ -30,6 +30,14 @@ type SlotResolutionContext = {
   fixtureEntries: FixtureEntry[];
 };
 
+export function fixtureSides<T extends { side: string | null }>(rows: T[]) {
+  const remaining = [...rows];
+  return (["home", "away"] as const).map((side) => {
+    const exact = remaining.findIndex((row) => row.side === side);
+    return remaining.splice(exact < 0 ? 0 : exact, 1)[0];
+  });
+}
+
 export function resolveSlotEntry(slot: Pick<FixtureSlot, "source_kind" | "source_entry_id" | "source_group_id" | "source_fixture_id" | "source_rank">, context: SlotResolutionContext) {
   const entriesById = new Map(context.entries.map((entry) => [entry.id, entry]));
   if (slot.source_kind === "entry") return entriesById.get(slot.source_entry_id ?? "");

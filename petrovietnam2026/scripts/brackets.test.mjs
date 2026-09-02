@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { deriveRaceRanks, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotLabel, slotSourceLabel } from "../src/lib/brackets.ts";
+import * as bracketHelpers from "../src/lib/brackets.ts";
+
+const { deriveRaceRanks, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotLabel, slotSourceLabel } = bracketHelpers;
 
 const fixtures = [
   { id: "semi-1", round_order: 1, bracket_position: 1 },
@@ -30,6 +32,15 @@ test("slot resolution replaces group rank with the mapped entry", () => {
     { entries: [entry], standings: [{ id: "standing-1", tournament_id: "tournament-1", group_id: "group-k", entry_id: "entry-a", played: 3, won: 2, drawn: 0, lost: 1, score_for: 6, score_against: 2, points: 6, rank: 2 }], fixtures: [], fixtureEntries: [] },
   );
   assert.equal(resolved?.name_vi, "Đội A / Đội B");
+});
+
+test("fixture sides recover legacy rows without side labels", () => {
+  const rows = [
+    { entry_id: "a", side: null },
+    { entry_id: "b", side: null },
+  ];
+  const resolved = bracketHelpers.fixtureSides?.(rows);
+  assert.deepEqual(resolved?.map((row) => row?.entry_id), ["a", "b"]);
 });
 
 test("slot candidate label shows the real teams behind an unresolved group rank", () => {

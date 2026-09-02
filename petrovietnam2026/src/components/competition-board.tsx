@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { CARD_WIDTH, COLUMN_GAP, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotGroupCandidates, slotLabel, slotSourceLabel } from "@/lib/brackets";
+import { CARD_WIDTH, COLUMN_GAP, fixtureSides, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotGroupCandidates, slotLabel, slotSourceLabel } from "@/lib/brackets";
 import { initialAdminActionState, type AdminActionState } from "@/lib/admin-action";
 import { standingDifference } from "@/lib/competition-display";
 import { buildSearchSuggestions } from "@/lib/search";
@@ -140,9 +140,10 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   };
   const matchRows = (fixture: Fixture): MatchRow[] => {
     const rows = fixtureRows.get(fixture.id) ?? [];
+    const sides = fixtureSides(rows);
     const slots = fixtureSlotsById.get(fixture.id) ?? [];
     return (["home", "away"] as const).map((side, index) => {
-      const row = rows.find((item) => item.side === side) ?? rows[index];
+      const row = sides[index];
       const slot = slots.find((item) => item.side === side);
       const entry = row ? entriesById.get(row.entry_id) : slot ? resolveSlotEntry(slot, { entries, standings, fixtures, fixtureEntries }) : undefined;
       const candidates = slot && !entry ? slotGroupCandidates(slot, groupEntries, entries) : [];

@@ -15,6 +15,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
 import { buildOperations, parseSportWorkbook, previewOperations, SPORT_EXCEL_MAX_BYTES, SPORT_EXCEL_VERSION, type SportExcelSnapshot } from "@/lib/sport-excel";
+import { fixtureSides } from "@/lib/brackets";
 export type AdminActionState = import("@/lib/admin-action").AdminActionState;
 
 async function adminClient() {
@@ -170,9 +171,9 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     const manualWinner = sport.slug === "keo-co";
     const { error: syncError } = await supabase.rpc("sync_tournament_slots", { p_tournament_id: fixture.tournament_id });
     if (syncError) return actionFailure(new Error(syncError.message));
-    const { data: currentRows, error: rowsError } = await supabase.from("fixture_entries").select("entry_id,side,score,result_detail").eq("tenant_id", tenantId).eq("fixture_id", fixtureId).is("archived_at", null).in("side", ["home", "away"]);
+    const { data: currentRows, error: rowsError } = await supabase.from("fixture_entries").select("entry_id,side,score,result_detail").eq("tenant_id", tenantId).eq("fixture_id", fixtureId).is("archived_at", null).order("id");
     if (rowsError) return actionFailure(new Error(rowsError.message));
-    const sides = (["home", "away"] as const).map((side) => currentRows?.find((row) => row.side === side));
+    const sides = fixtureSides(currentRows ?? []);
     if (sides.some((row) => !row) || new Set(sides.map((row) => row?.entry_id)).size !== 2) return actionFailure(new Error("Trận chưa đủ hai đội; hãy hoàn tất cấu trúc nguồn nhánh trước"));
 
     const entryIds = sides.map((row) => row!.entry_id);

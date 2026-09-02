@@ -15,19 +15,34 @@ insert into public.entries (id, tenant_id, tournament_id, kind, name_vi, name_en
   ('71000000-0000-0000-0000-000000000024', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000010', 'individual', 'D', 'D');
 
 insert into public.fixtures (id, tenant_id, tournament_id, status, round_vi, round_en, round_order, bracket_position, winner_entry_id) values
-  ('71000000-0000-0000-0000-000000000031', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000010', 'completed', 'Bán kết 1', 'Semifinal 1', 1, 1, '71000000-0000-0000-0000-000000000021'),
-  ('71000000-0000-0000-0000-000000000032', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000010', 'completed', 'Bán kết 2', 'Semifinal 2', 1, 2, '71000000-0000-0000-0000-000000000023'),
+  ('71000000-0000-0000-0000-000000000031', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000010', 'scheduled', 'Bán kết 1', 'Semifinal 1', 1, 1, null),
+  ('71000000-0000-0000-0000-000000000032', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000010', 'scheduled', 'Bán kết 2', 'Semifinal 2', 1, 2, null),
   ('71000000-0000-0000-0000-000000000033', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000010', 'scheduled', 'Chung kết', 'Final', 2, 1, null);
 
-insert into public.fixture_entries (tenant_id, fixture_id, entry_id, side, score_numeric) values
-  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000031', '71000000-0000-0000-0000-000000000021', 'home', 11),
-  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000031', '71000000-0000-0000-0000-000000000022', 'away', 4),
-  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000032', '71000000-0000-0000-0000-000000000023', 'home', 11),
-  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000032', '71000000-0000-0000-0000-000000000024', 'away', 5);
+insert into public.fixture_entries (tenant_id, fixture_id, entry_id, side) values
+  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000031', '71000000-0000-0000-0000-000000000021', 'home'),
+  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000031', '71000000-0000-0000-0000-000000000022', 'away'),
+  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000032', '71000000-0000-0000-0000-000000000023', 'home'),
+  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000032', '71000000-0000-0000-0000-000000000024', 'away');
+
+insert into public.fixture_entries (tenant_id, fixture_id, entry_id, side) values
+  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000033', '71000000-0000-0000-0000-000000000022', null),
+  ('11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000033', '71000000-0000-0000-0000-000000000024', null);
 
 insert into public.fixture_slots (id, tenant_id, fixture_id, side, source_kind, source_fixture_id, label_vi, label_en) values
   ('71000000-0000-0000-0000-000000000041', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000033', 'home', 'fixture_winner', '71000000-0000-0000-0000-000000000031', 'Thắng BK1', 'Winner SF1'),
   ('71000000-0000-0000-0000-000000000042', '11111111-1111-1111-1111-111111111111', '71000000-0000-0000-0000-000000000033', 'away', 'fixture_winner', '71000000-0000-0000-0000-000000000032', 'Thắng BK2', 'Winner SF2');
+
+update public.fixture_entries
+set score_numeric = case side when 'home' then 11 when 'away' then 4 end
+where fixture_id in ('71000000-0000-0000-0000-000000000031', '71000000-0000-0000-0000-000000000032');
+
+update public.fixtures
+set status = 'completed', winner_entry_id = case id
+  when '71000000-0000-0000-0000-000000000031' then '71000000-0000-0000-0000-000000000021'::uuid
+  else '71000000-0000-0000-0000-000000000023'::uuid
+end
+where id in ('71000000-0000-0000-0000-000000000031', '71000000-0000-0000-0000-000000000032');
 
 select private.sync_fixture_slots('71000000-0000-0000-0000-000000000031');
 select private.sync_fixture_slots('71000000-0000-0000-0000-000000000032');
@@ -37,13 +52,17 @@ begin
   if not exists (select 1 from public.fixture_entries where fixture_id = '71000000-0000-0000-0000-000000000033' and side = 'home' and entry_id = '71000000-0000-0000-0000-000000000021' and archived_at is null) then
     raise exception 'winner propagation failed';
   end if;
+  if (select count(*) from public.fixture_entries where fixture_id = '71000000-0000-0000-0000-000000000033' and archived_at is null) <> 2
+    or exists (select 1 from public.fixture_entries where fixture_id = '71000000-0000-0000-0000-000000000033' and archived_at is null and side is null) then
+    raise exception 'winner propagation left legacy participant rows';
+  end if;
 end $$;
 
+update public.fixture_entries set score_numeric = case side when 'home' then 11 else 8 end
+where fixture_id = '71000000-0000-0000-0000-000000000033' and archived_at is null;
 update public.fixtures
 set status = 'completed', winner_entry_id = '71000000-0000-0000-0000-000000000021'
 where id = '71000000-0000-0000-0000-000000000033';
-update public.fixture_entries set score_numeric = case side when 'home' then 11 else 8 end
-where fixture_id = '71000000-0000-0000-0000-000000000033' and archived_at is null;
 
 set local request.headers = '{"x-tenant-slug":"petrovietnam2026"}';
 set local request.jwt.claim.sub = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
