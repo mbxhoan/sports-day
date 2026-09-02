@@ -10,6 +10,7 @@ import { eventFieldNames } from "@/lib/admin-event";
 import { assertImageFile, heroStoragePath, mediaDeletionIds } from "@/lib/admin-media";
 import { relationEntity } from "@/lib/admin-relations";
 import { headToHeadRule } from "@/lib/standings";
+import { formatMatchResult } from "@/lib/competition-display";
 import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
@@ -195,7 +196,7 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     const winnerEntryId = manualWinner ? (status === "completed" ? requestedWinner : null) : derivedWinner;
     const note = String(formData.get("note") ?? "").trim();
     const entries = sides.map((row, index) => ({ entry_id: row!.entry_id, side: index === 0 ? "home" : "away", score: scores[index] || null, score_numeric: parsedScores[index], rank: null, result_detail: note ? { note } : row!.result_detail ?? {} }));
-    const summary = (field: "name_vi" | "name_en") => entries.map((item) => `${labelsById.get(item.entry_id)?.[field] ?? ""} ${item.score ?? ""}`.trim()).join(" - ");
+    const summary = (field: "name_vi" | "name_en") => formatMatchResult(labelsById.get(entryIds[0])?.[field] ?? "", scores[0], scores[1], labelsById.get(entryIds[1])?.[field] ?? "");
     const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: winnerEntryId, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
     if (error) return actionFailure(new Error(error.message));
     revalidatePath("/", "layout");

@@ -13,7 +13,7 @@ import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
 import { isManualSport, orderManualStandings, validateGalleryDriveUrl } from "../src/lib/manual-competition.ts";
-import { standingDifference } from "../src/lib/competition-display.ts";
+import { formatMatchResult, normalizeLegacyMatchResult, standingDifference } from "../src/lib/competition-display.ts";
 import { buildSearchSuggestions, matchesSearch } from "../src/lib/search.ts";
 
 const supabaseRoot = new URL("../../supabase/", import.meta.url);
@@ -267,6 +267,14 @@ test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(adminActions, /Hạng trong bảng không được trùng/);
   assert.match(migrations, /update public\.standings existing\s+set rank = null/);
   assert.match(adminSportPage, /auto-rank-cell/);
+});
+
+test("fixture result summaries place both scores between the team names", () => {
+  assert.equal(formatMatchResult("PQPOC", "1", "2", "BỘ MÁY QL&ĐH PETROVN"), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
+  assert.equal(normalizeLegacyMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "PQPOC", "BỘ MÁY QL&ĐH PETROVN"), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
+  assert.equal(normalizeLegacyMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "", ""), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
+  assert.match(adminActions, /labelsById\.get\(entryIds\[0\]\).*scores\[0\].*scores\[1\].*labelsById\.get\(entryIds\[1\]\)/s);
+  assert.match(competitionBoard, /bracket-result-summary/);
 });
 
 test("bracket resolves mapped names and exposes standings editing below", () => {

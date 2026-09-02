@@ -288,6 +288,7 @@ tbody tr:last-child td { border: 0; }
 .source-bracket-match { height: 134px; padding: 10px; display: grid; align-content: center; gap: 5px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); box-shadow: 0 5px 18px #001b3b99; box-sizing: border-box; }
 .admin-bracket-match { height: 184px; }
 .source-bracket-match .bracket-team span { display: block; overflow: visible; text-overflow: clip; white-space: normal; line-height: 1.25; }
+.bracket-result-summary { padding: 9px 8px; border-radius: 4px; background: #082b61; color: #fff; font-size: 11px; font-weight: 700; line-height: 1.35; text-align: center; }
 .bracket-candidates { display: -webkit-box; max-height: 26px; margin-top: 3px; overflow: hidden; color: #b8c9e4 !important; font-size: 8px !important; line-height: 1.25; white-space: normal !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .source-bracket-match > small { color: var(--muted-foreground); font-size: 9px; }
 .bracket-edit-button { position: relative; z-index: 2; width: 100%; min-height: 34px; margin-top: 5px; padding: 0 8px; border: 1px solid var(--primary); border-radius: 4px; background: var(--primary); color: var(--primary-foreground); font-size: 10px; font-weight: 700; pointer-events: auto; }
