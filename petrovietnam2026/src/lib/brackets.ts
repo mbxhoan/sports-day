@@ -82,16 +82,33 @@ export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[], ca
     nodes.push(node);
     byId.set(node.id, node);
   }
-  const connectors = slots.flatMap((slot) => {
-    const source = slot.source_fixture_id ? byId.get(slot.source_fixture_id) : undefined;
-    const target = byId.get(slot.fixture_id);
-    if (!source || !target) return [];
-    const x1 = source.x + CARD_WIDTH;
-    const y1 = source.y + cardHeight / 2;
+  const targetGroups = [...Map.groupBy(slots.filter((slot) => slot.source_fixture_id && byId.has(slot.source_fixture_id) && byId.has(slot.fixture_id)), (slot) => slot.fixture_id)];
+  const targetsByColumn = Map.groupBy(targetGroups, ([targetId]) => byId.get(targetId)!.x);
+  const targetLanes = new Map<string, { index: number; count: number }>();
+  for (const columnTargets of targetsByColumn.values()) {
+    columnTargets.sort((a, b) => byId.get(a[0])!.y - byId.get(b[0])!.y);
+    columnTargets.forEach(([targetId], index) => targetLanes.set(targetId, { index, count: columnTargets.length }));
+  }
+  const connectors = targetGroups.flatMap(([targetId, targetSlots]) => {
+    const target = byId.get(targetId)!;
+    const sources = targetSlots.map((slot) => ({ slot, node: byId.get(slot.source_fixture_id!)! }));
+    const x1 = sources[0].node.x + CARD_WIDTH;
     const x2 = target.x;
     const y2 = target.y + cardHeight / 2;
-    const middle = x1 + COLUMN_GAP / 2;
-    return [{ sourceId: source.id, targetId: target.id, path: `M${x1} ${y1} H${middle} V${y2} H${x2}` }];
+    const lane = targetLanes.get(targetId)!;
+    const middle = x1 + COLUMN_GAP * (lane.index + 1) / (lane.count + 1);
+    const sourceYs = sources.map(({ node }) => node.y + cardHeight / 2);
+    const minY = Math.min(y2, ...sourceYs);
+    const maxY = Math.max(y2, ...sourceYs);
+    return sources.map(({ node }, index) => ({
+      sourceId: node.id,
+      targetId: target.id,
+      path: index === 0 && sources.length > 1
+        ? `M${x1} ${sourceYs[index]} H${middle} M${middle} ${minY} V${maxY} M${middle} ${y2} H${x2}`
+        : index === 0
+          ? `M${x1} ${sourceYs[index]} H${middle} H${x2}`
+          : `M${x1} ${sourceYs[index]} H${middle}`,
+    }));
   });
   const rounds = Math.max(1, ...nodes.map((node) => Math.round(node.x / (CARD_WIDTH + COLUMN_GAP)) + 1));
   return {

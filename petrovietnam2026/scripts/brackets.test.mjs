@@ -19,6 +19,7 @@ test("layout centers parent between source matches", () => {
   const result = layoutBracket(fixtures, slots);
   assert.equal(result.nodes.find((node) => node.id === "final").y, 132);
   assert.equal(result.connectors.length, 2);
+  assert.equal(result.connectors.filter((connector) => connector.targetId === "final").filter((connector) => connector.path.includes("V")).length, 1);
 });
 
 test("slot label preserves unresolved source", () => {
@@ -74,6 +75,18 @@ test("source topology preserves approved PDF decisions", () => {
   const women50 = tournament("pickleball", "doi-nu-tren-50");
   assert.equal(women50.competition_mode, "round_robin");
   assert.equal(women50.fixtures.length, 0);
+});
+
+test("under-30 pickleball bracket keeps source-fed rounds aligned", () => {
+  const under30 = tournament("pickleball", "doi-nam-nu-duoi-30");
+  const result = layoutBracket(
+    under30.fixtures.map((fixture) => ({ id: fixture.key, round_order: fixture.round_order, bracket_position: fixture.bracket_position })),
+    under30.fixtures.flatMap((fixture) => fixture.slots.map((slot) => ({ fixture_id: fixture.key, source_kind: slot.kind, source_fixture_id: slot.fixture ?? null }))),
+  );
+  const nodes = new Map(result.nodes.map((node) => [node.id, node]));
+  assert.equal(nodes.get("match-10").y, nodes.get("match-6").y);
+  assert.equal(nodes.get("match-9").y, (nodes.get("match-4").y + nodes.get("match-5").y) / 2);
+  assert.equal(result.connectors.filter((connector) => connector.targetId === "match-9").filter((connector) => connector.path.includes("V")).length, 1);
 });
 
 test("bronze match does not overlap final", () => {

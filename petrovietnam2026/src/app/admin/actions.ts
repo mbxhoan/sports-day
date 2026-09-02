@@ -313,6 +313,10 @@ export async function saveManualStandings(formData: FormData) {
   const { supabase, tenantId } = await adminClient();
   const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: persistedRows });
   if (error) throw new Error(error.message);
+  if (groupId) {
+    const { error: syncError } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
+    if (syncError) throw new Error(syncError.message);
+  }
   if (race) {
     const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("tournament_id", tournamentId).is("archived_at", null).order("round_order").limit(1).maybeSingle();
     if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");

@@ -272,7 +272,10 @@ test("results derive winners and recalculate unique standings ranks", () => {
 test("bracket resolves mapped names and exposes standings editing below", () => {
   assert.match(competitionBoard, /resolveSlotEntry/);
   assert.match(competitionBoard, /standingsAction/);
+  assert.match(competitionBoard, /scoreLabel/);
   assert.match(adminSportPage, /standingsAction: saveManualStandings/);
+  assert.match(adminActions, /confirm_group_standings/);
+  assert.match(migrations, /standings_confirmed_at is not null/);
 });
 
 test("manual standings RPC accepts and persists all display fields", () => {
@@ -483,6 +486,7 @@ test("schedule labels unassigned teams and renders source-driven boards", () => 
   assert.match(siteLib, /teamsNotAssigned: "Chưa xếp đội"/);
   assert.match(scheduleView, /CompetitionBoard/);
   assert.match(scheduleView, /fixtureSlots/);
+  assert.match(scheduleView, /score_numeric/);
   assert.match(sportTabs, /CompetitionBoard/);
   assert.match(sportTabs, /bracket-overview/);
   assert.match(publicPages, /schedule-page/);
