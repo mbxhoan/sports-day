@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { CalendarDays, Clock3, GitBranch, Info, MapPin, Trophy, Users } from "lucide-react";
 import type { ComponentType } from "react";
+import { useState } from "react";
 import {
   copy, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry, type FixtureSlot,
   type Group, type GroupEntry, type Locale, type Organization, type Participant,
@@ -38,9 +41,21 @@ type SportTab = [TabKey, string, ComponentType<{ size?: number }>];
 export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, venues, courts }: Props) {
   const t = copy[locale];
   const tournamentIds = new Set(tournaments.map((item) => item.id));
+  const [selectedTournamentId, setSelectedTournamentId] = useState("");
   const sportFixtures = fixtures.filter((fixture) => tournamentIds.has(fixture.tournament_id));
   const sportEntries = entries.filter((entry) => tournamentIds.has(entry.tournament_id));
   const sportGroups = groups.filter((group) => tournamentIds.has(group.tournament_id));
+  const boardTournamentIds = selectedTournamentId ? new Set([selectedTournamentId]) : tournamentIds;
+  const boardTournaments = tournaments.filter((tournament) => boardTournamentIds.has(tournament.id));
+  const boardEntries = sportEntries.filter((entry) => boardTournamentIds.has(entry.tournament_id));
+  const boardGroups = sportGroups.filter((group) => boardTournamentIds.has(group.tournament_id));
+  const boardGroupIds = new Set(boardGroups.map((group) => group.id));
+  const boardGroupEntries = groupEntries.filter((item) => boardGroupIds.has(item.group_id));
+  const boardFixtures = sportFixtures.filter((fixture) => boardTournamentIds.has(fixture.tournament_id));
+  const boardFixtureIds = new Set(boardFixtures.map((fixture) => fixture.id));
+  const boardFixtureEntries = fixtureEntries.filter((item) => boardFixtureIds.has(item.fixture_id));
+  const boardFixtureSlots = fixtureSlots.filter((item) => boardFixtureIds.has(item.fixture_id));
+  const boardStandings = standings.filter((row) => boardTournamentIds.has(row.tournament_id));
   const organizationsById = new Map(organizations.map((item) => [item.id, item]));
   const participantsById = new Map(participants.map((item) => [item.id, item]));
   const tournamentsById = new Map(tournaments.map((item) => [item.id, item]));
@@ -77,7 +92,7 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     </div>
     {active === "brackets" && <div className="bracket-overview" aria-label={`${t.fixtures} / ${t.categories}`}>
       <Link className="bracket-schedule-link" href={`${hrefBase}?tab=fixtures`}><CalendarDays size={15}/>{t.fixtures}</Link>
-      <span className="bracket-overview-label">{t.categories} · {locale === "vi" ? "Chọn một hạng mục trong bảng" : "Choose one category in the board"}</span>
+      {tournaments.length > 1 && <label className="bracket-category-filter" htmlFor={`bracket-category-${sport.id}`}><span>{t.categories}</span><select id={`bracket-category-${sport.id}`} value={selectedTournamentId} onChange={(event) => setSelectedTournamentId(event.target.value)}><option value="">{locale === "vi" ? "Tất cả hạng mục" : "All categories"}</option>{tournaments.map((tournament) => <option key={tournament.id} value={tournament.id}>{localized(tournament, "name", locale)}</option>)}</select></label>}
     </div>}
     <div className="tabs sport-tabs" role="tablist" aria-label={localized(sport, "name", locale)}>
       {tabs.map(([key,label,Icon]) => <Link key={key} href={key === "info" ? hrefBase : `${hrefBase}?tab=${key}`} className={active === key ? "active" : ""} role="tab" aria-selected={active === key} scroll={false}><Icon size={16}/>{label}</Link>)}
@@ -121,6 +136,6 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
 
     {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} participants={participants} entryMembers={entryMembers} defaultVenue={venue}/>}
 
-    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={tournaments} entries={entries} groups={sportGroups} groupEntries={groupEntries} fixtures={sportFixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings}/>}
+    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} showTournamentSelector={false}/>}
   </>;
 }

@@ -396,8 +396,8 @@ test("home renders separate desktop and mobile KV sources", () => {
   assert.match(publicPages, /hero_mobile_path/);
 });
 
-test("sport detail tabs work without client state and keep untimed fixtures", () => {
-  assert.doesNotMatch(sportTabs, /useState/);
+test("sport detail tabs keep untimed fixtures and bracket category filter", () => {
+  assert.match(sportTabs, /useState/);
   assert.match(sportTabs, /\?tab=\$\{key\}/);
   assert.match(sportTabs, /ScheduleView/);
 });
@@ -548,7 +548,12 @@ test("schedule labels unassigned teams and renders source-driven boards", () => 
   assert.match(publicPages, /schedule-page/);
   assert.match(adminCss, /\.schedule-page/);
   assert.match(competitionBoard, /tournament-stack/);
-  assert.doesNotMatch(competitionBoard, /board-selector|selectedTournament/);
+  assert.match(competitionBoard, /board-selector/);
+  assert.match(competitionBoard, /selectedTournamentId/);
+  assert.match(sportTabs, /bracket-category-filter/);
+  assert.match(sportTabs, /setSelectedTournamentId/);
+  assert.match(sportTabs, /showTournamentSelector=\{false\}/);
+  assert.match(adminCss, /\.bracket-category-filter select/);
   assert.match(competitionBoard, /contentVisibility/);
   assert.match(competitionBoard, /matchLabel/);
   assert.match(adminCss, /@media \(max-width: 600px\)/);

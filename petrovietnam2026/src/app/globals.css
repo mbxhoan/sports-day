@@ -90,6 +90,7 @@ form[data-pending] button[data-pending]::after { content: ""; width: 13px; heigh
 .card-cta, .filter-pills button.active { padding: 5px 12px; border-radius: 999px; background: var(--secondary); color: #fff; font-size: 11px; }
 
 .page-container { min-height: calc(100vh - 260px); padding-block: 36px 80px; }
+main:has(.sport-page), main:has(.schedule-page) { background: var(--background); }
 .schedule-page { width: 100%; max-width: none; padding-inline: max(16px, calc((100% - 1280px) / 2)); background: #030b2b; }
 .page-heading { display: flex; align-items: center; gap: 15px; margin-bottom: 26px; }
 .page-heading > span { font-size: 38px; }
@@ -196,7 +197,8 @@ tbody tr:last-child td { border: 0; }
 .sport-summary span + span::before { content: ""; width: 1px; height: 14px; margin-right: 10px; background: var(--border); }
 .bracket-overview { margin: 0 0 14px; padding: 10px 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: #062b5d; }
 .bracket-schedule-link { min-height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border-radius: 5px; background: var(--primary); color: var(--primary-foreground); font-size: 11px; font-weight: 700; }
-.bracket-overview-label { margin-left: 4px; color: var(--primary); font-size: 11px; font-weight: 700; }
+.bracket-category-filter { display: inline-flex; align-items: center; gap: 7px; color: var(--primary); font-size: 11px; font-weight: 700; }
+.bracket-category-filter select { min-height: 30px; min-width: 220px; padding: 0 30px 0 9px; border: 1px solid var(--border); border-radius: 5px; background: #0a3c76; color: #fff; font-size: 11px; }
 .bracket-category-pills { display: flex; min-width: 0; flex: 1; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
 .bracket-category-pills a { padding: 5px 9px; border: 1px solid #2a6195; border-radius: 999px; background: #0a3c76; color: #dce8ff; font-size: 10px; white-space: nowrap; }
 .bracket-category-pills a:hover { border-color: var(--primary); color: var(--primary); }
@@ -582,6 +584,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .sport-summary span + span::before { display: none; }
   .sport-tabs, .tabs { position: static; width: 100%; overflow: visible; flex-wrap: wrap; }
   .sport-tabs a { flex: 1 1 46%; justify-content: center; }
+  .bracket-category-filter { width: 100%; }
+  .bracket-category-filter select { flex: 1; min-width: 0; }
   .result-match-summary { padding: 11px; gap: 8px; }
   .result-match-summary b { white-space: normal; }
   .result-match-summary strong { font-size: 16px; }

@@ -29,6 +29,7 @@ type Props = {
   previewAction?: PreviewAction;
   standingsAction?: PreviewAction;
   sportSlug?: string;
+  showTournamentSelector?: boolean;
 };
 
 type BracketLayout = ReturnType<typeof layoutBracket>;
@@ -107,7 +108,7 @@ function InlineBracketResult({ fixture, rows, action, manualWinner }: { fixture:
   </form>;
 }
 
-export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, standingsAction, sportSlug }: Props) {
+export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, standingsAction, sportSlug, showTournamentSelector = true }: Props) {
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
@@ -129,6 +130,10 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   }, [editingFixture, resultState, submittedFixtureId]);
   const sourceCodes = groupBy(fixtures.filter((fixture) => fixture.source_code), (fixture) => `${fixture.tournament_id}:${fixture.source_code}`);
   const available = tournaments.filter((tournament) => (fixturesByTournament.get(tournament.id)?.length ?? 0) > 0 || (groupsByTournament.get(tournament.id)?.length ?? 0) > 0 || (entriesByTournament.get(tournament.id)?.length ?? 0) > 0);
+  const [selectedTournamentId, setSelectedTournamentId] = useState(available[0]?.id ?? "");
+  useEffect(() => {
+    if (!available.some((tournament) => tournament.id === selectedTournamentId)) setSelectedTournamentId(available[0]?.id ?? "");
+  }, [available, selectedTournamentId]);
 
   const matchLabel = (fixture: Fixture) => {
     if (!fixture.source_code) return localized(fixture, "round", locale) || t.updating;
@@ -189,7 +194,8 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); const summary = localized(fixture, "result_summary", locale); const result = formatMatchResult(rows[0]?.label ?? "", scoreValue(rows[0]?.row), scoreValue(rows[1]?.row), rows[1]?.label ?? "") || normalizeLegacyMatchResult(summary, rows[0]?.label ?? "", rows[1]?.label ?? "") || summary; return <tr key={fixture.id}><td>{matchLabel(fixture)}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td>{rows.map((row) => row.label).join(" — ")}</td><td>{result || rows.map((row) => scoreLabel(row.row)).join(" : ")}</td></tr>; })}</tbody></table></div>;
 
   if (!available.length) return <section className="panel empty-state"><h2>{t.empty}</h2></section>;
-  return <div className="competition-board"><div className="tournament-stack">{available.map((tournament) => {
+  const selectedTournament = available.find((tournament) => tournament.id === selectedTournamentId) ?? available[0];
+  return <div className="competition-board">{showTournamentSelector && available.length > 1 && <div className="board-selector"><label htmlFor="board-tournament">Lọc hạng mục / Category<select id="board-tournament" value={selectedTournament.id} onChange={(event) => setSelectedTournamentId(event.target.value)}>{available.map((tournament) => <option key={tournament.id} value={tournament.id}>{localized(tournament, "name", locale)}</option>)}</select></label></div>}<div className="tournament-stack">{[selectedTournament].map((tournament) => {
     const tournamentFixtures = fixturesByTournament.get(tournament.id) ?? [];
     const tournamentGroups = groupsByTournament.get(tournament.id) ?? [];
     const knockout = tournamentFixtures.filter((fixture) => fixture.round_order !== null && fixture.bracket_position !== null);
