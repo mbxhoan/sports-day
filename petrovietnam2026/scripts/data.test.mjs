@@ -244,6 +244,23 @@ test("entry variants are merged without leaving duplicate group rows", () => {
   assert.match(source, /select distinct on \(member\.group_id, merge\.keeper_id\)/);
 });
 
+test("dedupe handles Vietnamese Unicode variants and removes teams or athletes from the event", () => {
+  const dedupeMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("dedupe_entry_variants"));
+  assert.ok(dedupeMigration, "missing Unicode entry dedupe migration");
+  const source = readFileSync(new URL(`migrations/${dedupeMigration}`, supabaseRoot), "utf8");
+  assert.match(source, /chr\(768\)/);
+  assert.match(source, /merge_participant_variants/);
+  assert.match(source, /merge_entry_variants/);
+  assert.match(source, /first_value\(name_vi\)/);
+  assert.match(source, /participant\.full_name,\s+private\.entry_identity\(participant\.full_name/s);
+  assert.match(source, /entry\.name_vi,\s+private\.entry_identity\(entry\.name_vi/s);
+  assert.match(source, /left\(normalized, length\(normalized\) - length\(organization_code\)\) ~ '\[-\[:space:\]\]\$'/);
+  assert.doesNotMatch(source, /regexp_replace\(normalized, '\\s\*-\[\^-\]\*\$'/);
+  assert.match(source, /participants_prevent_duplicate_identity/);
+  assert.match(adminSportPage, /entity === "entries" \|\| entity === "participants"/);
+  assert.match(adminSportPage, /Xoá khỏi giải/);
+});
+
 test("workbook updates reuse pair identity instead of creating suffix variants", () => {
   assert.match(migrations, /create or replace function private\.entry_identity/);
   assert.match(updateWorkbookSeed, /private\.entry_identity\(existing\.name_vi, existing\.kind\)/);
@@ -624,6 +641,10 @@ test("master schedule seeds pickleball and chess blocks", () => {
 test("PDF individual seed keeps source-explicit swimming and athletics rosters", () => {
   for (const row of ["('boi-loi','50m-nam'", "('boi-loi','100m-nu'", "('dien-kinh','800m-nam'", "('dien-kinh','5000m-nam'"]) assert.ok(individualSportsSeed.includes(row), row);
   assert.match(individualSportsSeed, /insert into public\.entry_members/);
+  assert.match(individualSportsSeed, /p\.organization_id = o\.id\s+and private\.entry_identity\(p\.full_name, 'individual'\)/);
+  assert.match(individualSportsSeed, /e\.tournament_id = t\.id\s+and e\.kind = r\.kind[\s\S]*private\.entry_identity\(e\.name_vi, e\.kind\)/);
+  assert.doesNotMatch(individualSportsSeed, /p\.full_name = names\.full_name/);
+  assert.doesNotMatch(individualSportsSeed, /e\.name_vi = r\.entry_name/);
   assert.doesNotMatch(individualSportsSeed, /insert into public\.fixture_entries/);
 });
 

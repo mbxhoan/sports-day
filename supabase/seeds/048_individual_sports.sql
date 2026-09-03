@@ -354,24 +354,36 @@ select distinct organization_code, organization_code, organization_code from see
 on conflict (tenant_id, code) do update set archived_at = null;
 
 insert into public.participants (organization_id, full_name)
-select o.id, names.full_name
+select distinct on (o.id, private.entry_identity(names.full_name, 'individual')) o.id, names.full_name
 from seed_individual_sports r join public.organizations o on o.code = r.organization_code
 cross join lateral unnest(string_to_array(r.member_names, E'\n')) names(full_name)
-where not exists (select 1 from public.participants p where p.organization_id = o.id and p.full_name = names.full_name);
+where names.full_name is not null
+and not exists (
+  select 1 from public.participants p
+  where p.organization_id = o.id
+    and private.entry_identity(p.full_name, 'individual') = private.entry_identity(names.full_name, 'individual')
+)
+order by o.id, private.entry_identity(names.full_name, 'individual'), names.full_name;
 
 insert into public.entries (tournament_id, organization_id, kind, name_vi, name_en)
-select t.id, o.id, r.kind, r.entry_name, r.entry_name
+select distinct on (t.id, r.kind, private.entry_identity(r.entry_name, r.kind)) t.id, o.id, r.kind, r.entry_name, r.entry_name
 from (select distinct sport_slug, tournament_slug, kind, entry_name, organization_code from seed_individual_sports) r
 join public.sports s on s.slug = r.sport_slug join public.tournaments t on t.sport_id = s.id and t.slug = r.tournament_slug
 join public.organizations o on o.code = r.organization_code
-where not exists (select 1 from public.entries e where e.tournament_id = t.id and e.name_vi = r.entry_name);
+where not exists (
+  select 1 from public.entries e
+  where e.tournament_id = t.id
+    and e.kind = r.kind
+    and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(r.entry_name, r.kind)
+)
+order by t.id, r.kind, private.entry_identity(r.entry_name, r.kind), r.entry_name;
 
 insert into public.entry_members (entry_id, participant_id, sort_order)
 select distinct e.id, p.id, names.sort_order
 from seed_individual_sports r join public.sports s on s.slug = r.sport_slug
 join public.tournaments t on t.sport_id = s.id and t.slug = r.tournament_slug
-join public.entries e on e.tournament_id = t.id and e.name_vi = r.entry_name
+join public.entries e on e.tournament_id = t.id and e.kind = r.kind and e.archived_at is null and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(r.entry_name, r.kind)
 join public.organizations o on o.code = r.organization_code
 cross join lateral unnest(string_to_array(r.member_names, E'\n')) with ordinality names(full_name, sort_order)
-join public.participants p on p.organization_id = o.id and p.full_name = names.full_name
+join public.participants p on p.organization_id = o.id and p.archived_at is null and private.entry_identity(p.full_name, 'individual') = private.entry_identity(names.full_name, 'individual')
 on conflict (entry_id, participant_id) do update set archived_at = null;

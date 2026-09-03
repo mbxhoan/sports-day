@@ -1123,12 +1123,13 @@ insert into seed_update_participants values
   ('Vương Thị Hiền','PV DRILLING'),
   ('XẾP',null);
 insert into public.participants (organization_id, full_name)
-select o.id, p.full_name from seed_update_participants p left join public.organizations o on o.code = p.organization_code
+select distinct on (o.id, private.entry_identity(p.full_name, 'individual')) o.id, p.full_name from seed_update_participants p left join public.organizations o on o.code = p.organization_code
 where not exists (
   select 1 from public.participants existing
-  where regexp_replace(lower(coalesce(existing.full_name,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(p.full_name,'')), '[^[:alnum:]]', '', 'g')
+  where private.entry_identity(existing.full_name, 'individual') = private.entry_identity(p.full_name, 'individual')
     and coalesce(existing.organization_id::text, '') = coalesce(o.id::text, '')
-);
+)
+order by o.id, private.entry_identity(p.full_name, 'individual'), p.full_name;
 
 create temporary table seed_update_entries (sport_slug text, tournament_slug text, kind text, name_vi text, organization_code text, seed_number integer, bib_number text) on commit drop;
 insert into seed_update_entries values
@@ -3062,8 +3063,8 @@ insert into public.entry_members (entry_id, participant_id, sort_order)
 select e.id, p.id, min(source.sort_order)
 from seed_update_members source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
 join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug
-join public.entries e on e.tournament_id = t.id and regexp_replace(lower(coalesce(e.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.entry_name,'')), '[^[:alnum:]]', '', 'g')
-join public.participants p on regexp_replace(lower(coalesce(p.full_name,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.full_name,'')), '[^[:alnum:]]', '', 'g')
+join public.entries e on e.tournament_id = t.id and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(source.entry_name, e.kind)
+join public.participants p on private.entry_identity(p.full_name, 'individual') = private.entry_identity(source.full_name, 'individual')
 where not exists (select 1 from public.entry_members existing where existing.entry_id = e.id and existing.participant_id = p.id)
 group by e.id, p.id;
 
@@ -3570,7 +3571,7 @@ select g.id, e.id, source.seed_order
 from seed_update_group_entries source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
 join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug
 join public.groups g on g.tournament_id = t.id and g.name_vi = source.group_name
-join lateral (select candidate.id from public.entries candidate where candidate.tournament_id = t.id and regexp_replace(lower(coalesce(candidate.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.entry_name,'')), '[^[:alnum:]]', '', 'g') order by candidate.id limit 1) e on true
+join lateral (select candidate.id from public.entries candidate where candidate.tournament_id = t.id and private.entry_identity(candidate.name_vi, candidate.kind) = private.entry_identity(source.entry_name, candidate.kind) order by candidate.id limit 1) e on true
 on conflict (group_id, entry_id) do update set seed_order = coalesce(excluded.seed_order, group_entries.seed_order), archived_at = null;
 
 create temporary table seed_update_fixtures (sport_slug text, tournament_slug text, group_name text, home_name text, away_name text, source_code text, sort_order integer) on commit drop;
@@ -4037,8 +4038,8 @@ where not exists (
   join public.fixture_entries away_fe on away_fe.fixture_id = existing.id and away_fe.archived_at is null
   join public.entries away on away.id = away_fe.entry_id
   where existing.tournament_id = t.id and existing.group_id = g.id
-    and regexp_replace(lower(coalesce(home.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.home_name,'')), '[^[:alnum:]]', '', 'g')
-    and regexp_replace(lower(coalesce(away.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.away_name,'')), '[^[:alnum:]]', '', 'g')
+    and private.entry_identity(home.name_vi, home.kind) = private.entry_identity(source.home_name, home.kind)
+    and private.entry_identity(away.name_vi, away.kind) = private.entry_identity(source.away_name, away.kind)
 );
 insert into public.fixture_entries (fixture_id, entry_id, side)
 select f.id, e.id, source_side.side
@@ -4047,7 +4048,7 @@ join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_sl
 join public.groups g on g.tournament_id = t.id and g.name_vi = source.group_name
 join public.fixtures f on f.tournament_id = t.id and f.group_id = g.id and f.source_code = source.source_code
 cross join lateral (values (source.home_name, 'home'), (source.away_name, 'away')) source_side(entry_name, side)
-join lateral (select candidate.id from public.entries candidate where candidate.tournament_id = t.id and regexp_replace(lower(coalesce(candidate.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source_side.entry_name,'')), '[^[:alnum:]]', '', 'g') order by candidate.id limit 1) e on true
+join lateral (select candidate.id from public.entries candidate where candidate.tournament_id = t.id and private.entry_identity(candidate.name_vi, candidate.kind) = private.entry_identity(source_side.entry_name, candidate.kind) order by candidate.id limit 1) e on true
 on conflict (fixture_id, entry_id) do update set side = excluded.side, archived_at = null;
 
 -- Individual/race and Swiss workbooks need editable result rows too. Existing scores/ranks are preserved.
@@ -4411,7 +4412,7 @@ from seed_update_race_entries source
 join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
 join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug
 join public.fixtures f on f.tournament_id = t.id and f.round_vi = 'Thi đấu'
-join lateral (select candidate.id from public.entries candidate where candidate.tournament_id = t.id and regexp_replace(lower(coalesce(candidate.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.entry_name,'')), '[^[:alnum:]]', '', 'g') order by candidate.id limit 1) e on true
+join lateral (select candidate.id from public.entries candidate where candidate.tournament_id = t.id and private.entry_identity(candidate.name_vi, candidate.kind) = private.entry_identity(source.entry_name, candidate.kind) order by candidate.id limit 1) e on true
 where f.id = (select candidate.id from public.fixtures candidate where candidate.tournament_id = t.id and candidate.round_vi = 'Thi đấu' order by candidate.id limit 1)
 on conflict (fixture_id, entry_id) do update set seed_order = coalesce(excluded.seed_order, fixture_entries.seed_order), archived_at = null;
 
@@ -4420,7 +4421,7 @@ select t.id, null, e.id
 from seed_update_race_entries source
 join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
 join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug
-join public.entries e on e.tournament_id = t.id and regexp_replace(lower(coalesce(e.name_vi,'')), '[^[:alnum:]]', '', 'g') = regexp_replace(lower(coalesce(source.entry_name,'')), '[^[:alnum:]]', '', 'g')
+join public.entries e on e.tournament_id = t.id and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(source.entry_name, e.kind)
 where not exists (select 1 from public.standings existing where existing.tournament_id = t.id and existing.group_id is null and existing.entry_id = e.id);
 
 insert into public.standings (tournament_id, group_id, entry_id)

@@ -256,9 +256,10 @@ insert into public.organizations (code, name_vi, name_en)
 select distinct organization_code, organization_code, organization_code from seed_pickleball_pairs where organization_code is not null
 on conflict (tenant_id, code) do update set archived_at = null;
 insert into public.participants (organization_id, full_name)
-select o.id, names.full_name from seed_pickleball_pairs p join public.organizations o on o.code = p.organization_code
+select distinct on (o.id, private.entry_identity(names.full_name, 'individual')) o.id, names.full_name from seed_pickleball_pairs p join public.organizations o on o.code = p.organization_code
 cross join lateral (values (p.member_one), (p.member_two)) names(full_name) where names.full_name is not null
-and not exists (select 1 from public.participants a where a.organization_id = o.id and a.full_name = names.full_name);
+and not exists (select 1 from public.participants a where a.organization_id = o.id and private.entry_identity(a.full_name, 'individual') = private.entry_identity(names.full_name, 'individual'))
+order by o.id, private.entry_identity(names.full_name, 'individual'), names.full_name;
 insert into public.groups (tournament_id, name_vi, name_en, sort_order)
 select t.id, g.group_name, replace(g.group_name, 'Bảng ', 'Group '), min(g.group_order)
 from (values
@@ -345,17 +346,17 @@ insert into public.entries (tournament_id, organization_id, kind, name_vi, name_
 select t.id, o.id, 'pair', p.pair_name, p.pair_name from (select distinct tournament_slug, pair_name, organization_code from seed_pickleball_pairs) p
 join public.sports s on s.slug = 'pickleball' join public.tournaments t on t.sport_id = s.id and t.slug = p.tournament_slug
 left join public.organizations o on o.code = p.organization_code
-where not exists (select 1 from public.entries e where e.tournament_id = t.id and e.name_vi = p.pair_name);
+where not exists (select 1 from public.entries e where e.tournament_id = t.id and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(p.pair_name, 'pair'));
 insert into public.entry_members (entry_id, participant_id, sort_order)
 select e.id, a.id, names.sort_order from seed_pickleball_pairs p join public.sports s on s.slug = 'pickleball'
-join public.tournaments t on t.sport_id = s.id and t.slug = p.tournament_slug join public.entries e on e.tournament_id = t.id and e.name_vi = p.pair_name
+join public.tournaments t on t.sport_id = s.id and t.slug = p.tournament_slug join public.entries e on e.tournament_id = t.id and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(p.pair_name, 'pair')
 join public.organizations o on o.code = p.organization_code cross join lateral (values (p.member_one, 1), (p.member_two, 2)) names(full_name, sort_order)
-join public.participants a on a.organization_id = o.id and a.full_name = names.full_name where names.full_name is not null
+join public.participants a on a.organization_id = o.id and private.entry_identity(a.full_name, 'individual') = private.entry_identity(names.full_name, 'individual') where names.full_name is not null
 on conflict (entry_id, participant_id) do update set archived_at = null;
 insert into public.group_entries (group_id, entry_id)
 select g.id, e.id from seed_pickleball_pairs p join public.sports s on s.slug = 'pickleball'
 join public.tournaments t on t.sport_id = s.id and t.slug = p.tournament_slug join public.groups g on g.tournament_id = t.id and g.name_vi = p.group_name
-join public.entries e on e.tournament_id = t.id and e.name_vi = p.pair_name
+join public.entries e on e.tournament_id = t.id and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(p.pair_name, 'pair')
 on conflict (group_id, entry_id) do update set archived_at = null;
 -- Match rows intentionally omit time/court: these PDF tables do not state either field.
 create temporary table seed_pickleball_fixtures (tournament_slug text, group_name text, home_name text, away_name text, source_page integer, sort_order integer) on commit drop;

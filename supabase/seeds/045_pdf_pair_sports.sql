@@ -195,11 +195,12 @@ from seed_pair_sports where organization_code is not null
 on conflict (tenant_id, code) do update set archived_at = null;
 
 insert into public.participants (organization_id, full_name)
-select o.id, names.full_name
+select distinct on (o.id, private.entry_identity(names.full_name, 'individual')) o.id, names.full_name
 from seed_pair_sports p join public.organizations o on o.code = p.organization_code
 cross join lateral (values (p.member_one), (p.member_two)) names(full_name)
 where names.full_name is not null
-and not exists (select 1 from public.participants a where a.organization_id = o.id and a.full_name = names.full_name);
+and not exists (select 1 from public.participants a where a.organization_id = o.id and private.entry_identity(a.full_name, 'individual') = private.entry_identity(names.full_name, 'individual'))
+order by o.id, private.entry_identity(names.full_name, 'individual'), names.full_name;
 
 insert into public.groups (tournament_id, name_vi, name_en, sort_order)
 select t.id, p.group_name, replace(p.group_name, 'Bảng ', 'Group '), min(p.group_order)

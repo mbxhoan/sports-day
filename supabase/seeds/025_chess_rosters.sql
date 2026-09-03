@@ -105,21 +105,28 @@ insert into seed_roster values
   ('co-tuong','nam-tren-45','Trần Nguyên Đồng','VSP');
 
 insert into public.participants (organization_id, full_name, gender)
-select o.id, r.full_name, case when r.tournament_slug = 'nu' then 'female' else 'male' end
+select distinct on (o.id, private.entry_identity(r.full_name, 'individual')) o.id, r.full_name, case when r.tournament_slug = 'nu' then 'female' else 'male' end
 from seed_roster r join public.organizations o on o.code = r.org_code
 where not exists (
-  select 1 from public.participants p where p.organization_id = o.id and p.full_name = r.full_name
-);
+  select 1 from public.participants p
+  where p.organization_id = o.id
+    and private.entry_identity(p.full_name, 'individual') = private.entry_identity(r.full_name, 'individual')
+)
+order by o.id, private.entry_identity(r.full_name, 'individual'), r.full_name;
 
 insert into public.entries (tournament_id, organization_id, kind, name_vi, name_en)
-select t.id, o.id, 'individual', r.full_name, r.full_name
+select distinct on (t.id, private.entry_identity(r.full_name, 'individual')) t.id, o.id, 'individual', r.full_name, r.full_name
 from seed_roster r
 join public.sports s on s.slug = r.sport_slug
 join public.tournaments t on t.sport_id = s.id and t.slug = r.tournament_slug
 join public.organizations o on o.code = r.org_code
 where not exists (
-  select 1 from public.entries e where e.tournament_id = t.id and e.name_vi = r.full_name
-);
+  select 1 from public.entries e
+  where e.tournament_id = t.id
+    and e.kind = 'individual'
+    and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(r.full_name, 'individual')
+)
+order by t.id, private.entry_identity(r.full_name, 'individual'), r.full_name;
 
 insert into public.entry_members (entry_id, participant_id)
 select e.id, p.id
@@ -127,6 +134,6 @@ from seed_roster r
 join public.sports s on s.slug = r.sport_slug
 join public.tournaments t on t.sport_id = s.id and t.slug = r.tournament_slug
 join public.organizations o on o.code = r.org_code
-join public.entries e on e.tournament_id = t.id and e.organization_id = o.id and e.name_vi = r.full_name
-join public.participants p on p.organization_id = o.id and p.full_name = r.full_name
+join public.entries e on e.tournament_id = t.id and e.organization_id = o.id and e.kind = 'individual' and e.archived_at is null and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(r.full_name, 'individual')
+join public.participants p on p.organization_id = o.id and p.archived_at is null and private.entry_identity(p.full_name, 'individual') = private.entry_identity(r.full_name, 'individual')
 on conflict (entry_id, participant_id) do nothing;
