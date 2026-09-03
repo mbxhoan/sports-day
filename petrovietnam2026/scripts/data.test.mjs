@@ -692,6 +692,10 @@ test("PDF pair seed keeps source-explicit table-tennis and badminton pairs", () 
   assert.match(pairSportsSeed, /'cau-long'/);
   assert.match(pairSportsSeed, /insert into public\.fixture_entries/);
   assert.ok(!pairSportsSeed.includes("home_name = away_name"));
+  assert.doesNotMatch(pairSportsSeed, /'Bảng 6'/);
+  assert.match(pairSportsSeed, /'bong-ban','doi-nam-41-50','Bảng D'/);
+  assert.doesNotMatch(pairSportsSeed, /Vũ Văn Sỹ--VSP/);
+  assert.match(migrations, /repair_table_tennis_source_data|Unplayed 31-40 Bảng B/);
 });
 
 test("master schedule seeds pickleball and chess blocks", () => {
