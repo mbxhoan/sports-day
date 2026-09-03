@@ -146,9 +146,11 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     const sides = fixtureSides(rows);
     const slots = fixtureSlotsById.get(fixture.id) ?? [];
     return (["home", "away"] as const).map((side, index) => {
-      const row = sides[index];
+      const sideRow = sides[index];
       const slot = slots.find((item) => item.side === side);
-      const entry = row ? entriesById.get(row.entry_id) : slot ? resolveSlotEntry(slot, { entries, standings, fixtures, fixtureEntries }) : undefined;
+      const slotEntry = slot ? resolveSlotEntry(slot, { entries, standings, fixtures, fixtureEntries }) : undefined;
+      const entry = slot ? slotEntry : sideRow ? entriesById.get(sideRow.entry_id) : undefined;
+      const row = slotEntry ? rows.find((item) => item.entry_id === slotEntry.id) : slot ? undefined : sideRow;
       const candidates = slot && !entry ? slotGroupCandidates(slot, groupEntries, entries) : [];
       return { row, entry, slot, candidates, label: entry ? localized(entry, "name", locale) : slot ? slotDisplayLabel(slot) : t.teamsNotAssigned, candidateLabel: !entry && candidates.length ? slotCandidateLabel(candidates, locale) : "" };
     });

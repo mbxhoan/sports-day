@@ -212,6 +212,8 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(adminCss, /\.bracket-edit-button\s*\{[^}]*position:\s*absolute[^}]*width:\s*24px/);
   assert.match(competitionBoard, /className="gold-button bracket-inline-save"/);
   assert.match(adminCss, /\.bracket-inline-save\s*\{[^}]*width:\s*28px/);
+  assert.match(competitionBoard, /const slotEntry = slot \? resolveSlotEntry/);
+  assert.match(competitionBoard, /const row = slotEntry \? rows\.find/);
 });
 
 test("result editor accepts teams resolved from bracket slots", () => {
