@@ -13,7 +13,7 @@ import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
 import { isManualSport, orderManualStandings, validateGalleryDriveUrl } from "../src/lib/manual-competition.ts";
-import { formatMatchResult, normalizeLegacyMatchResult, standingDifference } from "../src/lib/competition-display.ts";
+import { formatMatchResult, normalizeLegacyMatchResult, scoresFromMatchResult, standingDifference } from "../src/lib/competition-display.ts";
 import { buildSearchSuggestions, matchesSearch } from "../src/lib/search.ts";
 
 const supabaseRoot = new URL("../../supabase/", import.meta.url);
@@ -321,8 +321,11 @@ test("fixture result summaries keep score formatting and bracket rows", () => {
   assert.equal(formatMatchResult("PQPOC", "1", "2", "BỘ MÁY QL&ĐH PETROVN"), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
   assert.equal(normalizeLegacyMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "PQPOC", "BỘ MÁY QL&ĐH PETROVN"), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
   assert.equal(normalizeLegacyMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "", ""), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
+  assert.deepEqual(scoresFromMatchResult("PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN", "PQPOC", "BỘ MÁY QL&ĐH PETROVN"), ["1", "2"]);
+  assert.deepEqual(scoresFromMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "PQPOC", "BỘ MÁY QL&ĐH PETROVN"), ["1", "2"]);
   assert.match(adminActions, /labelsById\.get\(entryIds\[0\]\).*scores\[0\].*scores\[1\].*labelsById\.get\(entryIds\[1\]\)/s);
   assert.match(competitionBoard, /className="bracket-teams"/);
+  assert.match(competitionBoard, /scoresFromMatchResult/);
   assert.match(competitionBoard, /entry\?\.id === fixture\.winner_entry_id/);
 });
 

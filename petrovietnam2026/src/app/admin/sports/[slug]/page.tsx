@@ -169,7 +169,9 @@ export default async function SportAdminPage({ params, searchParams }: { params:
       const groupIds = rows.groups.map((item) => item.id);
       const groupIdSet = new Set(groupIds);
       const fixtureSlotsQuery = supabase.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en,archived_at").eq("tenant_id", tenantId).is("archived_at", null);
-      const activeFixtureEntriesQuery = all("fixture_entries").is("archived_at", null);
+      const activeFixtureEntriesQuery = supabase.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,seed_order,score,score_numeric,rank,result_status,result_detail,archived_at").eq("tenant_id", tenantId).is("archived_at", null).order("seed_order");
+      if (fixtureIds.length) activeFixtureEntriesQuery.in("fixture_id", fixtureIds);
+      else activeFixtureEntriesQuery.limit(0);
       const [fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult] = await withTimeout(() => Promise.all([activeFixtureEntriesQuery, all("group_entries"), fixtureSlotsQuery]), 10_000);
       if ([fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult].some((result) => result.error)) throw new Error("Results query failed");
       rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIdSet.has(String(item.fixture_id)));

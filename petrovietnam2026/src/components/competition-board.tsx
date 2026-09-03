@@ -5,7 +5,7 @@ import { Pencil, Save, X } from "lucide-react";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { CARD_WIDTH, COLUMN_GAP, fixtureSides, groupBy, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotGroupCandidates, slotLabel, slotSourceLabel } from "@/lib/brackets";
 import { initialAdminActionState, type AdminActionState } from "@/lib/admin-action";
-import { formatMatchResult, normalizeLegacyMatchResult, standingDifference } from "@/lib/competition-display";
+import { formatMatchResult, normalizeLegacyMatchResult, scoresFromMatchResult, standingDifference } from "@/lib/competition-display";
 import { buildSearchSuggestions } from "@/lib/search";
 import { copy, localized, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Standing, type Tournament } from "@/lib/site";
 import { SearchCombobox } from "./search-combobox";
@@ -36,8 +36,8 @@ type BracketLayout = ReturnType<typeof layoutBracket>;
 type MatchRow = { row: FixtureEntry | undefined; entry: Entry | undefined; slot: FixtureSlot | undefined; candidates: Entry[]; label: string; candidateLabel: string };
 
 const noopAction: AdminAction = async () => initialAdminActionState;
-const scoreLabel = (row: FixtureEntry | undefined) => row?.score || (row?.score_numeric == null ? "—" : String(row.score_numeric));
 const scoreValue = (row: FixtureEntry | undefined) => row?.score || (row?.score_numeric == null ? "" : String(row.score_numeric));
+const scoreLabel = (row: FixtureEntry | undefined, fallback = "—") => scoreValue(row) || fallback;
 
 function ZoomableBracket({ layout, children, locale }: { layout: BracketLayout; children: React.ReactNode; locale: Locale }) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -149,7 +149,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       const slot = slots.find((item) => item.side === side);
       const slotEntry = slot ? resolveSlotEntry(slot, { entries, standings, fixtures, fixtureEntries }) : undefined;
       const entry = slot ? slotEntry : sideRow ? entriesById.get(sideRow.entry_id) : undefined;
-      const row = slotEntry ? rows.find((item) => item.entry_id === slotEntry.id) : slot ? undefined : sideRow;
+      const row = slotEntry ? rows.find((item) => item.entry_id === slotEntry.id) ?? sideRow : sideRow;
       const candidates = slot && !entry ? slotGroupCandidates(slot, groupEntries, entries) : [];
       return { row, entry, slot, candidates, label: entry ? localized(entry, "name", locale) : slot ? slotDisplayLabel(slot) : t.teamsNotAssigned, candidateLabel: !entry && candidates.length ? slotCandidateLabel(candidates, locale) : "" };
     });
@@ -206,7 +206,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         knockout.forEach((fixture) => { if (fixture.round_order !== null && !roundLabels.has(fixture.round_order)) roundLabels.set(fixture.round_order, localized(fixture, "round", locale) || `${locale === "vi" ? "Vòng" : "Round"} ${fixture.round_order}`); });
         return <ZoomableBracket key={`${tournament.id}-${layout.width}`} locale={locale} layout={layout}><div className="bracket-round-headings">{Array.from({ length: roundCount }, (_, index) => <div className="bracket-round-heading" key={index} style={{ left: index * (CARD_WIDTH + COLUMN_GAP), width: CARD_WIDTH }}>{roundLabels.get(index + 1) ?? `${locale === "vi" ? "Vòng" : "Round"} ${index + 1}`}</div>)}</div><svg viewBox={`0 0 ${layout.width} ${layout.height}`} aria-hidden="true">{layout.connectors.map((connector) => <path key={`${connector.sourceId}-${connector.targetId}`} d={connector.path}/>)}</svg>{layout.nodes.map((node) => { const fixture = fixturesById.get(node.id)!; const rows = matchRows(fixture); const card = <article className={`bracket-match source-bracket-match${resultAction ? " admin-bracket-match" : ""}`}>
           {resultAction && <button type="button" className="bracket-edit-button" aria-label={`Mở form sửa kết quả ${matchLabel(fixture)}`} title="Mở form sửa kết quả" onClick={() => { setSubmittedFixtureId(null); setEditingFixture(fixture); }}><Pencil size={13} aria-hidden="true"/><span>Sửa</span></button>}
-          <small className="bracket-match-label">{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small>{resultAction ? <InlineBracketResult fixture={fixture} rows={rows} action={resultAction} manualWinner={sportSlug === "keo-co"}/> : <div className="bracket-teams">{rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{scoreLabel(row)}</b></div>)}</div>}</article>;
+          <small className="bracket-match-label">{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small>{resultAction ? <InlineBracketResult fixture={fixture} rows={rows} action={resultAction} manualWinner={sportSlug === "keo-co"}/> : <div className="bracket-teams">{(() => { const fallbackScores = scoresFromMatchResult(localized(fixture, "result_summary", locale), rows[0]?.label ?? "", rows[1]?.label ?? ""); return rows.map(({ row, entry, label }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><span>{label}</span><b>{scoreLabel(row, fallbackScores?.[index] ?? "—")}</b></div>); })()}</div>}</article>;
           return <div className="source-bracket-node" style={{ left: node.x, top: node.y }} key={node.id}>{resultAction ? card : adminHref ? <Link href={`${adminHref}&edit=fixture-result:${fixture.id}#fixture-${fixture.id}`}>{card}</Link> : card}</div>;
         })}</ZoomableBracket>;
       })()}

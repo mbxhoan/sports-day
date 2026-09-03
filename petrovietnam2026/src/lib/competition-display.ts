@@ -24,3 +24,12 @@ export function normalizeLegacyMatchResult(summary: string, homeName: string, aw
   const awayScore = summary.slice(awayStart + away.length).match(/^\s*(\d+(?:[.,]\d+)?)/)?.[1];
   return formatMatchResult(home, homeScore, awayScore, away) || summary;
 }
+
+export function scoresFromMatchResult(summary: string, homeName: string, awayName: string): [string, string] | null {
+  const home = homeName.trim();
+  const away = awayName.trim();
+  const normalized = normalizeLegacyMatchResult(summary, home, away).trim();
+  if (!home || !away || !normalized.startsWith(home) || !normalized.endsWith(away)) return null;
+  const scores = normalized.slice(home.length, normalized.length - away.length).match(/^\s*(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\s*$/);
+  return scores ? [scores[1], scores[2]] : null;
+}
