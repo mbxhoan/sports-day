@@ -271,6 +271,21 @@ test("competitor identity repairs attached organization suffixes and reversed pa
   assert.match(source, /perform private\.merge_entry_variants\(tenant\.id\)/);
 });
 
+test("bracket result input accepts concrete source slots before fixture rows exist", () => {
+  assert.match(competitionBoard, /const ready = Boolean\(rows\[0\]\?\.entry && rows\[1\]\?\.entry/);
+  assert.doesNotMatch(competitionBoard, /const ready = Boolean\(rows\[0\]\?\.row && rows\[1\]\?\.row/);
+});
+
+test("latest pickleball roster archives the superseded PDF pair", () => {
+  assert.match(updateWorkbookSeed, /archive_obsolete_pickleball_pair\(private\.seed_tenant_id\(\)\)/);
+  const repairMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("repair_competitor_identity"));
+  assert.ok(repairMigration, "missing competitor identity repair migration");
+  const source = readFileSync(new URL(`migrations/${repairMigration}`, supabaseRoot), "utf8");
+  assert.match(source, /Hoàng Ngọc Quý \/ Nguyễn Minh Tú-PVG/);
+  assert.match(source, /archive_obsolete_pickleball_pair/);
+  assert.match(source, /set archived_at = now\(\)/);
+});
+
 test("workbook updates reuse pair identity instead of creating suffix variants", () => {
   assert.match(migrations, /create or replace function private\.entry_identity/);
   assert.match(updateWorkbookSeed, /private\.entry_identity\(existing\.name_vi, existing\.kind\)/);

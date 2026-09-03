@@ -90,7 +90,7 @@ function SlotEditor({ slot, fixture, entries, groups, groupEntries, fixtures, ac
 
 function InlineBracketResult({ fixture, rows, action, manualWinner }: { fixture: Fixture; rows: MatchRow[]; action: AdminAction; manualWinner: boolean }) {
   const [state, formAction, pending] = useActionState(action, initialAdminActionState);
-  const ready = Boolean(rows[0]?.row && rows[1]?.row && rows[0]?.entry && rows[1]?.entry && rows[0].entry.id !== rows[1].entry.id);
+  const ready = Boolean(rows[0]?.entry && rows[1]?.entry && rows[0].entry.id !== rows[1].entry.id);
   return <form className="bracket-inline-result" action={formAction}>
     <input type="hidden" name="fixture_id" value={fixture.id}/>
     <input type="hidden" name="status" value="completed"/>
