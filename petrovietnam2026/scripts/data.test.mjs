@@ -317,12 +317,13 @@ test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(adminSportPage, /auto-rank-cell/);
 });
 
-test("fixture result summaries place both scores between the team names", () => {
+test("fixture result summaries keep score formatting and bracket rows", () => {
   assert.equal(formatMatchResult("PQPOC", "1", "2", "BỘ MÁY QL&ĐH PETROVN"), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
   assert.equal(normalizeLegacyMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "PQPOC", "BỘ MÁY QL&ĐH PETROVN"), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
   assert.equal(normalizeLegacyMatchResult("PQPOC 1 - BỘ MÁY QL&ĐH PETROVN 2", "", ""), "PQPOC 1 - 2 BỘ MÁY QL&ĐH PETROVN");
   assert.match(adminActions, /labelsById\.get\(entryIds\[0\]\).*scores\[0\].*scores\[1\].*labelsById\.get\(entryIds\[1\]\)/s);
-  assert.match(competitionBoard, /bracket-result-summary/);
+  assert.match(competitionBoard, /className="bracket-teams"/);
+  assert.match(competitionBoard, /entry\?\.id === fixture\.winner_entry_id/);
 });
 
 test("bracket resolves mapped names and exposes standings editing below", () => {

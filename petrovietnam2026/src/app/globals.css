@@ -283,14 +283,14 @@ tbody tr:last-child td { border: 0; }
 .source-bracket { position: relative; min-width: 100%; margin-bottom: 10px; }
 .source-bracket > svg { position: absolute; inset: 0; z-index: 0; overflow: visible; pointer-events: none; }
 .source-bracket path { fill: none; stroke: #4f8eb6; stroke-width: 1.5; }
-.source-bracket-node { position: absolute; z-index: 1; width: 300px; }
+.source-bracket-node { position: absolute; z-index: 1; width: 288px; }
 .source-bracket-node > a { display: block; color: inherit; }
 .bracket-round-headings { position: absolute; inset: 0 0 auto; z-index: 2; height: 34px; pointer-events: none; }
 .bracket-round-heading { position: absolute; top: 4px; color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
-.source-bracket-match { position: relative; height: 134px; padding: 10px; display: grid; align-content: center; gap: 5px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--card); box-shadow: 0 5px 18px #001b3b99; box-sizing: border-box; }
+.source-bracket-match { position: relative; height: 84px; padding: 7px; display: grid; align-content: center; gap: 4px; overflow: hidden; border: 1px solid var(--border); border-radius: 4px; background: var(--card); box-shadow: 0 5px 18px #001b3b99; box-sizing: border-box; }
 .admin-bracket-match { height: 166px; padding: 8px; background: #07527f; }
-.source-bracket-match .bracket-team span { display: block; overflow: visible; text-overflow: clip; white-space: normal; line-height: 1.25; }
-.bracket-result-summary { padding: 9px 8px; border-radius: 4px; background: #082b61; color: #fff; font-size: 11px; font-weight: 700; line-height: 1.35; text-align: center; }
+.source-bracket-match .bracket-team { min-height: 24px; padding: 4px 6px; font-size: 9px; }
+.source-bracket-match .bracket-team span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
 .bracket-candidates { display: -webkit-box; max-height: 26px; margin-top: 3px; overflow: hidden; color: #b8c9e4 !important; font-size: 8px !important; line-height: 1.25; white-space: normal !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .source-bracket-match > small { color: var(--muted-foreground); font-size: 9px; }
 .bracket-match-label { min-width: 0; padding-right: 26px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -618,10 +618,9 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .board-heading { align-items: start; flex-direction: column; gap: 5px; }
   .bracket-canvas-toolbar { position: sticky; left: 0; }
   .bracket-canvas-viewport { overflow: auto; }
-  .bracket-canvas .source-bracket-node { position: absolute; width: 300px; }
+  .bracket-canvas .source-bracket-node { position: absolute; width: 288px; }
   .bracket-canvas .source-bracket-match { box-shadow: none; }
-  .bracket-canvas .source-bracket-match .bracket-team span { white-space: normal; overflow: visible; text-overflow: clip; }
-  .bracket-canvas .source-bracket-match .bracket-team { min-height: 34px; }
+  .bracket-canvas .source-bracket-match .bracket-team span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .standings-inline-form { overflow-x: auto; }
   .standings-inline-form > table { min-width: 760px; }
   table, .schedule-day table, .fixture-day table, .group-grid table, .board-matches table, .board-race table, thead, tbody, tr, th, td { min-width: 0; max-width: 100%; }

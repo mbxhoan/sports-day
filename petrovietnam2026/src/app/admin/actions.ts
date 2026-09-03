@@ -201,6 +201,7 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     if (error) return actionFailure(new Error(error.message));
     revalidatePath("/", "layout");
     revalidatePath("/admin");
+    revalidatePath(`/admin/sports/${sport.slug}`);
     return { ok: true, message: "Đã lưu kết quả" };
   } catch (error) {
     return actionFailure(error);

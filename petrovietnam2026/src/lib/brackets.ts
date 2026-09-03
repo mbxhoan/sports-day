@@ -1,7 +1,7 @@
 import type { Entry, Fixture, FixtureEntry, FixtureSlot, GroupEntry, Locale, Standing } from "./site.ts";
 
-export const CARD_WIDTH = 300;
-export const COLUMN_GAP = 64;
+export const CARD_WIDTH = 288;
+export const COLUMN_GAP = 48;
 export const ROW_GAP = 182;
 const CARD_HEIGHT = 134;
 const FIRST_ROW_Y = 41;
@@ -75,8 +75,8 @@ export function slotGroupCandidates(slot: Pick<FixtureSlot, "source_kind" | "sou
   return groupEntries.filter((item) => item.group_id === slot.source_group_id).sort((a, b) => (a.seed_order ?? Number.MAX_SAFE_INTEGER) - (b.seed_order ?? Number.MAX_SAFE_INTEGER)).map((item) => entriesById.get(item.entry_id)).filter((entry): entry is Entry => Boolean(entry));
 }
 
-export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[], cardHeight = CARD_HEIGHT) {
-  const rowGap = Math.max(ROW_GAP, cardHeight + 48);
+export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[], cardHeight = CARD_HEIGHT, rowGapOverride?: number) {
+  const rowGap = rowGapOverride ?? Math.max(ROW_GAP, cardHeight + 48);
   const ordered = [...fixtures].sort((a, b) => (a.round_order ?? 0) - (b.round_order ?? 0) || (a.bracket_position ?? 0) - (b.bracket_position ?? 0));
   const nodes: Array<{ id: string; x: number; y: number }> = [];
   const byId = new Map<string, { id: string; x: number; y: number }>();

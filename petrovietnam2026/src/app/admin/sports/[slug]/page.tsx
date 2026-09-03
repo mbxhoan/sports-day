@@ -17,6 +17,8 @@ import { buildSearchSuggestions } from "@/lib/search";
 import type { Entry, Fixture, FixtureEntry, FixtureSlot, Group, GroupEntry, Standing, Tournament } from "@/lib/site";
 import { applySportExcelImport, confirmFixtureReset, confirmGroupStandings, deleteMedia, prepareSportExcelImport, previewFixtureReset, rollbackSportExcelImport, saveFixtureResult, saveFixtureSlot, saveManualStandings, saveRecord, saveScoringRule, setArchived } from "../../actions";
 
+export const dynamic = "force-dynamic";
+
 type Row = Record<string, unknown> & { id: string; archived_at: string | null };
 type ExcelImport = { id: string; status: string; mode: string; file_sha256: string; created_at: string; applied_at: string | null; rolled_back_at: string | null; preview: { blockers?: unknown[]; warnings?: unknown[]; diff?: unknown[]; operation_count?: number } | null };
 
@@ -167,7 +169,8 @@ export default async function SportAdminPage({ params, searchParams }: { params:
       const groupIds = rows.groups.map((item) => item.id);
       const groupIdSet = new Set(groupIds);
       const fixtureSlotsQuery = supabase.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en,archived_at").eq("tenant_id", tenantId).is("archived_at", null);
-      const [fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult] = await withTimeout(() => Promise.all([all("fixture_entries"), all("group_entries"), fixtureSlotsQuery]), 10_000);
+      const activeFixtureEntriesQuery = all("fixture_entries").is("archived_at", null);
+      const [fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult] = await withTimeout(() => Promise.all([activeFixtureEntriesQuery, all("group_entries"), fixtureSlotsQuery]), 10_000);
       if ([fixtureEntriesResult, groupEntriesResult, fixtureSlotsResult].some((result) => result.error)) throw new Error("Results query failed");
       rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIdSet.has(String(item.fixture_id)));
       const tournamentByFixture = new Map(rows.fixtures.map((fixture) => [fixture.id, fixture.tournament_id]));
