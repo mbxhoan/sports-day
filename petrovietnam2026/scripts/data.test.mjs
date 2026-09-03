@@ -213,7 +213,7 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(competitionBoard, /className="gold-button bracket-inline-save"/);
   assert.match(adminCss, /\.bracket-inline-save\s*\{[^}]*display:\s*inline-flex/);
   assert.match(competitionBoard, /const slotEntry = slot \? resolveSlotEntry/);
-  assert.match(competitionBoard, /const row = slotEntry \? rows\.find/);
+  assert.match(competitionBoard, /const row = sideRow \?\? \(slotEntry \? rows\.find/);
 });
 
 test("result editor accepts teams resolved from bracket slots", () => {
@@ -326,6 +326,16 @@ test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(migrations, /update public\.standings existing\s+set rank = null/);
   assert.match(adminSportPage, /auto-rank-cell/);
   assert.match(siteLib, /played: "Trận"/);
+});
+
+test("result editor uses persisted fixture side before a stale slot resolution", () => {
+  assert.match(competitionBoard, /const entry = sideRow \? entriesById\.get\(sideRow\.entry_id\) : slotEntry/);
+  assert.match(competitionBoard, /const row = sideRow \?\? \(slotEntry \? rows\.find\(\(item\) => item\.entry_id === slotEntry\.id\) : undefined\)/);
+});
+
+test("result scores auto-select the higher-scoring winner", () => {
+  assert.match(competitionBoard, /function updateWinnerFromScores\(/);
+  assert.match(competitionBoard, /onChange=\{\(event\) => updateWinnerFromScores\(event\.currentTarget\.form!/);
 });
 
 test("fixture result summaries keep score formatting and bracket rows", () => {
