@@ -261,6 +261,16 @@ test("dedupe handles Vietnamese Unicode variants and removes teams or athletes f
   assert.match(adminSportPage, /Xoá khỏi giải/);
 });
 
+test("competitor identity repairs attached organization suffixes and reversed pairs", () => {
+  const repairMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("repair_competitor_identity"));
+  assert.ok(repairMigration, "missing competitor identity repair migration");
+  const source = readFileSync(new URL(`migrations/${repairMigration}`, supabaseRoot), "utf8");
+  assert.match(source, /regexp_split_to_table\(normalized, '\/'\)/);
+  assert.match(source, /string_agg\(part_identity, '' order by part_identity\)/);
+  assert.match(source, /right\(identity, length\(organization_code\)\) = organization_code/);
+  assert.match(source, /perform private\.merge_entry_variants\(tenant\.id\)/);
+});
+
 test("workbook updates reuse pair identity instead of creating suffix variants", () => {
   assert.match(migrations, /create or replace function private\.entry_identity/);
   assert.match(updateWorkbookSeed, /private\.entry_identity\(existing\.name_vi, existing\.kind\)/);
