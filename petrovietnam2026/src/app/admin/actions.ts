@@ -193,6 +193,7 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     if (manualWinner && status === "completed" && !requestedWinner) return actionFailure(new Error("Kéo co phải chọn đội thắng"));
     if (requestedWinner && !entryIds.includes(requestedWinner)) return actionFailure(new Error("Đội thắng không thuộc trận đấu"));
     const derivedWinner = status === "completed" && parsedScores[0] !== null && parsedScores[1] !== null && parsedScores[0] !== parsedScores[1] ? entryIds[parsedScores[0] > parsedScores[1] ? 0 : 1] : null;
+    if (manualWinner && requestedWinner && derivedWinner && requestedWinner !== derivedWinner) return actionFailure(new Error("Đội thắng phải khớp với tỷ số"));
     const winnerEntryId = manualWinner ? (status === "completed" ? requestedWinner : null) : derivedWinner;
     const note = String(formData.get("note") ?? "").trim();
     const entries = sides.map((row, index) => ({ entry_id: row!.entry_id, side: index === 0 ? "home" : "away", score: scores[index] || null, score_numeric: parsedScores[index], rank: null, result_detail: note ? { note } : row!.result_detail ?? {} }));
@@ -308,11 +309,19 @@ export async function saveManualStandings(formData: FormData) {
     };
   });
   if (rows.some((row) => !row.entry_id || [row.played, row.won, row.drawn, row.lost].some((value) => !Number.isInteger(value) || value < 0) || [row.score_for, row.score_against, row.points].some((value) => !Number.isFinite(value) || value < 0) || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)))) throw new Error("Hạng hoặc chỉ số bảng không hợp lệ");
+  if (rows.some((row) => row.played !== row.won + row.drawn + row.lost)) throw new Error("Số trận phải bằng Thắng + Hòa + Thua");
   const explicitRanks = rows.filter((row) => row.rank !== null).map((row) => row.rank);
   if (new Set(explicitRanks).size !== explicitRanks.length) throw new Error("Hạng trong bảng không được trùng");
-  const automaticRanks = new Map([...rows].sort((a, b) => b.points - a.points || (b.score_for - b.score_against) - (a.score_for - a.score_against) || b.score_for - a.score_for || a.entry_id.localeCompare(b.entry_id)).map((row, index) => [row.entry_id, index + 1]));
-  const persistedRows = race ? rows : rows.map((row) => ({ ...row, rank: automaticRanks.get(row.entry_id) ?? null }));
   const { supabase, tenantId } = await adminClient();
+  const { data: tournamentRule, error: tournamentRuleError } = await supabase.from("tournaments").select("scoring_rule").eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null).maybeSingle();
+  if (tournamentRuleError) throw new Error(tournamentRuleError.message);
+  const rule = tournamentRule?.scoring_rule as { type?: string; win?: number; draw?: number; loss?: number } | undefined;
+  const ruleValues = [rule?.win, rule?.draw, rule?.loss].map(Number);
+  const scoredRows = !race && rule?.type === "head-to-head" && ruleValues.every(Number.isFinite)
+    ? rows.map((row) => ({ ...row, points: row.won * ruleValues[0] + row.drawn * ruleValues[1] + row.lost * ruleValues[2] }))
+    : rows;
+  const automaticRanks = new Map([...scoredRows].sort((a, b) => b.points - a.points || (b.score_for - b.score_against) - (a.score_for - a.score_against) || b.score_for - a.score_for || a.entry_id.localeCompare(b.entry_id)).map((row, index) => [row.entry_id, index + 1]));
+  const persistedRows = race ? scoredRows : scoredRows.map((row) => ({ ...row, rank: automaticRanks.get(row.entry_id) ?? null }));
   const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: persistedRows });
   if (error) throw new Error(error.message);
   if (groupId) {

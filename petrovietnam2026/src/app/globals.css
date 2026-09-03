@@ -363,6 +363,7 @@ tbody tr:last-child td { border: 0; }
 .standings-inline-form > table { min-width: 760px; }
 .standings-inline-form input { width: 62px; min-height: 30px; padding: 0 6px; font-size: 11px; }
 .standings-inline-form td:nth-child(2) { min-width: 180px; }
+.standings-guide { margin: 0; padding: 10px 13px; color: var(--muted-foreground); font-size: 10px; line-height: 1.45; }
 .standings-score-pair { display: inline-flex; gap: 5px; }
 .standings-score-pair label { display: grid; gap: 3px; color: var(--muted-foreground); font-size: 9px; }
 .standings-score-pair input { width: 48px; }

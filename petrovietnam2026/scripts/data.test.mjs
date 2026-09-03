@@ -308,13 +308,24 @@ test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(competitionBoard, /tỷ số.*đội thắng|đội thắng.*tỷ số/i);
   assert.match(adminActions, /p_winner_entry_id: winnerEntryId/);
   assert.match(adminActions, /winner_entry_id/);
+  assert.match(adminActions, /Số trận phải bằng Thắng \+ Hòa \+ Thua/);
+  assert.match(adminActions, /Đội thắng phải khớp với tỷ số/);
+  assert.match(adminActions, /row\.won \* ruleValues\[0\] \+ row\.drawn \* ruleValues\[1\] \+ row\.lost \* ruleValues\[2\]/);
   assert.match(competitionBoard, /sportSlug === "keo-co"/);
   assert.match(competitionBoard, /manualWinner/);
+  assert.match(competitionBoard, /deriveStandings/);
+  assert.match(competitionBoard, /standings-guide/);
+  assert.match(competitionBoard, /Ghi\/Thua \(\+\/-\)/);
   assert.match(migrations, /keo-co/);
+  assert.match(migrations, /create trigger tournaments_recalculate_standings/);
+  assert.match(migrations, /Kéo co không được hòa/);
+  assert.match(migrations, /Đội thắng phải khớp với tỷ số/);
+  assert.match(migrations, /perform private\.recalculate_group_standings\(fixture_row\.tournament_id, fixture_row\.group_id\);/);
   assert.doesNotMatch(adminSportPage, /Không tự tính lại/);
   assert.match(adminActions, /Hạng trong bảng không được trùng/);
   assert.match(migrations, /update public\.standings existing\s+set rank = null/);
   assert.match(adminSportPage, /auto-rank-cell/);
+  assert.match(siteLib, /played: "Trận"/);
 });
 
 test("fixture result summaries keep score formatting and bracket rows", () => {
@@ -528,7 +539,7 @@ test("admin results scope database reads before loading competition data", () =>
   assert.match(adminSportPage, /scoped\("fixtures", "tournament_id", tournamentIds\)/);
   assert.match(adminSportPage, /all\("fixture_entries"\)/);
   assert.match(adminSportPage, /all\("group_entries"\)/);
-  assert.doesNotMatch(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
+  assert.match(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
 });
 
 test("schedule uses grouped match rows for the global page and each sport", () => {
