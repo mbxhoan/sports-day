@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { CalendarDays, Clock3, GitBranch, MapPin, Printer } from "lucide-react";
-import { fixtureSides } from "@/lib/brackets";
+import { fixtureSides, groupBy } from "@/lib/brackets";
 import { formatMatchResult, normalizeLegacyMatchResult } from "@/lib/competition-display";
 import { copy, localized, type Court, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Sport, type Standing, type Tournament, type Venue } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
@@ -53,7 +53,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
   const tournamentsById = useMemo(() => new Map(tournaments.map((item) => [item.id, item])), [tournaments]);
   const sportsById = useMemo(() => new Map(sports.map((item) => [item.id, item])), [sports]);
   const entriesById = useMemo(() => new Map(entries.map((item) => [item.id, item])), [entries]);
-  const entriesByTournament = useMemo(() => Map.groupBy(entries, (item) => item.tournament_id), [entries]);
+  const entriesByTournament = useMemo(() => groupBy(entries, (item) => item.tournament_id), [entries]);
   const groupsById = useMemo(() => new Map(groups.map((item) => [item.id, item])), [groups]);
   const venuesById = useMemo(() => new Map(venues.map((item) => [item.id, item])), [venues]);
   const courtsById = useMemo(() => new Map(courts.map((item) => [item.id, item])), [courts]);
@@ -91,7 +91,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     const tournament = tournamentsById.get(fixture.tournament_id);
     return (!sportId || tournament?.sport_id === sportId) && (selectedSport === "all" || tournament?.sport_id === selectedSport) && (selectedTournament === "all" || fixture.tournament_id === selectedTournament) && (status === "all" || fixture.status === status) && matchesSearch(fixtureSearchText(fixture), searchTerm);
   }).sort((a, b) => a.starts_at && b.starts_at ? Date.parse(a.starts_at) - Date.parse(b.starts_at) : a.starts_at ? -1 : b.starts_at ? 1 : 0), [visibleFixtures, sportId, selectedSport, selectedTournament, status, searchTerm, tournamentsById, fixtureSearchText]);
-  const byDay = useMemo(() => Map.groupBy(filtered, (fixture) => dayLabel(fixture.starts_at, locale, t.updating)), [filtered, locale, t.updating]);
+  const byDay = useMemo(() => groupBy(filtered, (fixture) => dayLabel(fixture.starts_at, locale, t.updating)), [filtered, locale, t.updating]);
   const statusText = (value: string) => statusKeys.includes(value as typeof statusKeys[number]) ? t[value as typeof statusKeys[number]] : value;
   const matchScores = (fixture: Fixture) => {
     const scores = fixtureSides(fixtureEntriesById.get(fixture.id) ?? []).map((item) => item?.score || (item?.score_numeric == null ? "" : String(item.score_numeric)));

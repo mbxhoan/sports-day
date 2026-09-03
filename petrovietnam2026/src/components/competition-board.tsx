@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { CARD_WIDTH, COLUMN_GAP, fixtureSides, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotGroupCandidates, slotLabel, slotSourceLabel } from "@/lib/brackets";
+import { CARD_WIDTH, COLUMN_GAP, fixtureSides, groupBy, layoutBracket, resolveSlotEntry, slotCandidateLabel, slotGroupCandidates, slotLabel, slotSourceLabel } from "@/lib/brackets";
 import { initialAdminActionState, type AdminActionState } from "@/lib/admin-action";
 import { formatMatchResult, normalizeLegacyMatchResult, standingDifference } from "@/lib/competition-display";
 import { buildSearchSuggestions } from "@/lib/search";
@@ -110,13 +110,13 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
-  const fixturesByTournament = Map.groupBy(fixtures, (fixture) => fixture.tournament_id);
-  const entriesByTournament = Map.groupBy(entries, (entry) => entry.tournament_id);
-  const groupsByTournament = Map.groupBy(groups, (group) => group.tournament_id);
-  const groupEntriesByGroup = Map.groupBy(groupEntries, (item) => item.group_id);
-  const standingsByGroup = Map.groupBy(standings, (row) => row.group_id ?? `tournament:${row.tournament_id}`);
-  const fixtureRows = Map.groupBy(fixtureEntries, (row) => row.fixture_id);
-  const fixtureSlotsById = Map.groupBy(fixtureSlots, (slot) => slot.fixture_id);
+  const fixturesByTournament = groupBy(fixtures, (fixture) => fixture.tournament_id);
+  const entriesByTournament = groupBy(entries, (entry) => entry.tournament_id);
+  const groupsByTournament = groupBy(groups, (group) => group.tournament_id);
+  const groupEntriesByGroup = groupBy(groupEntries, (item) => item.group_id);
+  const standingsByGroup = groupBy(standings, (row) => row.group_id ?? `tournament:${row.tournament_id}`);
+  const fixtureRows = groupBy(fixtureEntries, (row) => row.fixture_id);
+  const fixtureSlotsById = groupBy(fixtureSlots, (slot) => slot.fixture_id);
   const [editingFixture, setEditingFixture] = useState<Fixture | null>(null);
   const [submittedFixtureId, setSubmittedFixtureId] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -126,7 +126,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     if (!editingFixture && dialogRef.current?.open) dialogRef.current.close();
     if (editingFixture && submittedFixtureId === editingFixture.id && resultState.ok && resultState.message) dialogRef.current?.close();
   }, [editingFixture, resultState, submittedFixtureId]);
-  const sourceCodes = Map.groupBy(fixtures.filter((fixture) => fixture.source_code), (fixture) => `${fixture.tournament_id}:${fixture.source_code}`);
+  const sourceCodes = groupBy(fixtures.filter((fixture) => fixture.source_code), (fixture) => `${fixture.tournament_id}:${fixture.source_code}`);
   const available = tournaments.filter((tournament) => (fixturesByTournament.get(tournament.id)?.length ?? 0) > 0 || (groupsByTournament.get(tournament.id)?.length ?? 0) > 0 || (entriesByTournament.get(tournament.id)?.length ?? 0) > 0);
 
   const matchLabel = (fixture: Fixture) => {

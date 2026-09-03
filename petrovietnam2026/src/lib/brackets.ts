@@ -9,6 +9,17 @@ const FIRST_ROW_Y = 41;
 type LayoutFixture = Pick<Fixture, "id" | "round_order" | "bracket_position">;
 type LayoutSlot = Pick<FixtureSlot, "fixture_id" | "source_kind" | "source_fixture_id">;
 
+export function groupBy<T, K>(items: Iterable<T>, key: (item: T) => K) {
+  const groups = new Map<K, T[]>();
+  for (const item of items) {
+    const groupKey = key(item);
+    const group = groups.get(groupKey);
+    if (group) group.push(item);
+    else groups.set(groupKey, [item]);
+  }
+  return groups;
+}
+
 export function slotLabel(slot: Pick<FixtureSlot, "label_vi" | "label_en" | "source_kind">, resolvedEntry: Entry | undefined, locale: Locale) {
   return resolvedEntry?.[`name_${locale}`] || slot[`label_${locale}`] || (locale === "vi" ? "Chờ xác định" : "To be determined");
 }
@@ -82,8 +93,8 @@ export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[], ca
     nodes.push(node);
     byId.set(node.id, node);
   }
-  const targetGroups = [...Map.groupBy(slots.filter((slot) => slot.source_fixture_id && byId.has(slot.source_fixture_id) && byId.has(slot.fixture_id)), (slot) => slot.fixture_id)];
-  const targetsByColumn = Map.groupBy(targetGroups, ([targetId]) => byId.get(targetId)!.x);
+  const targetGroups = [...groupBy(slots.filter((slot) => slot.source_fixture_id && byId.has(slot.source_fixture_id) && byId.has(slot.fixture_id)), (slot) => slot.fixture_id)];
+  const targetsByColumn = groupBy(targetGroups, ([targetId]) => byId.get(targetId)!.x);
   const targetLanes = new Map<string, { index: number; count: number }>();
   for (const columnTargets of targetsByColumn.values()) {
     columnTargets.sort((a, b) => byId.get(a[0])!.y - byId.get(b[0])!.y);

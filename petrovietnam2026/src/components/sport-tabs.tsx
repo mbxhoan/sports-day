@@ -7,6 +7,7 @@ import {
   type Sport, type Standing, type Tournament, type Venue, type Court,
 } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
+import { groupBy } from "@/lib/brackets";
 import { ScheduleView } from "./schedule-view";
 import { CompetitionBoard } from "./competition-board";
 
@@ -66,7 +67,7 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     ["brackets", t.brackets, GitBranch],
   ];
   const timeSlots = [...new Map(datedFixtures.map((fixture) => [`${fixture.tournament_id}|${fixture.starts_at}|${localized(fixture, "round", locale)}`, fixture])).values()];
-  const slotsByDay = Map.groupBy(timeSlots, (fixture) => dateParts(fixture.starts_at).day);
+  const slotsByDay = groupBy(timeSlots, (fixture) => dateParts(fixture.starts_at).day);
 
   return <>
     <div className="sport-summary" aria-label={t.details}>

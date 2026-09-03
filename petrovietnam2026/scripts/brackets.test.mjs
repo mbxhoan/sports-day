@@ -22,6 +22,16 @@ test("layout centers parent between source matches", () => {
   assert.equal(result.connectors.filter((connector) => connector.targetId === "final").filter((connector) => connector.path.includes("V")).length, 1);
 });
 
+test("bracket layout works without Map.groupBy", () => {
+  const original = Map.groupBy;
+  Map.groupBy = undefined;
+  try {
+    assert.equal(layoutBracket(fixtures, slots).nodes.length, 3);
+  } finally {
+    Map.groupBy = original;
+  }
+});
+
 test("slot label preserves unresolved source", () => {
   assert.equal(slotLabel({ source_kind: "group_rank", label_vi: "Nhất A", label_en: "Group A winner" }, undefined, "vi"), "Nhất A");
 });
