@@ -207,7 +207,11 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(competitionBoard, /name="score_2"/);
   assert.match(adminSportPage, /resultAction=\{saveFixtureResult\}/);
   assert.match(adminCss, /\.source-bracket-node\s*\{[^}]*z-index:\s*1/);
-  assert.match(adminCss, /\.bracket-edit-button\s*\{[^}]*position:\s*relative[^}]*background:\s*var\(--primary\)[^}]*color:\s*var\(--primary-foreground\)/);
+  assert.match(competitionBoard, /className="bracket-edit-button"[^>]*aria-label=/);
+  assert.match(competitionBoard, /<Pencil size=\{13\}/);
+  assert.match(adminCss, /\.bracket-edit-button\s*\{[^}]*position:\s*absolute[^}]*width:\s*24px/);
+  assert.match(competitionBoard, /className="gold-button bracket-inline-save"/);
+  assert.match(adminCss, /\.bracket-inline-save\s*\{[^}]*width:\s*28px/);
 });
 
 test("result editor accepts teams resolved from bracket slots", () => {

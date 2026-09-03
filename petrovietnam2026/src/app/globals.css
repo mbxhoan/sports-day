@@ -276,7 +276,7 @@ tbody tr:last-child td { border: 0; }
 .drive-gallery p { color: var(--muted-foreground); }
 .drive-gallery .gold-button { width: fit-content; text-decoration: none; }
 .manual-results table { min-width: 560px; }
-.board-warning { margin: -5px 0 14px; color: #ffd992; font-size: 11px; }
+.board-warning { display: -webkit-box; max-width: 100%; margin: -5px 0 10px; padding: 6px 9px; overflow: hidden; border-left: 2px solid var(--primary); background: #082b61; color: #ffd992; font-size: 10px; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .competition-board .group-grid { margin-bottom: 18px; }
 .source-bracket { position: relative; min-width: 100%; margin-bottom: 10px; }
 .source-bracket > svg { position: absolute; inset: 0; z-index: 0; overflow: visible; pointer-events: none; }
@@ -285,26 +285,29 @@ tbody tr:last-child td { border: 0; }
 .source-bracket-node > a { display: block; color: inherit; }
 .bracket-round-headings { position: absolute; inset: 0 0 auto; z-index: 2; height: 34px; pointer-events: none; }
 .bracket-round-heading { position: absolute; top: 4px; color: var(--primary); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
-.source-bracket-match { height: 134px; padding: 10px; display: grid; align-content: center; gap: 5px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); box-shadow: 0 5px 18px #001b3b99; box-sizing: border-box; }
-.admin-bracket-match { height: 184px; }
+.source-bracket-match { position: relative; height: 134px; padding: 10px; display: grid; align-content: center; gap: 5px; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--card); box-shadow: 0 5px 18px #001b3b99; box-sizing: border-box; }
+.admin-bracket-match { height: 166px; padding: 8px; background: #07527f; }
 .source-bracket-match .bracket-team span { display: block; overflow: visible; text-overflow: clip; white-space: normal; line-height: 1.25; }
 .bracket-result-summary { padding: 9px 8px; border-radius: 4px; background: #082b61; color: #fff; font-size: 11px; font-weight: 700; line-height: 1.35; text-align: center; }
 .bracket-candidates { display: -webkit-box; max-height: 26px; margin-top: 3px; overflow: hidden; color: #b8c9e4 !important; font-size: 8px !important; line-height: 1.25; white-space: normal !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .source-bracket-match > small { color: var(--muted-foreground); font-size: 9px; }
-.bracket-edit-button { position: relative; z-index: 2; width: 100%; min-height: 34px; margin-top: 5px; padding: 0 8px; border: 1px solid var(--primary); border-radius: 4px; background: var(--primary); color: var(--primary-foreground); font-size: 10px; font-weight: 700; pointer-events: auto; }
+.bracket-match-label { min-width: 0; padding-right: 26px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bracket-edit-button { position: absolute; top: 7px; right: 7px; z-index: 2; width: 24px; min-height: 24px; height: 24px; padding: 0; display: grid; place-items: center; border: 1px solid var(--primary); border-radius: 3px; background: #0b0c0a; color: var(--primary); pointer-events: auto; }
 .bracket-edit-button:hover, .bracket-edit-button:focus-visible { background: #fff36b; color: #032c55; }
-.bracket-inline-result { min-width: 0; display: grid; gap: 5px; }
-.bracket-inline-score { min-width: 0; min-height: 30px; display: grid; grid-template-columns: minmax(0, 1fr) 48px auto; align-items: center; gap: 5px; padding: 3px 5px; border-radius: 4px; background: #082b61; color: #fff; font-size: 9px; }
+.bracket-inline-result { min-width: 0; display: grid; gap: 3px; }
+.bracket-inline-score { min-width: 0; min-height: 27px; display: grid; grid-template-columns: minmax(0, 1fr) 44px; align-items: center; gap: 4px; padding: 2px 4px; border: 1px solid #2f6681; border-radius: 2px; background: #0b0c0a; color: #fff; font-size: 9px; }
 .bracket-inline-score > span { min-width: 0; display: -webkit-box; overflow: hidden; line-height: 1.15; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.bracket-inline-score > input { width: 48px; min-height: 26px; padding: 0 5px; font-size: 11px; }
+.bracket-inline-score > input { width: 44px; min-height: 24px; padding: 0 4px; border-color: #2f6681; background: #123f4d; font-size: 11px; font-variant-numeric: tabular-nums; }
 .bracket-inline-score label { display: flex; align-items: center; gap: 3px; color: var(--primary); font-size: 8px; white-space: nowrap; }
 .bracket-inline-score label input { width: 14px; min-height: 14px; accent-color: var(--primary); }
 .bracket-inline-score small { grid-column: 1 / -1; display: -webkit-box; max-height: 20px; overflow: hidden; color: #b8c9e4; font-size: 8px; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.bracket-inline-help { color: #ffd992; font-size: 8px; }
+.bracket-inline-winner { min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 5px; color: #ffd992; font-size: 8px; }
+.bracket-inline-winner select { min-width: 0; min-height: 25px; padding: 0 5px; border-color: #2f6681; background: #123f4d; color: #fff; font-size: 9px; }
+.bracket-inline-state { min-width: 0; overflow: hidden; color: #ffd992; font-size: 8px; line-height: 1.1; text-overflow: ellipsis; white-space: nowrap; }
 .auto-rank-cell { min-height: 30px; padding: 0 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #2f6681; border-radius: 6px; background: #082b61; color: var(--primary); font-weight: 700; }
-.auto-winner-note { grid-column: 1 / -1; margin: 0; padding: 7px 8px; border-left: 3px solid var(--primary); background: #082b61; color: #fff4a6; font-size: 10px; }
-.bracket-inline-result > .form-error { margin: 0; padding: 4px 6px; font-size: 9px; }
-.bracket-inline-result > .gold-button { min-height: 26px; margin: 0; padding: 0 8px; font-size: 9px; }
+.auto-winner-note { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 5px 7px; overflow: hidden; border-left: 2px solid var(--primary); background: #082b61; color: #fff4a6; font-size: 8px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.bracket-inline-result > .form-error { min-width: 0; max-height: 18px; margin: 0; padding: 3px 5px; overflow: hidden; font-size: 8px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.bracket-inline-save { width: 28px; min-height: 25px !important; height: 25px; margin: 0 0 0 auto !important; padding: 0 !important; justify-content: center; }
 .result-dialog { width: min(640px, calc(100% - 24px)); max-height: calc(100% - 24px); padding: 0; border: 1px solid var(--border); border-radius: 8px; background: #07527f; color: #fff; box-shadow: 0 24px 70px #001a35cc; }
 .result-dialog::backdrop { background: #00142eb8; }
 .result-dialog > header { padding: 22px 22px 0; }
@@ -335,8 +338,9 @@ tbody tr:last-child td { border: 0; }
 .result-dialog header { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .result-dialog header h2 { margin: 0; color: var(--primary); font-size: 18px; }
 .result-dialog header p { margin: 4px 0 0; color: var(--muted-foreground); font-size: 11px; }
-.dialog-close { min-height: 30px; padding: 0 8px; border: 1px solid var(--border); border-radius: 5px; background: transparent; color: #fff; font-size: 20px; line-height: 1; }
+.dialog-close { width: 30px; min-height: 30px; padding: 0; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 3px; background: transparent; color: #fff; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.result-form-message { max-height: 38px; overflow: hidden; text-overflow: ellipsis; }
 .bracket-canvas { min-width: 0; }
 .tournament-block > .bracket-canvas + .group-grid { margin-top: 34px; }
 .bracket-canvas-toolbar { min-height: 38px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--primary); font-size: 11px; font-weight: 700; }
