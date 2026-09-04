@@ -45,6 +45,9 @@ form[data-pending] button[data-pending]::after { content: ""; width: 13px; heigh
 .desktop-nav a:hover { color: var(--primary); }
 .header-actions { margin-left: auto; display: flex; align-items: center; gap: 18px; color: #c3ccdb; }
 .language, .login-link { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; }
+.refresh-data-button { width: 34px; height: 34px; padding: 0; display: inline-grid; place-items: center; border: 1px solid #2f9fc3; border-radius: 5px; background: transparent; color: #dce8ff; }
+.refresh-data-button:hover, .refresh-data-button:focus-visible { border-color: var(--primary); color: var(--primary); }
+.refresh-data-button[data-refreshing] svg { animation: spin .8s linear infinite; }
 .mobile-menu { display: none; position: relative; }
 .mobile-menu summary { list-style: none; width: 42px; height: 42px; display: grid; place-items: center; cursor: pointer; }
 .mobile-menu summary::-webkit-details-marker { display: none; }

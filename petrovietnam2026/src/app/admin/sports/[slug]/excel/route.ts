@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { buildSportWorkbook, SPORT_EXCEL_SPORTS, SPORT_EXCEL_VERSION, type SportExcelMode, type SportExcelSnapshot } from "@/lib/sport-excel";
+import { buildSportWorkbook, SPORT_EXCEL_SPORTS, SPORT_EXCEL_VERSION, type SportExcelMode, type SportExcelSnapshot, type SportExcelView } from "@/lib/sport-excel";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
@@ -8,7 +8,10 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const mode = new URL(request.url).searchParams.get("mode") as SportExcelMode | null;
+  const searchParams = new URL(request.url).searchParams;
+  const requestedMode = searchParams.get("mode");
+  const view = searchParams.get("view") === "results" ? "results" as SportExcelView : "full" as SportExcelView;
+  const mode = (view === "results" ? "current" : requestedMode) as SportExcelMode | null;
   if (mode !== "current" && mode !== "blank") return new Response("mode không hợp lệ", { status: 400 });
   if (!SPORT_EXCEL_SPORTS.includes(slug as (typeof SPORT_EXCEL_SPORTS)[number])) return new Response("Môn thể thao không được hỗ trợ", { status: 422 });
   const supabase = await createSupabaseServerClient();
@@ -25,6 +28,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   if (error || !data) return new Response(error?.message ?? "Không thể tạo template Excel", { status: 422 });
   const result = data as { export_id?: string; snapshot?: SportExcelSnapshot };
   if (!result.export_id || !result.snapshot || result.snapshot.sport_slug !== slug || result.snapshot.sport_id !== sport.id || tenantSlug !== "petrovietnam2026") return new Response("Snapshot Excel không hợp lệ", { status: 422 });
-  const workbook = await buildSportWorkbook(result.snapshot, mode, result.export_id);
-  return new Response(workbook, { headers: { "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Content-Disposition": `attachment; filename="${slug}-${mode}.xlsx"`, "Cache-Control": "private, no-store" } });
+  const workbook = await buildSportWorkbook(result.snapshot, mode, result.export_id, view);
+  return new Response(workbook, { headers: { "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Content-Disposition": `attachment; filename="${slug}-${view === "results" ? "ket-qua" : mode}.xlsx"`, "Cache-Control": "private, no-store" } });
 }

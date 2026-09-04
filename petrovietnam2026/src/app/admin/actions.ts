@@ -421,12 +421,20 @@ export async function prepareSportExcelImport(formData: FormData) {
     const currentSport = sport as { id: string; slug: string };
     const buffer = Buffer.from(await uploadFile.arrayBuffer());
     const parsed = await parseSportWorkbook(buffer);
-    if (parsed.meta.tenant_slug !== tenantSlug || parsed.meta.sport_slug !== slug || parsed.meta.sport_id !== currentSport.id) fail("Workbook không thuộc tenant hoặc môn đang mở");
-    const exportId = parsed.meta.export_id;
-    const { data: exportRow, error: exportError } = await supabase.from("sport_excel_exports").select("id,sport_id,template_version,mode,payload").eq("tenant_id", tenantId).eq("id", exportId).eq("sport_id", currentSport.id).is("archived_at", null).maybeSingle();
-    if (exportError || !exportRow || exportRow.template_version !== SPORT_EXCEL_VERSION || exportRow.mode !== parsed.meta.mode) fail("Snapshot export không hợp lệ hoặc đã hết hiệu lực");
-    const currentExport = exportRow as { payload: unknown; mode: string; template_version: number };
-    const snapshot = currentExport.payload as SportExcelSnapshot;
+    if (parsed.meta.tenant_slug !== tenantSlug || parsed.meta.sport_slug !== slug || (parsed.meta.sport_id && parsed.meta.sport_id !== currentSport.id)) fail("Workbook không thuộc tenant hoặc môn đang mở");
+    let exportId = parsed.meta.export_id;
+    let snapshot: SportExcelSnapshot;
+    if (!exportId && parsed.meta.view === "results") {
+      const { data: exportData, error: exportError } = await supabase.rpc("create_sport_excel_export", { p_sport_id: currentSport.id, p_mode: "current", p_template_version: SPORT_EXCEL_VERSION });
+      const created = exportData as { export_id?: string; snapshot?: SportExcelSnapshot } | null;
+      if (exportError || !created?.export_id || !created.snapshot) fail("Không tạo được snapshot kết quả");
+      exportId = created!.export_id!;
+      snapshot = created!.snapshot!;
+    } else {
+      const { data: exportRow, error: exportError } = await supabase.from("sport_excel_exports").select("id,sport_id,template_version,mode,payload").eq("tenant_id", tenantId).eq("id", exportId).eq("sport_id", currentSport.id).is("archived_at", null).maybeSingle();
+      if (exportError || !exportRow || exportRow.template_version !== SPORT_EXCEL_VERSION || exportRow.mode !== parsed.meta.mode) fail("Snapshot export không hợp lệ hoặc đã hết hiệu lực");
+      snapshot = (exportRow as { payload: SportExcelSnapshot }).payload;
+    }
     const operationPayload = buildOperations(parsed, snapshot, currentSport.id);
     const preview = previewOperations(operationPayload.operations);
     const { data, error } = await supabase.rpc("prepare_sport_excel_import", { p_sport_id: currentSport.id, p_export_id: exportId, p_template_version: SPORT_EXCEL_VERSION, p_mode: parsed.meta.mode, p_file_sha256: createHash("sha256").update(buffer).digest("hex"), p_payload: operationPayload, p_preview: preview });

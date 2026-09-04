@@ -35,7 +35,32 @@ test("Excel export round-trips all eight sport configurations", async () => {
   assert.equal(changed.operations.length, 2);
   assert.equal(changed.operations[0].data.sport_id, sportId);
   assert.equal(changed.operations.find((item) => item.table === "fixture_entries")?.data.fixture_id, fixtureId);
+  assert.equal(changed.operations.find((item) => item.table === "fixture_entries")?.data.score_numeric, 2);
   assert.equal(previewOperations(changed.operations).blockers.length, 0);
+});
+
+test("results view keeps only readable match sheets", async () => {
+  const buffer = await buildSportWorkbook(snapshot, "current", "dddddddd-dddd-4ddd-8ddd-dddddddddddd", "results");
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
+  assert.deepEqual(workbook.worksheets.map((sheet) => sheet.name), ["HƯỚNG_DẪN", "TRẬN_ĐẤU", "KẾT_QUẢ", "_LOOKUP", "_META"]);
+  const result = workbook.getWorksheet("KẾT_QUẢ");
+  const headers = result.getRow(1).values;
+  const scoreColumn = headers.indexOf("Tỷ số / Score");
+  const numericScoreColumn = headers.indexOf("Điểm số / Numeric score");
+  assert.ok(scoreColumn > 0);
+  assert.equal(result.getColumn(numericScoreColumn).hidden, true);
+  assert.equal(result.getCell(2, headers.indexOf("Trận / Fixture")).value, "Vòng bảng");
+});
+
+test("manual chess results use the standings sheet", async () => {
+  const chess = { ...snapshot, sport_slug: "co-vua", tables: { ...snapshot.tables, standings: [{ id: "70000000-0000-4000-8000-000000000001", tournament_id: tournamentId, group_id: null, entry_id: entryId, played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0, rank: null, note_vi: null, note_en: null }] } };
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(await buildSportWorkbook(chess, "current", "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", "results"));
+  assert.deepEqual(workbook.worksheets.map((sheet) => sheet.name), ["HƯỚNG_DẪN", "BXH", "_LOOKUP", "_META"]);
+  const standings = workbook.getWorksheet("BXH");
+  assert.equal(standings.getCell(2, standings.getRow(1).values.indexOf("Đội / Entry")).value, "A / B");
+  assert.equal(standings.getColumn(standings.getRow(1).values.indexOf("Điểm")).hidden, false);
 });
 
 test("Excel templates hide technical columns and show readable relation names", async () => {

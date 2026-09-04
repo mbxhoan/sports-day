@@ -10,6 +10,7 @@ export const SPORT_EXCEL_SPORTS = [
 ] as const;
 
 export type SportExcelMode = "current" | "blank";
+export type SportExcelView = "full" | "results";
 export type SportExcelTable =
   | "sports" | "tournaments" | "organizations" | "participants" | "entries" | "entry_members"
   | "venues" | "courts" | "groups" | "group_entries" | "fixtures" | "fixture_entries"
@@ -120,6 +121,20 @@ const tablePrefix: Record<SportExcelTable, string> = {
 
 const hiddenColumns = new Set(["ref", "action", "source_metadata", "scoring_rule", "result_detail", "source_code"]);
 
+function hiddenColumnsForView(view: SportExcelView, sportSlug: string) {
+  if (view !== "results") return hiddenColumns;
+  const hidden = new Set([...hiddenColumns, "score_numeric"]);
+  if (["co-vua", "co-tuong"].includes(sportSlug)) for (const column of ["group_ref", "played", "won", "drawn", "lost", "score_for", "score_against", "note_vi", "note_en"]) hidden.add(column);
+  if (!["boi-loi", "dien-kinh"].includes(sportSlug)) for (const column of ["side", "lane", "seed_order", "rank", "result_status"]) hidden.add(column);
+  return hidden;
+}
+
+function resultSheets(sportSlug: string): readonly SportExcelTable[] {
+  if (["co-vua", "co-tuong"].includes(sportSlug)) return ["standings"];
+  if (["boi-loi", "dien-kinh"].includes(sportSlug)) return ["fixtures", "fixture_entries", "standings"];
+  return ["fixtures", "fixture_entries"];
+}
+
 function slugPart(value: unknown) {
   return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 28) || "row";
 }
@@ -182,13 +197,14 @@ function exportValue(table: SportExcelTable, key: string, row: RawRow, refs: Ret
 }
 
 function displayLabel(row: RawRow) {
-  return String(row.name_vi ?? row.full_name ?? row.code ?? row.slug ?? row.title_vi ?? row.source_code ?? row.id);
+  return String(row.name_vi ?? row.full_name ?? row.code ?? row.slug ?? row.title_vi ?? row.source_code ?? row.round_vi ?? row.id);
 }
 
-function configureDataSheet(sheet: ExcelJS.Worksheet, table: SportExcelTable, rows: RawRow[], refs: ReturnType<typeof refsForSnapshot>, editable: boolean) {
+function configureDataSheet(sheet: ExcelJS.Worksheet, table: SportExcelTable, rows: RawRow[], refs: ReturnType<typeof refsForSnapshot>, editable: boolean, view: SportExcelView, sportSlug: string) {
   const columns = tableDefinitions[table];
-  const visibleColumns = columns.filter((column) => !hiddenColumns.has(column.key));
-  const technicalColumns = columns.filter((column) => hiddenColumns.has(column.key));
+  const hidden = hiddenColumnsForView(view, sportSlug);
+  const visibleColumns = columns.filter((column) => !hidden.has(column.key));
+  const technicalColumns = columns.filter((column) => hidden.has(column.key));
   sheet.columns = [
     ...visibleColumns.map((column) => ({ header: column.header, key: column.key, width: Math.min(42, Math.max(15, column.header.length + 5)) })),
     ...technicalColumns.map((column) => ({ header: column.header, key: column.key, width: 2 })),
@@ -217,26 +233,26 @@ function configureDataSheet(sheet: ExcelJS.Worksheet, table: SportExcelTable, ro
   sheet.eachRow((row, rowNumber) => { if (rowNumber > 1 && rowNumber % 2 === 0) row.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF2F8FA" } }; });
 }
 
-export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: SportExcelMode, exportId: string) {
+export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: SportExcelMode, exportId: string, view: SportExcelView = "full") {
   if (!SPORT_EXCEL_SPORTS.includes(snapshot.sport_slug as (typeof SPORT_EXCEL_SPORTS)[number])) throw new Error("Môn thể thao không được hỗ trợ");
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "Petrovietnam Sports Day";
   workbook.created = new Date();
   workbook.modified = new Date();
   const refs = refsForSnapshot(snapshot);
-  const allowed = sportExcelConfig[snapshot.sport_slug as keyof typeof sportExcelConfig].sheets;
+  const allowed: readonly SportExcelTable[] = view === "results" ? resultSheets(snapshot.sport_slug) : sportExcelConfig[snapshot.sport_slug as keyof typeof sportExcelConfig].sheets;
   const guide = workbook.addWorksheet("HƯỚNG_DẪN");
   guide.columns = [{ header: "Nội dung", key: "content", width: 110 }];
   guide.addRows([
     ["Workbook quản trị Excel · Petrovietnam 2026"],
     [`Môn: ${snapshot.sport_slug} · Chế độ: ${mode === "current" ? "Dữ liệu hiện tại" : "Mẫu trống"}`],
-    ["Sửa dữ liệu ở các sheet tiếng Việt. Cột kỹ thuật đặt cuối và đã ẩn, không cần điền."],
-    ["Tên hạng mục, đơn vị, đội, bảng và trận hiển thị bằng tên dễ đọc; không cần nhớ mã."],
-    ["Thêm dòng ở cuối sheet, điền các cột tên/kết quả. Hệ thống tự tạo mã và nhận là dòng mới."],
-    ["Sửa tỷ số ở KẾT_QUẢ. Để trống cột không muốn đổi; không xóa dòng để xóa dữ liệu."],
-    ["Dòng cũ được cập nhật khi nạp. Dòng mới được thêm. ARCHIVE chỉ dùng khi muốn lưu trữ."],
-    ["Import có xem trước và kiểm tra toàn bộ; có lỗi chặn thì không ghi dở dang."],
-    ["NGUỒN_NHÁNH ẩn và chỉ đọc. Ngày giờ dùng múi giờ Asia/Ho_Chi_Minh."],
+    [view === "results" ? "Chỉ dùng file này để cập nhật kết quả." : "Sửa dữ liệu ở các sheet tiếng Việt. Cột kỹ thuật đặt cuối và đã ẩn, không cần điền."],
+    [view === "results" && ["co-vua", "co-tuong"].includes(snapshot.sport_slug) ? "Sheet BXH: nhập Điểm và Hạng theo biên bản tổng hợp." : view === "results" ? "Sheet TRẬN_ĐẤU: đổi Trạng thái thành Hoàn tất khi trận đã có kết quả." : "Tên hạng mục, đơn vị, đội, bảng và trận hiển thị bằng tên dễ đọc; không cần nhớ mã."],
+    [view === "results" && ["co-vua", "co-tuong"].includes(snapshot.sport_slug) ? "Chỉ sửa ô Điểm và Hạng ở đúng dòng tên VĐV." : view === "results" ? "Sheet KẾT_QUẢ: nhập tỷ số/thành tích vào đúng dòng tên người hoặc đội." : "Thêm dòng ở cuối sheet, điền các cột tên/kết quả. Hệ thống tự tạo mã và nhận là dòng mới."],
+    [view === "results" ? "Không đổi tên trận, tên người/đội hoặc cột ẩn. Không cần nhớ ID." : "Sửa tỷ số ở KẾT_QUẢ. Để trống cột không muốn đổi; không xóa dòng để xóa dữ liệu."],
+    [view === "results" ? "Với bơi lội/điền kinh, nhập Làn, Thành tích, Hạng và Trạng thái KQ nếu có." : "Dòng cũ được cập nhật khi nạp. Dòng mới được thêm. ARCHIVE chỉ dùng khi muốn lưu trữ."],
+    ["Lưu file rồi nạp lại trên trang admin. Hệ thống xem trước và chỉ ghi toàn bộ khi mọi kiểm tra đều đạt."],
+    ["NGUỒN_NHÁNH, ID và cột kỹ thuật được ẩn; ngày giờ dùng múi giờ Asia/Ho_Chi_Minh."],
   ]);
   guide.getRow(1).font = { bold: true, size: 16, color: { argb: "FFFFFFFF" } };
   guide.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF07527F" } };
@@ -245,7 +261,7 @@ export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: Spo
   for (const table of allowed) {
     const sheet = workbook.addWorksheet(sheetNames[table]);
     const rows = mode === "current" ? snapshot.tables[table] ?? [] : [];
-    configureDataSheet(sheet, table, rows, refs, table !== "fixture_slots");
+    configureDataSheet(sheet, table, rows, refs, table !== "fixture_slots", view, snapshot.sport_slug);
     if (table === "fixture_slots") sheet.getRow(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF6B7280" } };
   }
   const lookup = workbook.addWorksheet("_LOOKUP");
@@ -259,7 +275,7 @@ export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: Spo
   const meta = workbook.addWorksheet("_META");
   meta.columns = [{ header: "Khóa / Key", key: "key", width: 28 }, { header: "Giá trị / Value", key: "value", width: 80 }];
   meta.addRows([
-    { key: "template_version", value: String(SPORT_EXCEL_VERSION) }, { key: "export_id", value: exportId }, { key: "tenant_slug", value: "petrovietnam2026" }, { key: "sport_slug", value: snapshot.sport_slug }, { key: "sport_id", value: snapshot.sport_id }, { key: "mode", value: mode },
+    { key: "template_version", value: String(SPORT_EXCEL_VERSION) }, { key: "export_id", value: exportId }, { key: "tenant_slug", value: "petrovietnam2026" }, { key: "sport_slug", value: snapshot.sport_slug }, { key: "sport_id", value: snapshot.sport_id }, { key: "mode", value: mode }, { key: "view", value: view },
   ]);
   meta.views = [{ state: "frozen", ySplit: 1 }];
   meta.protect("sports-day-template", { selectLockedCells: true, selectUnlockedCells: true });
@@ -312,7 +328,7 @@ export async function parseSportWorkbook(buffer: Buffer | ArrayBuffer): Promise<
   const meta: Record<string, string> = {};
   metaSheet.eachRow((row, rowNumber) => { if (rowNumber > 1) { const key = String(row.getCell(1).value ?? "").trim(); if (key) meta[key] = String(row.getCell(2).value ?? "").trim(); } });
   if (meta.template_version !== String(SPORT_EXCEL_VERSION)) throw new Error("Phiên bản template không được hỗ trợ");
-  if (!meta.tenant_slug || !meta.sport_slug || !meta.export_id) throw new Error("_META thiếu tenant, môn hoặc export_id");
+  if (!meta.tenant_slug || !meta.sport_slug || (meta.view !== "results" && !meta.export_id)) throw new Error("_META thiếu tenant, môn hoặc export_id");
   const sheets = allowedSheetMap(meta.sport_slug);
   const allowedNames = new Set(["HƯỚNG_DẪN", "_META", "_LOOKUP", ...sheets.keys()]);
   for (const sheet of workbook.worksheets) if (!allowedNames.has(sheet.name)) throw new Error(`Sheet không được phép: ${sheet.name}`);
@@ -392,6 +408,10 @@ export function buildOperations(parsed: ParsedSportWorkbook, snapshot: SportExce
       if (row.action === "ARCHIVE" && !current) throw new Error(`Chỉ dòng đã xuất mới được ARCHIVE: ${row.ref}`);
       if (row.action === "KEEP") continue;
       const data = { ...row.values };
+      if (table === "fixture_entries" && current && !sameValue(data.score, current.score) && sameValue(data.score_numeric, current.score_numeric)) {
+        const score = data.score === null || data.score === undefined || data.score === "" ? null : Number(data.score);
+        data.score_numeric = score === null || Number.isFinite(score) ? score : null;
+      }
       if (!current) fallbackEnglish(data);
       applyInsertDefaults(table, data);
       for (const column of tableDefinitions[table]) {

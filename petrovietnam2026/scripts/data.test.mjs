@@ -54,6 +54,7 @@ const updateWorkbookSeed = readFileSync(new URL("../../supabase/seeds/052_update
 const chessRosterSeed = readFileSync(new URL("../../supabase/seeds/025_chess_rosters.sql", import.meta.url), "utf8");
 const customerFeedbackMigration = readFileSync(new URL("../../supabase/migrations/20260904100000_repair_chess_swimming_customer_feedback.sql", import.meta.url), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
+const refreshDataButton = readFileSync(new URL("../src/components/refresh-data-button.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 
 test("database models source-driven competition slots", () => {
@@ -99,6 +100,12 @@ test("public bracket shows source rank labels without candidate predictions", ()
   assert.match(competitionBoard, /slotDisplayLabel/);
   assert.doesNotMatch(competitionBoard, /label\}\{candidateLabel && <small className="bracket-candidates">\{candidateLabel\}<\/small>\}/);
   assert.match(competitionBoard, /item\.candidateLabel \? `Có thể: \$\{item\.candidateLabel\}`/);
+});
+
+test("public pages refresh live competition data", () => {
+  assert.match(refreshDataButton, /setInterval/);
+  assert.match(refreshDataButton, /30000/);
+  assert.match(refreshDataButton, /router\.refresh\(\)/);
 });
 
 test("source topology covers every supplied category", () => {

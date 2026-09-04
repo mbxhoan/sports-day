@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarDays, ImageIcon, ListOrdered, LogIn, Menu, Trophy, X } from "lucide-react";
 import { copy, getSiteData, localized, type Locale, type SiteData } from "@/lib/site";
 import { LanguageSwitch } from "./language-switch";
+import { RefreshDataButton } from "./refresh-data-button";
 
 const nav = [
   ["home", "", Trophy],
@@ -24,6 +25,7 @@ export function Header({ locale }: { locale: Locale }) {
         {nav.map(([key, href]) => <Link key={key} href={`${prefix}${href}` || "/"}>{t[key]}</Link>)}
       </nav>
       <div className="header-actions">
+        <RefreshDataButton label={t.refreshData} />
         <LanguageSwitch locale={locale} />
         <Link className="login-link" href={`${prefix}/login`}><LogIn size={16} />{t.login}</Link>
         <details className="mobile-menu">
