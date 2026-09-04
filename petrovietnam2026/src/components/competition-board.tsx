@@ -158,7 +158,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const entryCell = (id: string) => {
     const entry = entriesById.get(id);
     const members = (membersByEntryId.get(id) ?? []).map((memberId) => participantsById.get(memberId)).filter(Boolean);
-    return <>{entryName(id)}{entry?.kind === "team" && members.length > 0 && <span className="entry-member-list">{members.join(" · ")}</span>}</>;
+    return <div className="entry-cell"><span className="entry-name">{entryName(id)}</span>{entry?.kind === "team" && members.length > 0 && <span className="entry-member-list">{members.join(" · ")}</span>}</div>;
   };
   const slotDisplayLabel = (slot: FixtureSlot) => {
     const group = slot.source_group_id ? groups.find((item) => item.id === slot.source_group_id) : undefined;

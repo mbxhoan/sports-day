@@ -157,11 +157,15 @@ Trần Linh Vương'),
 Nguyễn Hoàng Anh
 Nguyễn Hữu Tuệ
 Nguyễn Văn Triệu'),
-  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','NCKHĐT','NCKHĐT','Nguyễn Văn Sử
+  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','NCKHĐT - 01','NCKHĐT','Nguyễn Văn Sử
 Phạm Hữu Tài
 Phan Ngọc Quốc
 Tạ Ngoc Thắng'),
-  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','Đội 2 - NCKHĐT','Đội 2 - NCKHĐT','Lê Dương Hải
+  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','Đội 2 - VSP','VSP','Nguyễn Văn Hưng
+Phạm Văn Thao
+Trịnh Thanh Hoàng
+Võ Xuân Tuấn'),
+  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','NCKHĐT - 02','NCKHĐT','Lê Dương Hải
 Lưu Đức Hà
 Nguyễn Lâm Quốc Cường
 Nguyễn Mạnh Hùng'),
@@ -173,7 +177,7 @@ Lê Viết Hưng'),
 Nguyễn Minh Nhật
 Phan Minh Tùng
 Phan Văn Thịnh'),
-  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','Đội 1 - PTSC','Đội 1 - PTSC','Đinh Hồng Phong
+  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','PTSC','PTSC','Đinh Hồng Phong
 Nguyễn Ngọc Lạp
 Nguyễn Văn Bằng
 Tô Mạnh Cường'),
@@ -181,10 +185,14 @@ Tô Mạnh Cường'),
 Lê Thanh Tiến
 Nguyễn Anh Dũng
 Nguyễn Hữu Tuấn'),
-  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','PV GAS','PV GAS','Đỗ Minh Xuân
+  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','PV GAS 1','PV GAS','Đỗ Minh Xuân
 Ngô Phương Bắc
 Trần Việt Dũng
 Vũ Mạnh Nhất'),
+  ('dien-kinh','4x100m-nam','2026-09-06 07:00:00+07',2,'team','PV GAS 2','PV GAS','Lê Tiến Dũng
+Ngô Văn Cường
+Nguyễn Hữu Thức
+Nguyễn Xuân Tùng'),
   ('dien-kinh','4x100m-nu','2026-09-06 07:00:00+07',4,'team','PVD','PVD','Nguyễn Thị Hồng Thúy
 Nguyễn Thị Thìn
 Vũ Thị Huệ

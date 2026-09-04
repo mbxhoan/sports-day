@@ -1500,7 +1500,8 @@ insert into seed_update_entries values
   ('dien-kinh','4x100m-nam','team','PETROSETCO','PETROSETCO',2,null),
   ('dien-kinh','4x100m-nam','team','PTSC','PTSC',2,null),
   ('dien-kinh','4x100m-nam','team','PV Drilling','PV DRILLING',2,null),
-  ('dien-kinh','4x100m-nam','team','PV GAS','PV GAS',4,null),
+  ('dien-kinh','4x100m-nam','team','PV GAS 1','PV GAS',4,null),
+  ('dien-kinh','4x100m-nam','team','PV GAS 2','PV GAS',5,null),
   ('dien-kinh','4x100m-nam','team','PVCFC','PVCFC',4,null),
   ('dien-kinh','4x100m-nam','team','PVEP','PVEP',3,null),
   ('dien-kinh','4x100m-nam','team','PVOIL','PVOIL',3,null),
@@ -2434,10 +2435,14 @@ insert into seed_update_members values
   ('dien-kinh','4x100m-nam','PV Drilling','Lê Thanh Tiến',2),
   ('dien-kinh','4x100m-nam','PV Drilling','Nguyễn Anh Dũng',3),
   ('dien-kinh','4x100m-nam','PV Drilling','Nguyễn Hữu Tuấn',4),
-  ('dien-kinh','4x100m-nam','PV GAS','Lê Tiến Dũng',1),
-  ('dien-kinh','4x100m-nam','PV GAS','Ngô Văn Cường',2),
-  ('dien-kinh','4x100m-nam','PV GAS','Nguyễn Hữu Thức',3),
-  ('dien-kinh','4x100m-nam','PV GAS','Nguyễn Xuân Tùng',4),
+  ('dien-kinh','4x100m-nam','PV GAS 1','Đỗ Minh Xuân',1),
+  ('dien-kinh','4x100m-nam','PV GAS 1','Ngô Phương Bắc',2),
+  ('dien-kinh','4x100m-nam','PV GAS 1','Trần Việt Dũng',3),
+  ('dien-kinh','4x100m-nam','PV GAS 1','Vũ Mạnh Nhất',4),
+  ('dien-kinh','4x100m-nam','PV GAS 2','Lê Tiến Dũng',1),
+  ('dien-kinh','4x100m-nam','PV GAS 2','Ngô Văn Cường',2),
+  ('dien-kinh','4x100m-nam','PV GAS 2','Nguyễn Hữu Thức',3),
+  ('dien-kinh','4x100m-nam','PV GAS 2','Nguyễn Xuân Tùng',4),
   ('dien-kinh','4x100m-nam','PVCFC','Đinh Hồng Em',1),
   ('dien-kinh','4x100m-nam','PVCFC','Nguyễn Đức Chính',2),
   ('dien-kinh','4x100m-nam','PVCFC','Phạm Hoàng Nam',3),
@@ -3147,6 +3152,27 @@ with duplicate_relay_members as (
 )
 delete from public.entry_members member
 using duplicate_relay_members duplicate
+where member.id = duplicate.id and duplicate.duplicate_rank > 1;
+
+-- Keep the reviewed men's 4×100m relay rosters unique after legacy imports.
+with duplicate_members as (
+  select member.id, row_number() over (
+    partition by member.entry_id, participant.full_name
+    order by member.archived_at nulls first, member.sort_order, member.id
+  ) as duplicate_rank
+  from public.entry_members member
+  join public.entries entry on entry.id = member.entry_id
+  join public.tournaments tournament on tournament.id = entry.tournament_id
+  join public.sports sport on sport.id = tournament.sport_id
+  join public.participants participant on participant.id = member.participant_id
+  where member.tenant_id = private.seed_tenant_id()
+    and sport.slug = 'dien-kinh'
+    and tournament.slug = '4x100m-nam'
+    and member.archived_at is null
+)
+update public.entry_members member
+set archived_at = now()
+from duplicate_members duplicate
 where member.id = duplicate.id and duplicate.duplicate_rank > 1;
 
 create temporary table seed_update_groups (sport_slug text, tournament_slug text, name_vi text, name_en text, sort_order integer) on commit drop;
@@ -4376,7 +4402,8 @@ insert into seed_update_race_entries values
   ('dien-kinh','4x100m-nam','PETROSETCO',2),
   ('dien-kinh','4x100m-nam','PTSC',2),
   ('dien-kinh','4x100m-nam','PV Drilling',2),
-  ('dien-kinh','4x100m-nam','PV GAS',4),
+  ('dien-kinh','4x100m-nam','PV GAS 1',4),
+  ('dien-kinh','4x100m-nam','PV GAS 2',5),
   ('dien-kinh','4x100m-nam','PVCFC',4),
   ('dien-kinh','4x100m-nam','PVEP',3),
   ('dien-kinh','4x100m-nam','PVOIL',3),
@@ -4649,3 +4676,25 @@ join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.see
 join public.admin_users admin on admin.tenant_id = s.tenant_id and admin.archived_at is null
 where admin.user_id = (select candidate.user_id from public.admin_users candidate where candidate.tenant_id = s.tenant_id and candidate.archived_at is null order by candidate.display_name limit 1)
 on conflict (id) do update set tenant_id = excluded.tenant_id, sport_id = excluded.sport_id, template_version = excluded.template_version, mode = excluded.mode, payload = excluded.payload, created_by = excluded.created_by, archived_at = null;
+
+-- Keep the reviewed women's 4×100m relay rosters unique after this seed runs.
+with duplicate_members as (
+  select member.id, row_number() over (
+    partition by member.entry_id, participant.full_name
+    order by member.archived_at nulls first, member.sort_order, member.id
+  ) as duplicate_rank
+  from public.entry_members member
+  join public.entries entry on entry.id = member.entry_id
+  join public.tournaments tournament on tournament.id = entry.tournament_id
+  join public.sports sport on sport.id = tournament.sport_id
+  join public.participants participant on participant.id = member.participant_id
+  where member.tenant_id = private.seed_tenant_id()
+    and sport.slug = 'dien-kinh'
+    and tournament.slug = '4x100m-nu'
+    and entry.name_vi in ('PVD', 'PVFCCo', 'PVG')
+    and member.archived_at is null
+)
+update public.entry_members member
+set archived_at = now()
+from duplicate_members duplicate
+where member.id = duplicate.id and duplicate.duplicate_rank > 1;
