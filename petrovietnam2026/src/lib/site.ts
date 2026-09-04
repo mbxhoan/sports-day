@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { unstable_noStore as noStore } from "next/cache.js";
 import { cache } from "react";
 import { tenantHeaders, tenantSlug } from "./tenant.ts";
 
@@ -203,15 +204,16 @@ const fallback: SiteData = {
 };
 
 export const getSiteData = cache(async function getSiteData(): Promise<SiteData> {
+  noStore();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key || !tenantSlug) return fallback;
 
-  const db = createClient(url, key, { auth: { persistSession: false }, global: { headers: tenantHeaders() } });
+  const db = createClient(url, key, { auth: { persistSession: false }, global: { headers: tenantHeaders(), fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) } });
   const { data: tenant, error: tenantError } = await db.from("tenants").select("id").eq("slug", tenantSlug).maybeSingle();
   if (tenantError || !tenant) return fallback;
   const tenantId = tenant.id;
-  const [event, sports, tournamentsResult, organizations, participants, teamParticipants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
+  const [event, sports, tournamentsResult, organizations, participants, teamParticipants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
@@ -225,7 +227,6 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     db.from("venues").select("id,name_vi,name_en,address_vi,address_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("courts").select("id,venue_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("fixtures").select("id,tournament_id,group_id,venue_id,court_id,starts_at,ends_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id,source_code").eq("tenant_id", tenantId).is("archived_at", null).order("starts_at"),
-    db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,seed_order,score,score_numeric,rank,result_status").eq("tenant_id", tenantId).is("archived_at", null).order("seed_order"),
     db.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en").eq("tenant_id", tenantId).is("archived_at", null),
     db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,score_for,score_against,points,rank").eq("tenant_id", tenantId).is("archived_at", null).order("rank"),
     db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
@@ -233,6 +234,14 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("footer_links").select("id,label_vi,label_en,href,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
   ]);
+
+  const fixtureEntryRows: FixtureEntry[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const page = await db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,seed_order,score,score_numeric,rank,result_status").eq("tenant_id", tenantId).is("archived_at", null).order("seed_order").range(offset, offset + 999);
+    if (page.error) return fallback;
+    fixtureEntryRows.push(...(page.data as FixtureEntry[] ?? []));
+    if ((page.data?.length ?? 0) < 1000) break;
+  }
 
   if (event.error || sports.error || tournamentsResult.error || fixtures.error || !event.data) return fallback;
   return {
@@ -256,7 +265,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     venues: (venues.data ?? []) as Venue[],
     courts: (courts.data ?? []) as Court[],
     fixtures: fixtures.data as Fixture[],
-    fixtureEntries: (fixtureEntries.data ?? []) as FixtureEntry[],
+    fixtureEntries: fixtureEntryRows,
     fixtureSlots: (fixtureSlots.data ?? []) as FixtureSlot[],
     standings: (standings.data ?? []) as Standing[],
     awards: (awards.data ?? []) as Award[],

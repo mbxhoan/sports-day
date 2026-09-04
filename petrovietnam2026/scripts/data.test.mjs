@@ -106,6 +106,10 @@ test("public pages refresh live competition data", () => {
   assert.match(refreshDataButton, /setInterval/);
   assert.match(refreshDataButton, /30000/);
   assert.match(refreshDataButton, /router\.refresh\(\)/);
+  assert.match(siteLib, /unstable_noStore as noStore/);
+  assert.match(siteLib, /noStore\(\)/);
+  assert.match(siteLib, /cache: "no-store"/);
+  assert.match(siteLib, /\.range\(offset, offset \+ 999\)/);
 });
 
 test("source topology covers every supplied category", () => {

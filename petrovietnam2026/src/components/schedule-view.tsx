@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { CalendarDays, Clock3, GitBranch, MapPin, Printer } from "lucide-react";
-import { fixtureSides, groupBy } from "@/lib/brackets";
+import { fixtureSides, groupBy, resolveMatchEntry } from "@/lib/brackets";
 import { formatMatchResult, normalizeLegacyMatchResult } from "@/lib/competition-display";
 import { copy, localized, type Court, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Sport, type Standing, type Tournament, type Venue } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
@@ -109,6 +109,19 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
     const score = item.score || (item.score_numeric == null ? "" : String(item.score_numeric));
     return entry ? `${localized(entry, "name", locale)}${score ? ` (${score})` : ""}` : "";
   }).filter(Boolean).join(" — ");
+  const resolvedMatchNames = (fixture: Fixture) => {
+    const rows = fixtureSides(fixtureEntriesById.get(fixture.id) ?? []);
+    const slots = fixtureSlots.filter((slot) => slot.fixture_id === fixture.id);
+    if (!slots.length) return matchNames(fixture);
+    return (['home', 'away'] as const).map((side, index) => {
+      const slot = slots.find((item) => item.side === side);
+      const entry = resolveMatchEntry(slot, rows[index], { entries, standings, fixtures, fixtureEntries }, true);
+      if (!entry) return "";
+      const row = rows.find((item) => item?.entry_id === entry.id);
+      const score = row?.score || (row?.score_numeric == null ? "" : String(row.score_numeric));
+      return `${localized(entry, "name", locale)}${score ? ` (${score})` : ""}`;
+    }).filter(Boolean).join(" — ");
+  };
 
   return <>
     <div className="schedule-toolbar no-print">
@@ -131,7 +144,7 @@ export function ScheduleView({ locale, sports, tournaments, entries, groups = []
         const result = localized(fixture, "result_summary", locale);
         const score = matchScores(fixture);
         const resultLabel = matchResult(fixture, result);
-        const teams = matchNames(fixture);
+        const teams = resolvedMatchNames(fixture);
         return <tr key={fixture.id}><td><time className="schedule-time"><Clock3 size={14}/>{timeLabel(fixture.starts_at, locale)}</time></td><td>{sport ? localized(sport, "name", locale) : "—"}</td><td>{tournament ? localized(tournament, "name", locale) : "—"}</td><td className="schedule-match"><b>{teams || t.teamsNotAssigned}</b>{group ? <small>{localized(group, "name", locale)}</small> : !teams && <small>{t.teamsNotAssigned}</small>}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td className="schedule-venue">{venue ? <><b><MapPin size={13}/>{localized(venue, "name", locale)}</b><small>{localized(venue, "address", locale)}</small></> : defaultVenue || "—"}</td><td>{court ? localized(court, "name", locale) : "—"}</td><td><span className={`status ${fixture.status}`}>{resultLabel || result || score || statusText(fixture.status)}</span></td></tr>;
       })}</tbody></table></div>
     </section>)}</div> : <section className="panel empty-state"><CalendarDays/><h2>{t.empty}</h2></section>}
