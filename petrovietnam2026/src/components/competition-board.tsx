@@ -232,11 +232,9 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     const tournamentFixtures = fixturesByTournament.get(tournament.id) ?? [];
     const tournamentGroups = groupsByTournament.get(tournament.id) ?? [];
     const knockout = tournamentFixtures.filter((fixture) => fixture.round_order !== null && fixture.bracket_position !== null);
-    const warnings = tournament.source_metadata?.warnings ?? [];
     const isBracket = tournament.competition_mode === "knockout" || tournament.competition_mode === "group_knockout";
     return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id} style={{ contentVisibility: "auto", containIntrinsicSize: "0 560px" }}>
       <header className="board-heading"><div><h2>{localized(tournament, "name", locale)}</h2>{sourceNote(tournament, locale)}</div><span>{localized(tournament, "format", locale)}</span></header>
-      {warnings.map((warning) => <p className="board-warning" key={warning}>⚠ {warning}</p>)}
       {isBracket && knockout.length > 0 && (() => {
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
         const layout = layoutBracket(knockout, slots, resultAction ? 166 : 84, resultAction ? undefined : 100);

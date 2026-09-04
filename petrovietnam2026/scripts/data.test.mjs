@@ -53,6 +53,7 @@ const sportExcelMigration = readFileSync(new URL("migrations/20260831120000_spor
 const updateWorkbookSeed = readFileSync(new URL("../../supabase/seeds/052_updates_workbooks.sql", import.meta.url), "utf8");
 const chessRosterSeed = readFileSync(new URL("../../supabase/seeds/025_chess_rosters.sql", import.meta.url), "utf8");
 const customerFeedbackMigration = readFileSync(new URL("../../supabase/migrations/20260904100000_repair_chess_swimming_customer_feedback.sql", import.meta.url), "utf8");
+const relayRepairMigration = readFileSync(new URL("../../supabase/migrations/20260904230000_retry_athletics_relay_repairs.sql", import.meta.url), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 const refreshDataButton = readFileSync(new URL("../src/components/refresh-data-button.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
@@ -745,6 +746,13 @@ test("PDF individual seed keeps source-explicit swimming and athletics rosters",
   assert.doesNotMatch(individualSportsSeed, /p\.full_name = names\.full_name/);
   assert.doesNotMatch(individualSportsSeed, /e\.name_vi = r\.entry_name/);
   assert.doesNotMatch(individualSportsSeed, /insert into public\.fixture_entries/);
+});
+
+test("relay repair migration pins the tenant and splits reviewed teams", () => {
+  assert.match(relayRepairMigration, /set app\.tenant_slug = 'petrovietnam2026';/);
+  assert.match(relayRepairMigration, /'PV GAS 1'/);
+  assert.match(relayRepairMigration, /'PV GAS 2'/);
+  assert.match(relayRepairMigration, /desired_womens_relay_members/);
 });
 
 test("workbook source manifest covers every supplied XLSX", () => {
