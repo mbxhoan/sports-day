@@ -23,7 +23,7 @@ insert into seed_pair_sports values
   ('bong-ban','doi-nam-31-40','Bảng A',5,'Bùi Văn Thiện / Nguyễn Quốc Hưng-PVG','PVG','Bùi Văn Thiện','Nguyễn Quốc Hưng',5),
   ('bong-ban','doi-nam-31-40','Bảng B',2,'Trần Huy Bảo / Võ Văn Lung-PVFCCo','PVFCCo','Trần Huy Bảo','Võ Văn Lung',6),
   ('bong-ban','doi-nam-31-40','Bảng B',2,'Phạm Dương Ngọc Lợi / Trần Quốc Bình-PET','PET','Phạm Dương Ngọc Lợi','Trần Quốc Bình',6),
-  ('bong-ban','doi-nam-31-40','Bảng B',2,'Phan Ngọc Lai/ Nguyễn V Vinh- PVTRANS','PVTRANS',null,null,6),
+  ('bong-ban','doi-nam-31-40','Bảng B',2,'Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','PVTRANS',null,null,6),
   ('bong-ban','doi-nam-31-40','Bảng B',2,'Nguyễn Trọng Vĩnh / Trần Nhựt Duy-PVG','PVG','Nguyễn Trọng Vĩnh','Trần Nhựt Duy',6),
   ('bong-ban','doi-nam-31-40','Bảng B',2,'Phạm Đức Thư / Trần Việt Dũng-PTSC','PTSC','Phạm Đức Thư','Trần Việt Dũng',6),
   ('bong-ban','doi-nam-31-40','Bảng B',2,'Đặng Đình Phúc / Lê Anh Thoại-VSP','VSP','Đặng Đình Phúc','Lê Anh Thoại',6),
