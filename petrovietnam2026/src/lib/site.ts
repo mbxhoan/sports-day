@@ -106,6 +106,62 @@ export type SiteData = {
   counts: { sports: number; organizations: number; participants: number; fixtures: number };
 };
 
+const organizationCatalog: Array<Pick<Organization, "code" | "name_vi" | "name_en" | "sort_order">> = [
+  ["BMĐH", "CĐ Bộ máy Điều hành Tập đoàn Công nghiệp Năng lượng Quốc gia VN", "Petrovietnam Executive Board"],
+  ["PVEP", "CĐ Tổng công ty Thăm Dò Khai thác Dầu khí", "Petrovietnam Exploration Production Corporation"],
+  ["PVPOWER", "CĐ Tổng Công ty Điện lực Dầu khí VN", "Petrovietnam Power Corporation"],
+  ["PVCOMBANK", "CĐ Ngân hàng TMCP Đại chúng Việt Nam", "Vietnam Public Joint Stock Commercial Bank"],
+  ["PVCHEM", "CĐ TCT Hóa chất và Dịch vụ Dầu khí", "Petrovietnam Chemical and Services Corporation"],
+  ["PETROCONs", "CĐ TCT Cổ phần Xây lắp Dầu khí Việt Nam", "Petrovietnam Construction Joint Stock Corporation"],
+  ["PVI", "CĐ Công ty Cổ phần PVI", "PVI Corporation"],
+  ["NCKH&ĐT", "CĐ Nghiên cứu Khoa học và Đào tạo", "Petrovietnam Research and Training"],
+  ["PTSC", "CĐ Tổng công ty CP Dịch vụ kỹ thuật Dầu khí", "Petrovietnam Technical Services Corporation"],
+  ["PVOIL", "CĐ Tổng Công ty Dầu Việt Nam", "Vietnam Oil Corporation"],
+  ["PVGAS", "CĐ Tổng công ty Khí Việt Nam", "Petrovietnam Gas Corporation"],
+  ["PVFCCo", "CĐ TCty Phân bón & Hóa chất Dầu khí", "Petrovietnam Fertilizer and Chemicals Corporation"],
+  ["PETROSETCO", "CĐ TCT CP Dịch vụ Tổng hợp DKVN", "Petrovietnam General Services Corporation"],
+  ["PVD", "CĐ TCT CP Khoan & Dịch vụ Khoan DK", "Petrovietnam Drilling and Well Services Corporation"],
+  ["PVTRANS", "CĐ TCT CP Vận Tải Dầu khí", "Petrovietnam Transportation Corporation"],
+  ["VSP", "CĐ Liên doanh Việt – Nga VIETSOVPETRO", "Vietsovpetro Joint Venture"],
+  ["PVMR", "CĐ CT Bảo dưỡng-sửa chữa công trình Dầu khí", "Petrovietnam Maintenance and Repair Corporation"],
+  ["PVCFC", "CĐ Tổng Công ty Phân bón Dầu khí Cà Mau", "Petrovietnam Ca Mau Fertilizer Corporation"],
+  ["BĐPOC", "CĐ Công ty Điều hành Dầu khí Biển Đông", "Bien Dong Petroleum Operating Company"],
+  ["SWPOC", "CĐ Công ty Điều hành Đường ống Tây Nam", "Southwest Pipeline Operating Company"],
+  ["PQPOC", "CĐ Công ty Điều hành Dầu khí Phú Quốc", "Phu Quoc Petroleum Operating Company"],
+  ["PVPMP", "CĐ Ban QLDA chuyên ngành Điện", "Power Projects Management Board"],
+  ["LP1PP", "CĐ Ban QLDA Điện lực Dầu khí Long Phú 1", "Long Phu 1 Power Project Management Board"],
+  ["PVE", "CĐ TCT Tư vấn Thiết kế Dầu khí", "Petrovietnam Design and Consulting Joint Stock Corporation"],
+].map(([code, name_vi, name_en], sort_order) => ({ code, name_vi, name_en, sort_order: sort_order + 1 }));
+
+const organizationAliases: Record<string, string> = {
+  "PV DRILLING": "PVD", "PV Drilling": "PVD", "PV GAS": "PVGAS", PVPMB: "PVPMP",
+  PVFCCO: "PVFCCo", PCFCCo: "PVFCCo", PCFCCCo: "PVFCCo", NCKHĐT: "NCKH&ĐT", NCKH: "NCKH&ĐT",
+  "Đội 2 - NCKHĐT": "NCKH&ĐT", PETOCONs: "PETROCONs", PTROCONs: "PETROCONs", PETRCONs: "PETROCONs",
+  PVCCHEM: "PVCHEM", PVChem: "PVCHEM", "PV CHEM": "PVCHEM", "PV POWER": "PVPOWER", POWER: "PVPOWER",
+  PVG: "PVGAS", PVFC: "PVCFC", PVMB: "PVPMP", PVMP: "PVPMP", "MNĐH PETRO": "BMĐH",
+  "BMĐH PETROVIETNAM": "BMĐH", "BỘ MÁY QL&ĐH PETROVN": "BMĐH", PVTANS: "PVTRANS", PVTRAN: "PVTRANS",
+  PVTRAS: "PVTRANS", PCTRANS: "PVTRANS", PCOIL: "PVOIL", "PVI HOLDINGS": "PVI", PET: "PETROSETCO",
+  Vietsovpetro: "VSP",
+};
+
+function canonicalOrganizationCode(code: string) {
+  return organizationAliases[code] ?? code;
+}
+
+function normalizeOrganizations(source: Organization[]) {
+  const grouped = new Map<string, Organization[]>();
+  for (const organization of source) {
+    const code = canonicalOrganizationCode(organization.code);
+    if (organizationCatalog.some((item) => item.code === code)) grouped.set(code, [...(grouped.get(code) ?? []), organization]);
+  }
+  return organizationCatalog.map((item) => {
+    const matches = grouped.get(item.code) ?? [];
+    const primary = matches.find((organization) => organization.code === item.code) ?? matches[0];
+    const values = (field: "gold_medals" | "silver_medals" | "bronze_medals") => matches.some((organization) => organization[field] !== undefined) ? matches.reduce((sum, organization) => sum + Number(organization[field] ?? 0), 0) : undefined;
+    return { id: primary?.id ?? `canonical-${item.code}`, ...item, logo_path: primary?.logo_path ?? null, leaderboard_rank: matches.map((organization) => organization.leaderboard_rank).filter((rank): rank is number => rank != null).sort((a, b) => a - b)[0] ?? null, gold_medals: values("gold_medals"), silver_medals: values("silver_medals"), bronze_medals: values("bronze_medals") };
+  });
+}
+
 export const copy = {
   vi: {
     home: "Trang chủ", leaderboard: "Bảng xếp hạng", gallery: "Thư viện ảnh", sports: "Môn thể thao", schedule: "Lịch thi đấu", login: "Đăng nhập",
@@ -116,7 +172,7 @@ export const copy = {
     description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
     filterSport: "Tất cả môn", filterCategory: "Tất cả hạng mục", filterStatus: "Tất cả trạng thái", calendar: "Theo lịch", byTeam: "Theo đội", board: "Bảng đấu", print: "Xuất PDF", scheduled: "Sắp diễn ra", live: "Đang diễn ra", completed: "Đã kết thúc", postponed: "Tạm hoãn", cancelled: "Đã huỷ",
-    organization: "Đơn vị", members: "Thành viên", group: "Bảng", rank: "Hạng", played: "Trận", wins: "Thắng", draws: "Hòa", losses: "Thua", points: "Điểm", total: "Tổng", medals: "huy chương", athlete: "VĐV", lane: "Làn", performance: "Thành tích", status: "Trạng thái", openDrive: "Mở thư mục Google Drive", searchLabel: "Tìm nhanh", searchPlaceholder: "Nhập tên VĐV, đội hoặc trận đấu...",
+    organization: "Đơn vị", abbreviation: "Viết tắt", members: "Thành viên", group: "Bảng", rank: "Hạng", played: "Trận", wins: "Thắng", draws: "Hòa", losses: "Thua", points: "Điểm", total: "Tổng", medals: "huy chương", athlete: "VĐV", lane: "Làn", performance: "Thành tích", status: "Trạng thái", openDrive: "Mở thư mục Google Drive", searchLabel: "Tìm nhanh", searchPlaceholder: "Nhập tên VĐV, đội hoặc trận đấu...",
     venue: "Địa điểm", court: "Sân / làn", time: "Giờ", match: "Trận đấu", round: "Vòng", result: "Kết quả", refreshData: "Cập nhật dữ liệu",
   },
   en: {
@@ -128,7 +184,7 @@ export const copy = {
     description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
     filterSport: "All sports", filterCategory: "All categories", filterStatus: "All statuses", calendar: "Calendar", byTeam: "By team", board: "Competition board", print: "Export PDF", scheduled: "Scheduled", live: "Live", completed: "Completed", postponed: "Postponed", cancelled: "Cancelled",
-    organization: "Organization", members: "Members", group: "Group", rank: "Rank", played: "Played", wins: "Wins", draws: "Draws", losses: "Losses", points: "Points", total: "Total", medals: "medals", athlete: "Athlete", lane: "Lane", performance: "Performance", status: "Status", openDrive: "Open Google Drive folder", searchLabel: "Quick search", searchPlaceholder: "Search athlete, team or match...",
+    organization: "Organization", abbreviation: "Short name", members: "Members", group: "Group", rank: "Rank", played: "Played", wins: "Wins", draws: "Draws", losses: "Losses", points: "Points", total: "Total", medals: "medals", athlete: "Athlete", lane: "Lane", performance: "Performance", status: "Status", openDrive: "Open Google Drive folder", searchLabel: "Quick search", searchPlaceholder: "Search athlete, team or match...",
     venue: "Venue", court: "Court / lane", time: "Time", match: "Match", round: "Round", result: "Result", refreshData: "Refresh data",
   },
 } as const;
@@ -184,7 +240,7 @@ const fallback: SiteData = {
   },
   sports: sportRows,
   tournaments,
-  organizations: [],
+  organizations: normalizeOrganizations([]),
   participants: [],
   entries: [],
   entryMembers: [],
@@ -200,7 +256,7 @@ const fallback: SiteData = {
   media: [],
   contacts: [],
   footerLinks: [],
-  counts: { sports: 8, organizations: 21, participants: 0, fixtures: 10 },
+  counts: { sports: 8, organizations: 24, participants: 0, fixtures: 10 },
 };
 
 export const getSiteData = cache(async function getSiteData(): Promise<SiteData> {
@@ -244,6 +300,10 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   }
 
   if (event.error || sports.error || tournamentsResult.error || fixtures.error || !event.data) return fallback;
+  const rawOrganizations = (organizations.data ?? []) as Organization[];
+  const normalizedOrganizations = normalizeOrganizations(rawOrganizations);
+  const organizationIds = new Map(rawOrganizations.map((organization) => [organization.id, normalizedOrganizations.find((item) => item.code === canonicalOrganizationCode(organization.code))?.id]));
+  const normalizeOrganizationId = (organizationId: string | null) => organizationId ? organizationIds.get(organizationId) ?? organizationId : null;
   return {
     event: event.data,
     sports: (sports.data as Sport[]).map((sport) => {
@@ -256,9 +316,9 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
       };
     }),
     tournaments: tournamentsResult.data as Tournament[],
-    organizations: (organizations.data ?? []) as Organization[],
-    participants: [...new Map([...participants.data ?? [], ...teamParticipants.data ?? []].map((participant) => [participant.id, participant])).values()] as Participant[],
-    entries: (entries.data ?? []) as Entry[],
+    organizations: normalizedOrganizations,
+    participants: [...new Map([...participants.data ?? [], ...teamParticipants.data ?? []].map((participant) => [participant.id, { ...participant, organization_id: normalizeOrganizationId(participant.organization_id) }])).values()] as Participant[],
+    entries: (entries.data ?? []).map((entry) => ({ ...entry, organization_id: normalizeOrganizationId(entry.organization_id) })) as Entry[],
     entryMembers: (entryMembers.data ?? []) as EntryMember[],
     groups: (groups.data ?? []) as Group[],
     groupEntries: (groupEntries.data ?? []) as GroupEntry[],
@@ -268,13 +328,13 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     fixtureEntries: fixtureEntryRows,
     fixtureSlots: (fixtureSlots.data ?? []) as FixtureSlot[],
     standings: (standings.data ?? []) as Standing[],
-    awards: (awards.data ?? []) as Award[],
+    awards: (awards.data ?? []).map((award) => ({ ...award, organization_id: normalizeOrganizationId(award.organization_id) })) as Award[],
     media: ((media.data ?? []) as Omit<Media, "public_url">[]).map((item) => ({ ...item, public_url: db.storage.from("event-media").getPublicUrl(item.storage_path).data.publicUrl })),
     contacts: (contacts.data ?? []) as Contact[],
     footerLinks: (footerLinks.data ?? []) as FooterLink[],
     counts: {
       sports: sports.data.length,
-      organizations: organizations.data?.length ?? 0,
+      organizations: normalizedOrganizations.length,
       participants: new Set([...(participants.data ?? []), ...(teamParticipants.data ?? [])].map((participant) => participant.id)).size,
       fixtures: fixtures.data.length,
     },

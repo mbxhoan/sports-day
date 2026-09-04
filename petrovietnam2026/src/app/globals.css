@@ -186,6 +186,7 @@ tbody tr:last-child td { border: 0; }
 .podium div.first { height: 145px; }
 .podium div > span { font-size: 28px; }
 .podium b { display: block; color: #fff; font-size: 12px; }
+.podium em { color: #bcecf3; font-size: 10px; font-style: normal; }
 .podium small { color: var(--primary); }
 .table-title { margin: 0 !important; padding: 17px 18px; border-bottom: 1px solid var(--border); }
 .bracket-scroll { overflow-x: auto; }
@@ -659,10 +660,11 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .schedule-day td:nth-child(8)::before { content: "Trạng thái"; }
   .leaderboard-table td:nth-child(1)::before { content: "#"; }
   .leaderboard-table td:nth-child(2)::before { content: "Đơn vị"; }
-  .leaderboard-table td:nth-child(3)::before { content: "Vàng"; }
-  .leaderboard-table td:nth-child(4)::before { content: "Bạc"; }
-  .leaderboard-table td:nth-child(5)::before { content: "Đồng"; }
-  .leaderboard-table td:nth-child(6)::before { content: "Tổng"; }
+  .leaderboard-table td:nth-child(3)::before { content: "Viết tắt"; }
+  .leaderboard-table td:nth-child(4)::before { content: "Vàng"; }
+  .leaderboard-table td:nth-child(5)::before { content: "Bạc"; }
+  .leaderboard-table td:nth-child(6)::before { content: "Đồng"; }
+  .leaderboard-table td:nth-child(7)::before { content: "Tổng"; }
   .group-grid td:nth-child(1)::before { content: "#"; }
   .group-grid td:nth-child(2)::before { content: "Đội / VĐV"; }
   .group-grid td:nth-child(3)::before { content: "P"; }
