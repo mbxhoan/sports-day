@@ -39,7 +39,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
     [Trophy, data.counts.sports, t.sportCount],
     [CalendarDays, dayCount, t.dayCount],
     [Medal, data.counts.organizations, t.unitCount],
-    [Users, data.counts.participants, t.athleteCount],
+    [Users, 1500, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale}>
     {(data.event.hero_path || data.event.hero_mobile_path) && <section className="hero">{data.event.hero_path && <Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" />}{data.event.hero_mobile_path && <Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" />}</section>}
@@ -82,7 +82,7 @@ export async function LeaderboardPage({ locale }: { locale: Locale }) {
   const rows = rankOrganizations(data.awards, data.organizations, data.entries, data.participants);
   const podium = [rows[1], rows[0], rows[2]];
   return <SiteShell locale={locale}><div className="container page-container"><PageTitle emoji="🏆" title={t.leaderboard}/>{rows.length ? <>
-    <section className="leaderboard podium panel">{podium.map((row, index) => row ? <div className={index === 1 ? "first" : ""} key={row.organization.id}><span>{index === 0 ? "🥈" : index === 1 ? "🥇" : "🥉"}</span><b>{localized(row.organization, "name", locale)}</b><em>{row.organization.code}</em><small>{row.total} {t.medals}</small></div> : <div className={index === 1 ? "first" : ""} key={index}/>)}</section>
+    <section className="leaderboard podium panel">{podium.map((row, index) => row ? <div className={index === 1 ? "first" : ""} key={row.organization.id}><span>{index === 0 ? "🥈" : index === 1 ? "🥇" : "🥉"}</span><b>{row.organization.code}</b><small>{row.total} {t.medals}</small></div> : <div className={index === 1 ? "first" : ""} key={index}/>)}</section>
     <section className="panel table-scroll"><table className="leaderboard-table"><thead><tr><th>#</th><th>{t.organization}</th><th>{t.abbreviation}</th><th>🥇</th><th>🥈</th><th>🥉</th><th>{t.total}</th></tr></thead><tbody>{rows.map((row, index) => <tr key={row.organization.id}><td>{index + 1}</td><td>{localized(row.organization, "name", locale)}</td><td><b>{row.organization.code}</b></td><td>{row.gold}</td><td>{row.silver}</td><td>{row.bronze}</td><td><b>{row.total}</b></td></tr>)}</tbody></table></section>
   </> : <section className="panel empty-state"><Medal/><h2>{t.leaderboardEmpty}</h2></section>}</div></SiteShell>;
 }
