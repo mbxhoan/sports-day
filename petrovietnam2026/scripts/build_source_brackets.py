@@ -51,6 +51,69 @@ DIRECT_BRACKETS = [
     dict(sport="cau-long", slug="doi-nam-nu-duoi-30", file="CẦU LÔNG/CẦU LÔNG PN 2026.pdf", page=6),
 ]
 
+EXPLICIT_BRACKETS = [
+    {
+        "sport_slug": "pickleball",
+        "tournament_slug": "doi-nu-duoi-30",
+        "competition_mode": "group_knockout",
+        "source": {
+            "file": "updates/PICKLEBALL EXCEL/ĐÔI NỮ/ĐÔI NỮ DƯỚI 30 TUỔI.xlsx",
+            "page_or_sheet": 1,
+            "warnings": ["Sơ đồ loại trực tiếp được đối chiếu từ workbook cập nhật; ba bảng vòng loại giữ nguyên dữ liệu nguồn."],
+        },
+        "fixtures": [
+            {
+                "key": "match-1", "source_code": "1", "round_order": 1, "bracket_position": 1,
+                "round_vi": "Tứ kết", "round_en": "Quarterfinal",
+                "slots": [
+                    {"side": "home", "kind": "group_rank", "group": "Bảng C", "rank": 2, "label_vi": "Nhì C", "label_en": "2nd C"},
+                    {"side": "away", "kind": "group_rank", "group": "Bảng B", "rank": 1, "label_vi": "Nhất B", "label_en": "1st B"},
+                ],
+            },
+            {
+                "key": "match-2", "source_code": "2", "round_order": 1, "bracket_position": 2,
+                "round_vi": "Tứ kết", "round_en": "Quarterfinal",
+                "slots": [
+                    {"side": "home", "kind": "group_rank", "group": "Bảng A", "rank": 2, "label_vi": "Nhì A", "label_en": "2nd A"},
+                    {"side": "away", "kind": "group_rank", "group": "Bảng B", "rank": 2, "label_vi": "Nhì B", "label_en": "2nd B"},
+                ],
+            },
+            {
+                "key": "match-3", "source_code": "3", "round_order": 2, "bracket_position": 1,
+                "round_vi": "Bán kết", "round_en": "Semifinal",
+                "slots": [
+                    {"side": "home", "kind": "group_rank", "group": "Bảng A", "rank": 1, "label_vi": "Nhất A", "label_en": "1st A"},
+                    {"side": "away", "kind": "fixture_winner", "fixture": "match-1", "label_vi": "Thắng 1", "label_en": "Winner 1"},
+                ],
+            },
+            {
+                "key": "match-4", "source_code": "4", "round_order": 2, "bracket_position": 2,
+                "round_vi": "Bán kết", "round_en": "Semifinal",
+                "slots": [
+                    {"side": "home", "kind": "fixture_winner", "fixture": "match-2", "label_vi": "Thắng 2", "label_en": "Winner 2"},
+                    {"side": "away", "kind": "group_rank", "group": "Bảng C", "rank": 1, "label_vi": "Nhất C", "label_en": "1st C"},
+                ],
+            },
+            {
+                "key": "match-5", "source_code": "CK", "round_order": 3, "bracket_position": 1,
+                "round_vi": "Chung kết", "round_en": "Final",
+                "slots": [
+                    {"side": "home", "kind": "fixture_winner", "fixture": "match-3", "label_vi": "Thắng 3", "label_en": "Winner 3"},
+                    {"side": "away", "kind": "fixture_winner", "fixture": "match-4", "label_vi": "Thắng 4", "label_en": "Winner 4"},
+                ],
+            },
+            {
+                "key": "match-h3", "source_code": "H3", "round_order": 3, "bracket_position": 2,
+                "round_vi": "Tranh hạng ba", "round_en": "Bronze medal match",
+                "slots": [
+                    {"side": "home", "kind": "fixture_loser", "fixture": "match-3", "label_vi": "Thua bán kết 1", "label_en": "Loser semifinal 1"},
+                    {"side": "away", "kind": "fixture_loser", "fixture": "match-4", "label_vi": "Thua bán kết 2", "label_en": "Loser semifinal 2"},
+                ],
+            },
+        ],
+    },
+]
+
 TUG = {
     "nu": "PVCHEM|VSP|PVI|NCKH|PVOIL|PVMR|PVTRANS|PTSC|PVCOMBANK|PETROCONs|PVPMB|PETROSETCO".split("|"),
     "nam": "PVFCCo|PTSC|PVGAS|PVOIL|PVPMB|PVMR|PVCHEM|PVI|PETROSETCO|PCTRANS|PVD|SWPOC|NCKH|PVCOMBANK|PQPOC|BỘ MÁY QL&ĐH PETROVN|VSP".split("|"),
@@ -270,6 +333,7 @@ def extract_manifest() -> dict:
         warnings = ["Tiêu đề PDF ghi năm 2027; giữ nội dung theo bộ hồ sơ Hội thao 2026."] if sport == "dien-kinh" and slug == "400m-nu" else []
         tournaments.append({"sport_slug": sport, "tournament_slug": slug, "competition_mode": mode, "source": source(file, page, warnings), "fixtures": []})
 
+    tournaments.extend(EXPLICIT_BRACKETS)
     tournaments.sort(key=lambda row: (row["sport_slug"], row["tournament_slug"]))
     return {"version": 1, "tournaments": tournaments}
 
@@ -288,9 +352,9 @@ def validate_manifest(data: dict) -> None:
         source_data = tournament.get("source", {})
         if not source_data.get("file") or not isinstance(source_data.get("page_or_sheet"), int) or source_data["page_or_sheet"] < 1:
             raise ValueError(f"invalid source: {key}")
-        if not (ASSET_DIR / source_data["file"]).is_file():
+        if not (ASSET_DIR / source_data["file"]).is_file() and not (ROOT / "assets" / source_data["file"]).is_file():
             raise ValueError(f"missing source asset: {source_data['file']}")
-        if source_data.get("supporting_file") and not (ASSET_DIR / source_data["supporting_file"]).is_file():
+        if source_data.get("supporting_file") and not (ASSET_DIR / source_data["supporting_file"]).is_file() and not (ROOT / "assets" / source_data["supporting_file"]).is_file():
             raise ValueError(f"missing supporting asset: {source_data['supporting_file']}")
 
         fixtures = tournament.get("fixtures", [])

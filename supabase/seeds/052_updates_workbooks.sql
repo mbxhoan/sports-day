@@ -123,7 +123,7 @@ insert into seed_update_participants values
   ('Châu Khiếu Minh','NCKHĐT'),
   ('Châu Pha Diễm','VSP'),
   ('Châu Thanh Lễ','SWPOC'),
-  ('Chu Ðình Quang Vinh','PTSC'),
+  ('Chu Đình Quang Vinh','PTSC'),
   ('Chu Mạnh Hùng','PVEP'),
   ('Chu Minh Hòa','SWPOC'),
   ('Chu Thị Hồng Vân','PVFCCO'),
@@ -131,7 +131,7 @@ insert into seed_update_participants values
   ('Chu Xuân Hải','PVFCCO'),
   ('Cù Xuân Huy','PVEP'),
   ('Đ+',null),
-  ('Ðái Quốc Triều','PVCFC'),
+  ('Đái Quốc Triều','PVCFC'),
   ('Đàm Thành Công','PVOIL'),
   ('Đặng Đình Phúc','VSP'),
   ('Đặng Hữu Huynh','PV GAS'),
@@ -203,7 +203,7 @@ insert into seed_update_participants values
   ('Đỗ Hữu Nguyên','VSP'),
   ('Đỗ Khắc Minh','PVEP'),
   ('Đỗ Minh Ngọc','PVI'),
-  ('Đỗ Ngọc',null),
+('Đỗ Ngọc Giang',null),
   ('Đỗ Ngọc Huân','PVCOMBANK'),
   ('Đỗ Ngọc Vĩnh','NCKHĐT'),
   ('Đỗ Nguyễn Hoài Thương','PVI'),
@@ -251,7 +251,6 @@ insert into seed_update_participants values
   ('Dương Trung Chương',null),
   ('Dương Trường Giang','PQPOC'),
   ('Fumitoshi SATO','PVEP'),
-  ('Giang',null),
   ('Giáp Văn Tỉnh','PV DRILLING'),
   ('Giáp Văn Tuấn','PETROSETCO'),
   ('Hà Hữu Anh','PVTRANS'),
@@ -1122,11 +1121,18 @@ insert into seed_update_participants values
   ('Vương Ngọc Trìu','PVCFC'),
   ('Vương Thị Hiền','PV DRILLING'),
   ('XẾP',null);
+update public.participants existing
+set full_name = source.full_name, full_name_en = source.full_name
+from seed_update_participants source
+left join public.organizations organization on organization.code = source.organization_code
+where existing.tenant_id = private.seed_tenant_id()
+  and existing.organization_id is not distinct from organization.id
+  and private.entry_identity(existing.full_name, 'individual') = private.entry_identity(source.full_name, 'individual');
 insert into public.participants (organization_id, full_name)
 select distinct on (o.id, private.entry_identity(p.full_name, 'individual')) o.id, p.full_name from seed_update_participants p left join public.organizations o on o.code = p.organization_code
 where not exists (
   select 1 from public.participants existing
-  where private.entry_identity(existing.full_name, 'individual') = private.entry_identity(p.full_name, 'individual')
+  where existing.full_name = p.full_name
     and coalesce(existing.organization_id::text, '') = coalesce(o.id::text, '')
 )
 order by o.id, private.entry_identity(p.full_name, 'individual'), p.full_name;
@@ -1179,6 +1185,11 @@ insert into seed_update_entries values
   ('boi-loi','4x50m-nam','team','PVEP','PVEP',17,null),
   ('boi-loi','4x50m-nam','team','PVOIL','PVOIL',21,null),
   ('boi-loi','4x50m-nam','team','VSP','VSP',25,null),
+  ('boi-loi','4x50m-nu','team','PTSC','PTSC',1,null),
+  ('boi-loi','4x50m-nu','team','PVG','PV GAS',2,null),
+  ('boi-loi','4x50m-nu','team','PVCFC','PVCFC',3,null),
+  ('boi-loi','4x50m-nu','team','VSP01','VSP',4,null),
+  ('boi-loi','4x50m-nu','team','VSP02','VSP',5,null),
   ('boi-loi','50m-nam','individual','Bùi Cảnh Hưng','PVTRANS',7,null),
   ('boi-loi','50m-nam','individual','Bùi Sĩ Hồi','PTSC',5,null),
   ('boi-loi','50m-nam','individual','Bùi Tuấn Minh','PVPMB',6,null),
@@ -1328,7 +1339,7 @@ insert into seed_update_entries values
   ('cau-long','doi-nam-nu-41-50','pair','Nguyễn Thị Thủy / Phạm Ngọc Thức - PVFCCO','PVFCCO',3,null),
   ('cau-long','doi-nam-nu-41-50','pair','Trần Bích Ngọc / Trần Xuân Lưu - PV DRILLING','PV DRILLING',1,null),
   ('cau-long','doi-nam-tren-51','pair','Đỗ Đức Đồng / Phạm Trung Hiếu',null,1,null),
-  ('cau-long','doi-nam-tren-51','pair','Đoàn Anh Sơn / Đỗ Ngọc / Giang',null,2,null),
+('cau-long','doi-nam-tren-51','pair','Đoàn Anh Sơn / Đỗ Ngọc Giang',null,2,null),
   ('cau-long','doi-nam-tren-51','pair','Dương Trung Chương / Vũ Xuân Cường',null,5,null),
   ('cau-long','doi-nam-tren-51','pair','Nguyễn Tường / Phạm Trí Dũng',null,4,null),
   ('cau-long','doi-nam-tren-51','pair','Nguyễn Văn Truyền / Trần Hoàng Thái',null,3,null),
@@ -1344,7 +1355,7 @@ insert into seed_update_entries values
   ('cau-long','doi-nu-duoi-30','pair','Nguyễn Thị Phương Anh / Vũ Thị Mỹ Hồng',null,2,null),
   ('cau-long','doi-nu-duoi-30','pair','Phạm Anh Thư / Phạm Thị Chung',null,3,null),
   ('co-tuong','nam-duoi-45','individual','Bùi Văn Hòa','VSP',25,null),
-  ('co-tuong','nam-duoi-45','individual','Chu Ðình Quang Vinh','PTSC',6,null),
+  ('co-tuong','nam-duoi-45','individual','Chu Đình Quang Vinh','PTSC',6,null),
   ('co-tuong','nam-duoi-45','individual','Đào Quốc Tuấn','PVE',16,null),
   ('co-tuong','nam-duoi-45','individual','Đỗ Ngọc Huân','PVCOMBANK',15,null),
   ('co-tuong','nam-duoi-45','individual','Đỗ Quang Lâm','PV DRILLING',8,null),
@@ -1374,7 +1385,7 @@ insert into seed_update_entries values
   ('co-tuong','nam-duoi-45','individual','Võ Hoàng Long','BĐPOC',2,null),
   ('co-tuong','nam-duoi-45','individual','Vũ Hoàng Phúc','PVTRANS',24,null),
   ('co-tuong','nam-duoi-45','individual','Vũ Ngọc Thắng','PVCFC',14,null),
-  ('co-tuong','nam-tren-45','individual','Ðái Quốc Triều','PVCFC',10,null),
+  ('co-tuong','nam-tren-45','individual','Đái Quốc Triều','PVCFC',10,null),
   ('co-tuong','nam-tren-45','individual','Hoàng Văn Mười','PVOIL',14,null),
   ('co-tuong','nam-tren-45','individual','Huỳnh Huy Giáp','LP1PP',1,null),
   ('co-tuong','nam-tren-45','individual','Lê Đức Thái Bình','PVEP',20,null),
@@ -1858,6 +1869,23 @@ insert into seed_update_entries values
   ('pickleball','doi-nu-tren-50','pair','Ng Thị Thanh Hương / Nguyễn Thị Thư - PVFCCO','PVFCCO',2,null),
   ('pickleball','doi-nu-tren-50','pair','Nguyễn Thị Loan / Nguyễn Thị Thu Mai - VSP','VSP',3,null),
   ('pickleball','doi-nu-tren-50','pair','Nguyễn Thị Oanh / Tạ Thị Thu Hiền - VSP','VSP',5,null);
+
+-- The swimming workbook separates individual races by age group. Keep the source
+-- rows in one place, then apply the same category to entries, members and lanes.
+create temporary table seed_swimming_category_map (entry_name text primary key, tournament_slug text) on commit drop;
+insert into seed_swimming_category_map values
+  ('Ngô Minh Chí Bảo','50m-nam-duoi-30'), ('Trịnh Xuân Cảnh','50m-nam-duoi-30'), ('Nguyễn Trường Giang','50m-nam-duoi-30'), ('Nguyễn Quách Thanh Nam','50m-nam-duoi-30'), ('Tokio DOSHITA','50m-nam-duoi-30'), ('Bùi Tuấn Minh','50m-nam-duoi-30'), ('Bùi Cảnh Hưng','50m-nam-duoi-30'), ('Nguyễn Mai Nam','50m-nam-duoi-30'), ('Vũ Hoàng Phúc','50m-nam-duoi-30'), ('Điêu Lâm Thành','50m-nam-duoi-30'), ('Phạm Minh Tài','50m-nam-duoi-30'),
+  ('Đặng Trọng Dũng','50m-nam-31-40'), ('Hồ Tấn Đạt','50m-nam-31-40'), ('Trịnh Hữu Chung','50m-nam-31-40'), ('Huỳnh Tấn Giang','50m-nam-31-40'), ('Bùi Sĩ Hồi','50m-nam-31-40'), ('Ngô Cửu Long','50m-nam-31-40'), ('Hoàng Nghĩa Ngọc','50m-nam-31-40'), ('Trần Linh Vương','50m-nam-31-40'), ('Nguyễn Hoàng Tân','50m-nam-31-40'), ('Nguyễn Duy Sơn','50m-nam-31-40'), ('Lê Minh Quyết','50m-nam-31-40'), ('Trần Ngọc Minh','50m-nam-31-40'), ('Nobuhiko MAKI','50m-nam-31-40'),
+  ('Lê Tiến Dũng','50m-nam-41-50'), ('Nguyễn Dương Bình','50m-nam-41-50'), ('Nguyễn Vân Nam','50m-nam-41-50'), ('Phạm Văn Em','50m-nam-41-50'), ('Ngô Thế Lạc','50m-nam-41-50'), ('Vũ Hoàng Lập','50m-nam-41-50'), ('Lê Ngọc Linh','50m-nam-41-50'), ('Lê Tiến Trung','50m-nam-41-50'), ('Vũ Trung Kiên','50m-nam-41-50'), ('Hoàng Duy Thu','50m-nam-41-50'), ('Hà Thiếu Sang','50m-nam-41-50'), ('Trần Văn Toàn','50m-nam-41-50'), ('Nguyễn Công Khiên','50m-nam-41-50'),
+  ('Nguyễn Văn Phong','50m-nam-tren-50'), ('Phạm Ngọc Tuân','50m-nam-tren-50'), ('Trần Song Hào','50m-nam-tren-50'), ('Nguyễn Như Thức','50m-nam-tren-50'), ('Lê Huy','50m-nam-tren-50'), ('Đặng Trọng Thông','50m-nam-tren-50'),
+  ('Trần Ngọc Thùy Dương','50m-nu-duoi-30'), ('Đỗ Hồ Minh Phương','50m-nu-duoi-30'), ('Lữ Thị Nhung','50m-nu-duoi-30'), ('Phương Thị Huyền','50m-nu-duoi-30'), ('Nguyễn Thị Lý','50m-nu-duoi-30'), ('Nguyễn Thị Thanh Thanh','50m-nu-duoi-30'), ('Trần Thị Quỳnh Vân','50m-nu-duoi-30'), ('Nguyễn Thị Ngọc Lan','50m-nu-duoi-30'), ('Lê Thị Phượng Uyển','50m-nu-duoi-30'), ('Nguyễn Thị Thanh Nhã','50m-nu-duoi-30'),
+  ('Châu Pha Diễm','50m-nu-31-40'), ('Nguyễn Minh Nguyệt','50m-nu-31-40'), ('Hà Thị Trang','50m-nu-31-40'), ('Trịnh Thị Thanh','50m-nu-31-40'), ('Nguyễn Ái Thanh Đan','50m-nu-31-40'), ('Lê Thị Hằng','50m-nu-31-40'), ('Nguyễn Thị Thùy Dung','50m-nu-31-40'),
+  ('Đặng Trần Anh Tuấn','100m-nam-duoi-30'), ('Masakazu KAGANOI','100m-nam-duoi-30'), ('Nguyễn Anh Tuấn','100m-nam-duoi-30'), ('Trần Quốc Toản','100m-nam-duoi-30'), ('Lý Gia Thành','100m-nam-duoi-30'), ('Tăng Hoàng Nhân','100m-nam-duoi-30'), ('Shumpei YONETSU','100m-nam-duoi-30'), ('Nguyễn Phú Nam','100m-nam-duoi-30'), ('Lê Minh Hoàng','100m-nam-duoi-30'), ('Trần Xuân Chánh','100m-nam-duoi-30'), ('Trần Công Bằng','100m-nam-duoi-30'), ('Trần Văn Cường','100m-nam-duoi-30'), ('Trương Trần Trung Tín','100m-nam-duoi-30'),
+  ('Alexey','100m-nam-41-50'), ('Phạm Ngọc Anh','100m-nam-41-50'), ('Phạm Hồng Minh','100m-nam-41-50'), ('Vũ Việt Bình','100m-nam-41-50'), ('Lê Trọng Hiếu','100m-nam-41-50'), ('Đỗ Công Hữu','100m-nam-41-50'), ('Nguyễn Văn Lếm','100m-nam-41-50'), ('Huỳnh Lương Sánh','100m-nam-41-50'), ('Fumitoshi SATO','100m-nam-41-50'), ('Shamil','100m-nam-41-50'), ('Nguyễn Quang Trung','100m-nam-41-50'), ('Ngô Minh Phú','100m-nam-41-50'), ('Lâm Tất Thắng','100m-nam-41-50'), ('Nguyễn Tiến Trình','100m-nam-41-50'), ('Phạm Văn Thuận','100m-nam-41-50'), ('Nguyễn Hồng Phúc','100m-nam-41-50'), ('Bùi Trung Kiên','100m-nam-41-50');
+update seed_update_entries source
+set tournament_slug = category.tournament_slug
+from seed_swimming_category_map category
+where source.sport_slug = 'boi-loi' and source.kind = 'individual' and source.name_vi = category.entry_name;
 insert into public.entries (tournament_id, organization_id, kind, name_vi, name_en, seed_number, bib_number)
 select t.id, o.id, source.kind, source.name_vi, source.name_vi, source.seed_number, source.bib_number
 from seed_update_entries source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
@@ -1947,6 +1975,26 @@ insert into seed_update_members values
   ('boi-loi','4x50m-nam','VSP','Nguyễn Thị Ngọc Anh',2),
   ('boi-loi','4x50m-nam','VSP','Nguyễn Thị Thùy',3),
   ('boi-loi','4x50m-nam','VSP','Trần Văn Toàn',4),
+  ('boi-loi','4x50m-nu','PTSC','Bùi Sĩ Hồi',1),
+  ('boi-loi','4x50m-nu','PTSC','Đặng Trần Anh Tuấn',2),
+  ('boi-loi','4x50m-nu','PTSC','Tăng Hoàng Nhân',3),
+  ('boi-loi','4x50m-nu','PTSC','Vũ Trung Kiên',4),
+  ('boi-loi','4x50m-nu','PVG','Hồ Tấn Đạt',1),
+  ('boi-loi','4x50m-nu','PVG','Lê Ngọc Linh',2),
+  ('boi-loi','4x50m-nu','PVG','Nguyễn Vân Nam',3),
+  ('boi-loi','4x50m-nu','PVG','Trần Công Bằng',4),
+  ('boi-loi','4x50m-nu','PVCFC','Nguyễn Duy Sơn',1),
+  ('boi-loi','4x50m-nu','PVCFC','Nguyễn Quách Thanh Nam',2),
+  ('boi-loi','4x50m-nu','PVCFC','Phạm Văn Em',3),
+  ('boi-loi','4x50m-nu','PVCFC','Trần Ngọc Minh',4),
+  ('boi-loi','4x50m-nu','VSP01','Alexey',1),
+  ('boi-loi','4x50m-nu','VSP01','Đặng Trọng Thông',2),
+  ('boi-loi','4x50m-nu','VSP01','Nguyễn Anh Tuấn',3),
+  ('boi-loi','4x50m-nu','VSP01','Vũ Việt Bình',4),
+  ('boi-loi','4x50m-nu','VSP02','Điêu Lâm Thành',1),
+  ('boi-loi','4x50m-nu','VSP02','Lâm Tất Thắng',2),
+  ('boi-loi','4x50m-nu','VSP02','Shamil',3),
+  ('boi-loi','4x50m-nu','VSP02','Trần Linh Vương',4),
   ('boi-loi','50m-nam','Bùi Cảnh Hưng','Bùi Cảnh Hưng',1),
   ('boi-loi','50m-nam','Bùi Sĩ Hồi','Bùi Sĩ Hồi',1),
   ('boi-loi','50m-nam','Bùi Tuấn Minh','Bùi Tuấn Minh',1),
@@ -2185,9 +2233,8 @@ insert into seed_update_members values
   ('cau-long','doi-nam-nu-41-50','Trần Bích Ngọc / Trần Xuân Lưu - PV DRILLING','Trần Xuân Lưu',2),
   ('cau-long','doi-nam-tren-51','Đỗ Đức Đồng / Phạm Trung Hiếu','Đỗ Đức Đồng',1),
   ('cau-long','doi-nam-tren-51','Đỗ Đức Đồng / Phạm Trung Hiếu','Phạm Trung Hiếu',2),
-  ('cau-long','doi-nam-tren-51','Đoàn Anh Sơn / Đỗ Ngọc / Giang','Đoàn Anh Sơn',1),
-  ('cau-long','doi-nam-tren-51','Đoàn Anh Sơn / Đỗ Ngọc / Giang','Đỗ Ngọc',2),
-  ('cau-long','doi-nam-tren-51','Đoàn Anh Sơn / Đỗ Ngọc / Giang','Giang',3),
+  ('cau-long','doi-nam-tren-51','Đoàn Anh Sơn / Đỗ Ngọc Giang','Đoàn Anh Sơn',1),
+  ('cau-long','doi-nam-tren-51','Đoàn Anh Sơn / Đỗ Ngọc Giang','Đỗ Ngọc Giang',2),
   ('cau-long','doi-nam-tren-51','Dương Trung Chương / Vũ Xuân Cường','Dương Trung Chương',1),
   ('cau-long','doi-nam-tren-51','Dương Trung Chương / Vũ Xuân Cường','Vũ Xuân Cường',2),
   ('cau-long','doi-nam-tren-51','Nguyễn Tường / Phạm Trí Dũng','Nguyễn Tường',1),
@@ -2217,7 +2264,7 @@ insert into seed_update_members values
   ('cau-long','doi-nu-duoi-30','Phạm Anh Thư / Phạm Thị Chung','Phạm Anh Thư',1),
   ('cau-long','doi-nu-duoi-30','Phạm Anh Thư / Phạm Thị Chung','Phạm Thị Chung',2),
   ('co-tuong','nam-duoi-45','Bùi Văn Hòa','Bùi Văn Hòa',1),
-  ('co-tuong','nam-duoi-45','Chu Ðình Quang Vinh','Chu Ðình Quang Vinh',1),
+  ('co-tuong','nam-duoi-45','Chu Đình Quang Vinh','Chu Đình Quang Vinh',1),
   ('co-tuong','nam-duoi-45','Đào Quốc Tuấn','Đào Quốc Tuấn',1),
   ('co-tuong','nam-duoi-45','Đỗ Ngọc Huân','Đỗ Ngọc Huân',1),
   ('co-tuong','nam-duoi-45','Đỗ Quang Lâm','Đỗ Quang Lâm',1),
@@ -2247,7 +2294,7 @@ insert into seed_update_members values
   ('co-tuong','nam-duoi-45','Võ Hoàng Long','Võ Hoàng Long',1),
   ('co-tuong','nam-duoi-45','Vũ Hoàng Phúc','Vũ Hoàng Phúc',1),
   ('co-tuong','nam-duoi-45','Vũ Ngọc Thắng','Vũ Ngọc Thắng',1),
-  ('co-tuong','nam-tren-45','Ðái Quốc Triều','Ðái Quốc Triều',1),
+  ('co-tuong','nam-tren-45','Đái Quốc Triều','Đái Quốc Triều',1),
   ('co-tuong','nam-tren-45','Hoàng Văn Mười','Hoàng Văn Mười',1),
   ('co-tuong','nam-tren-45','Huỳnh Huy Giáp','Huỳnh Huy Giáp',1),
   ('co-tuong','nam-tren-45','Lê Đức Thái Bình','Lê Đức Thái Bình',1),
@@ -3059,18 +3106,53 @@ insert into seed_update_members values
   ('pickleball','doi-nu-tren-50','Nguyễn Thị Loan / Nguyễn Thị Thu Mai - VSP','Nguyễn Thị Thu Mai',2),
   ('pickleball','doi-nu-tren-50','Nguyễn Thị Oanh / Tạ Thị Thu Hiền - VSP','Nguyễn Thị Oanh',1),
   ('pickleball','doi-nu-tren-50','Nguyễn Thị Oanh / Tạ Thị Thu Hiền - VSP','Tạ Thị Thu Hiền',2);
+update seed_update_members source
+set tournament_slug = category.tournament_slug
+from seed_swimming_category_map category
+where source.sport_slug = 'boi-loi' and source.entry_name = category.entry_name;
 insert into public.entry_members (entry_id, participant_id, sort_order)
 select e.id, p.id, min(source.sort_order)
 from seed_update_members source join public.sports s on s.slug = source.sport_slug and s.tenant_id = private.seed_tenant_id()
 join public.tournaments t on t.sport_id = s.id and t.slug = source.tournament_slug
 join public.entries e on e.tournament_id = t.id and private.entry_identity(e.name_vi, e.kind) = private.entry_identity(source.entry_name, e.kind)
-join public.participants p on private.entry_identity(p.full_name, 'individual') = private.entry_identity(source.full_name, 'individual')
+join public.participants p on p.organization_id = e.organization_id and p.full_name = source.full_name
 where not exists (select 1 from public.entry_members existing where existing.entry_id = e.id and existing.participant_id = p.id)
 group by e.id, p.id;
+
+-- Older workbook imports carried case/organization variants of relay members.
+-- The reviewed member list is authoritative for these six relay rosters.
+delete from public.entry_members member
+using public.entries entry, public.tournaments tournament, public.sports sport, public.participants participant
+where member.entry_id = entry.id and member.participant_id = participant.id
+  and entry.tournament_id = tournament.id and tournament.sport_id = sport.id
+  and member.tenant_id = private.seed_tenant_id() and entry.tenant_id = private.seed_tenant_id()
+  and sport.slug = 'boi-loi' and tournament.slug in ('4x50m-nam','4x50m-nu')
+  and not exists (
+    select 1 from seed_update_members source
+    where source.sport_slug = sport.slug and source.tournament_slug = tournament.slug
+      and source.entry_name = entry.name_vi and source.full_name = participant.full_name
+  );
+with duplicate_relay_members as (
+  select member.id, row_number() over (
+    partition by member.entry_id, participant.full_name
+    order by member.archived_at nulls first, member.sort_order, member.id
+  ) as duplicate_rank
+  from public.entry_members member
+  join public.entries entry on entry.id = member.entry_id
+  join public.tournaments tournament on tournament.id = entry.tournament_id
+  join public.sports sport on sport.id = tournament.sport_id
+  join public.participants participant on participant.id = member.participant_id
+  where member.tenant_id = private.seed_tenant_id() and sport.slug = 'boi-loi'
+    and tournament.slug in ('4x50m-nam','4x50m-nu') and member.archived_at is null
+)
+delete from public.entry_members member
+using duplicate_relay_members duplicate
+where member.id = duplicate.id and duplicate.duplicate_rank > 1;
 
 create temporary table seed_update_groups (sport_slug text, tournament_slug text, name_vi text, name_en text, sort_order integer) on commit drop;
 insert into seed_update_groups values
   ('bong-ban','doi-nam-31-40','Bảng A','Group A',0),
+  ('bong-ban','doi-nam-31-40','Bảng B','Group B',1),
   ('bong-ban','doi-nam-41-50','Bảng A','Group A',0),
   ('bong-ban','doi-nam-41-50','Bảng B','Group B',0),
   ('bong-ban','doi-nam-41-50','Bảng C','Group C',0),
@@ -3186,20 +3268,20 @@ insert into seed_update_group_entries values
   ('bong-ban','doi-nam-31-40','Bảng A','Trần Ngọc Sơn / Vũ Hải Long - PVPMB',3),
   ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Vũ Chiến / Trần Tất Thắng - PVTRANS',4),
   ('bong-ban','doi-nam-31-40','Bảng A','Bùi Văn Thiện / Nguyễn Quốc Hưng - PV GAS',5),
-  ('bong-ban','doi-nam-31-40','Bảng A','Trần Huy Bảo / Võ Văn Lung - PVFCCO',1),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO',2),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS',3),
-  ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS',4),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Đức Thư / Trần Việt Dũng - PTSC',5),
-  ('bong-ban','doi-nam-31-40','Bảng A','Đặng Đình Phúc / Lê Anh Thoại - VSP',6),
+  ('bong-ban','doi-nam-31-40','Bảng B','Trần Huy Bảo / Võ Văn Lung - PVFCCO',1),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO',2),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS',3),
+  ('bong-ban','doi-nam-31-40','Bảng B','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS',4),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Đức Thư / Trần Việt Dũng - PTSC',5),
+  ('bong-ban','doi-nam-31-40','Bảng B','Đặng Đình Phúc / Lê Anh Thoại - VSP',6),
   ('bong-ban','doi-nam-41-50','Bảng A','Lèng Văn Chi / Trần Xuân Mạnh - PVEP',1),
   ('bong-ban','doi-nam-41-50','Bảng A','Nguyễn Hải Sơn / Phạm Văn Bảy - VSP',2),
   ('bong-ban','doi-nam-41-50','Bảng A','Đinh Xuân Hiền / Nguyễn Minh Thắng - PVTRANS',3),
-  ('bong-ban','doi-nam-41-50','Bảng A','Nguyễn Ngọc Lân / Phan Quốc Thắng - PV DRILLING',5),
+  ('bong-ban','doi-nam-41-50','Bảng A','Nguyễn Ngọc Lân / Phan Quốc Thắng - PV DRILLING',4),
   ('bong-ban','doi-nam-41-50','Bảng B','Đặng Xuân Đức / Lê Hoàng Vĩnh Thái - LP1PP',1),
   ('bong-ban','doi-nam-41-50','Bảng B','Hồ Đức Kỳ / Trần Đình Nam - PTSC',2),
   ('bong-ban','doi-nam-41-50','Bảng B','Phan Viết Hoàng / Võ Hồng Sơn - PVI',3),
-  ('bong-ban','doi-nam-41-50','Bảng B','Lê Thanh Châu / Phạm Công Điện - PETROSETCO',5),
+  ('bong-ban','doi-nam-41-50','Bảng B','Lê Thanh Châu / Phạm Công Điện - PETROSETCO',4),
   ('bong-ban','doi-nam-41-50','Bảng C','Bùi Văn Dũng / Vũ Đình Chính - PVFCCO',1),
   ('bong-ban','doi-nam-41-50','Bảng C','Nguyễn Hà Hải / Nguyễn Văn Ánh - PTSC',2),
   ('bong-ban','doi-nam-41-50','Bảng C','Đặng Thiệu Ích / Nguyễn Đồng Hiệp - PVCFC',3),
@@ -3213,23 +3295,10 @@ insert into seed_update_group_entries values
   ('bong-ban','doi-nam-41-50','Bảng E','Đoàn Quốc Quân / Vũ Tiến Dũng - PVFCCO',3),
   ('bong-ban','doi-nam-41-50','Bảng E','Phạm Thành Trung / Vũ Anh Hữu - PVOIL',4),
   ('bong-ban','doi-nam-41-50','Bảng F','Nguyễn Tấn Nam Phương / Phù Quang Thạch - PVTRANS',1),
-  ('bong-ban','doi-nam-41-50','Bảng F','Dương Minh Bảo Phác / Đặng Văn Sơn - PVEP',22),
+  ('bong-ban','doi-nam-41-50','Bảng F','Dương Minh Bảo Phác / Đặng Văn Sơn - PVEP',2),
   ('bong-ban','doi-nam-41-50','Bảng F','Nguyễn Văn Hiếu / Vũ Văn Sỹ - VSP',3),
-  ('bong-ban','doi-nam-41-50','Bảng F','Đào Quang Thành / Hoàng Văn Tuấn - BĐPOC',24),
+  ('bong-ban','doi-nam-41-50','Bảng F','Đào Quang Thành / Hoàng Văn Tuấn - BĐPOC',4),
   ('bong-ban','doi-nam-41-50','Bảng F','Đặng Quyết Thắng / Nguyễn Duy Thế - PVOIL',5),
-  ('bong-ban','doi-nam-41-50','Bảng F','Nguyễn Hữu Tùng / Trần Đức Ninh - BMĐH',18),
-  ('bong-ban','doi-nam-41-50','Bảng F','Đặng Xuân Đức / Lê Hoàng Vĩnh Thái - LP1PP',5),
-  ('bong-ban','doi-nam-41-50','Bảng F','Lê Thanh Châu / Phạm Công Điện - PETROSETCO',8),
-  ('bong-ban','doi-nam-41-50','Bảng F','Hồ Đức Kỳ / Trần Đình Nam - PTSC',6),
-  ('bong-ban','doi-nam-41-50','Bảng F','Nguyễn Hà Hải / Nguyễn Văn Ánh - PTSC',10),
-  ('bong-ban','doi-nam-41-50','Bảng F','Nguyễn Ngọc Lân / Phan Quốc Thắng - PV DRILLING',4),
-  ('bong-ban','doi-nam-41-50','Bảng F','Bùi Công Tâm / Nguyễn Vũ Hiệp - PV GAS',16),
-  ('bong-ban','doi-nam-41-50','Bảng F','Đào Phú Hoàng / Đào Xuân Thu - PV GAS',17),
-  ('bong-ban','doi-nam-41-50','Bảng F','Đặng Thiệu Ích / Nguyễn Đồng Hiệp - PVCFC',11),
-  ('bong-ban','doi-nam-41-50','Bảng F','Đinh Chí Thanh / Nguyễn Ngọc Hòe - PVE',13),
-  ('bong-ban','doi-nam-41-50','Bảng F','Lèng Văn Chi / Trần Xuân Mạnh - PVEP',1),
-  ('bong-ban','doi-nam-41-50','Bảng F','Đinh Quang Vinh / Lê Văn Cho - PVFCCO',15),
-  ('bong-ban','doi-nam-41-50','Bảng F','Bùi Văn Dũng / Vũ Đình Chính - PVFCCO',9),
   ('bong-ban','doi-nam-duoi-30','Bảng A','Nguyễn Hữu Mạnh / Nguyễn Văn Khai - PV GAS',1),
   ('bong-ban','doi-nam-duoi-30','Bảng A','Chu Xuân Hải / Lê Hồng Thái - PVFCCO',2),
   ('bong-ban','doi-nam-duoi-30','Bảng A','Âu Công Phúc / Vũ Việt Hoàng - PTSC',3),
@@ -3265,10 +3334,6 @@ insert into seed_update_group_entries values
   ('bong-ban','doi-nu','Bảng B','Hoàng Thị Thơm / Nguyễn Thị Hiên - VSP',6),
   ('bong-ban','doi-nu','Bảng B','Nguyễn Thị Bạch Mai / Phan Thị Mai - VSP',7),
   ('bong-ban','doi-nu','Bảng B','Đào Thị Kim Anh / Trần Thị Thanh Huyền - PVFCCO',8),
-  ('bong-ban','doi-nu','Bảng B','Đào Thị Huyền / Đào Thị Thuý Hằng - VSP',2),
-  ('bong-ban','doi-nu','Bảng B','Nguyễn Thị Thúy Hằng / Phạm Thị Lương - PV GAS',3),
-  ('bong-ban','doi-nu','Bảng B','Lê Thanh Nga / Phạm Thuý Anh - VSP',1),
-  ('bong-ban','doi-nu','Bảng B','Đinh Thị Lan Anh / Nguyễn Thị Ninh - VSP',4),
   ('cau-long','doi-nam-nu-31-40','Bảng A','Phạm Văn Khang / Trần Thị Thu Mai - VSP',1),
   ('cau-long','doi-nam-nu-31-40','Bảng A','Phan Xuân Hưng / Vũ Thị Hoài Thu - PV GAS',2),
   ('cau-long','doi-nam-nu-31-40','Bảng A','Biện Văn Tráng / Lê Thị Việt Phương - NCKHĐT',1),
@@ -3577,21 +3642,21 @@ on conflict (group_id, entry_id) do update set seed_order = coalesce(excluded.se
 create temporary table seed_update_fixtures (sport_slug text, tournament_slug text, group_name text, home_name text, away_name text, source_code text, sort_order integer) on commit drop;
 insert into seed_update_fixtures values
   ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Mạnh Hà / Võ Bá Anh Tuấn - PV DRILLING','Bùi Văn Thiện / Nguyễn Quốc Hưng - PV GAS','UPD-DOI-NAM-31-40-BANG-A-01',1),
-  ('bong-ban','doi-nam-31-40','Bảng A','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-10',10),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','UPD-DOI-NAM-31-40-BANG-A-11',11),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-12',12),
-  ('bong-ban','doi-nam-31-40','Bảng A','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','UPD-DOI-NAM-31-40-BANG-A-13',13),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-14',14),
-  ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-15',15),
-  ('bong-ban','doi-nam-31-40','Bảng A','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','UPD-DOI-NAM-31-40-BANG-A-16',16),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-17',17),
-  ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-18',18),
-  ('bong-ban','doi-nam-31-40','Bảng A','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-19',19),
+  ('bong-ban','doi-nam-31-40','Bảng B','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-10',10),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','UPD-DOI-NAM-31-40-BANG-A-11',11),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-12',12),
+  ('bong-ban','doi-nam-31-40','Bảng B','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','UPD-DOI-NAM-31-40-BANG-A-13',13),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-14',14),
+  ('bong-ban','doi-nam-31-40','Bảng B','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-15',15),
+  ('bong-ban','doi-nam-31-40','Bảng B','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','UPD-DOI-NAM-31-40-BANG-A-16',16),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-17',17),
+  ('bong-ban','doi-nam-31-40','Bảng B','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-18',18),
+  ('bong-ban','doi-nam-31-40','Bảng B','Trần Huy Bảo / Võ Văn Lung - PVFCCO','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-19',19),
   ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Mạnh Tùng / Phạm Tú Anh - VSP','Nguyễn Vũ Chiến / Trần Tất Thắng - PVTRANS','UPD-DOI-NAM-31-40-BANG-A-02',2),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-20',20),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','UPD-DOI-NAM-31-40-BANG-A-21',21),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','UPD-DOI-NAM-31-40-BANG-A-22',22),
-  ('bong-ban','doi-nam-31-40','Bảng A','Phạm Đức Thư / Trần Việt Dũng - PTSC','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-23',23),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Phạm Đức Thư / Trần Việt Dũng - PTSC','UPD-DOI-NAM-31-40-BANG-A-20',20),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','Nguyễn Trọng Vĩnh / Trần Nhựt Duy - PV GAS','UPD-DOI-NAM-31-40-BANG-A-21',21),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Dương Ngọc Lợi / Trần Quốc Bình - PETROSETCO','Phan Ngọc Lai / Nguyễn Văn Vinh - PVTRANS','UPD-DOI-NAM-31-40-BANG-A-22',22),
+  ('bong-ban','doi-nam-31-40','Bảng B','Phạm Đức Thư / Trần Việt Dũng - PTSC','Đặng Đình Phúc / Lê Anh Thoại - VSP','UPD-DOI-NAM-31-40-BANG-A-23',23),
   ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Mạnh Hà / Võ Bá Anh Tuấn - PV DRILLING','Nguyễn Vũ Chiến / Trần Tất Thắng - PVTRANS','UPD-DOI-NAM-31-40-BANG-A-03',3),
   ('bong-ban','doi-nam-31-40','Bảng A','Trần Ngọc Sơn / Vũ Hải Long - PVPMB','Bùi Văn Thiện / Nguyễn Quốc Hưng - PV GAS','UPD-DOI-NAM-31-40-BANG-A-04',4),
   ('bong-ban','doi-nam-31-40','Bảng A','Nguyễn Mạnh Hà / Võ Bá Anh Tuấn - PV DRILLING','Nguyễn Mạnh Tùng / Phạm Tú Anh - VSP','UPD-DOI-NAM-31-40-BANG-A-05',5),
@@ -4100,6 +4165,11 @@ insert into seed_update_race_entries values
   ('boi-loi','4x50m-nam','PVEP',17),
   ('boi-loi','4x50m-nam','PVOIL',21),
   ('boi-loi','4x50m-nam','VSP',25),
+  ('boi-loi','4x50m-nu','PTSC',1),
+  ('boi-loi','4x50m-nu','PVG',2),
+  ('boi-loi','4x50m-nu','PVCFC',3),
+  ('boi-loi','4x50m-nu','VSP01',4),
+  ('boi-loi','4x50m-nu','VSP02',5),
   ('boi-loi','50m-nam','Bùi Cảnh Hưng',7),
   ('boi-loi','50m-nam','Bùi Sĩ Hồi',5),
   ('boi-loi','50m-nam','Bùi Tuấn Minh',6),
@@ -4161,7 +4231,7 @@ insert into seed_update_race_entries values
   ('boi-loi','50m-nu','Trần Thị Quỳnh Vân',7),
   ('boi-loi','50m-nu','Trịnh Thị Thanh',4),
   ('co-tuong','nam-duoi-45','Bùi Văn Hòa',25),
-  ('co-tuong','nam-duoi-45','Chu Ðình Quang Vinh',6),
+  ('co-tuong','nam-duoi-45','Chu Đình Quang Vinh',6),
   ('co-tuong','nam-duoi-45','Đào Quốc Tuấn',16),
   ('co-tuong','nam-duoi-45','Đỗ Ngọc Huân',15),
   ('co-tuong','nam-duoi-45','Đỗ Quang Lâm',8),
@@ -4191,7 +4261,7 @@ insert into seed_update_race_entries values
   ('co-tuong','nam-duoi-45','Võ Hoàng Long',2),
   ('co-tuong','nam-duoi-45','Vũ Hoàng Phúc',24),
   ('co-tuong','nam-duoi-45','Vũ Ngọc Thắng',14),
-  ('co-tuong','nam-tren-45','Ðái Quốc Triều',10),
+  ('co-tuong','nam-tren-45','Đái Quốc Triều',10),
   ('co-tuong','nam-tren-45','Hoàng Văn Mười',14),
   ('co-tuong','nam-tren-45','Huỳnh Huy Giáp',1),
   ('co-tuong','nam-tren-45','Lê Đức Thái Bình',20),
@@ -4406,6 +4476,10 @@ insert into seed_update_race_entries values
   ('dien-kinh','800m-nam','Trần Văn Cường',2),
   ('dien-kinh','800m-nam','Trần Văn Thắng',5),
   ('dien-kinh','800m-nam','Vũ Hoàng Tiến',2);
+update seed_update_race_entries source
+set tournament_slug = category.tournament_slug
+from seed_swimming_category_map category
+where source.sport_slug = 'boi-loi' and source.entry_name = category.entry_name;
 insert into public.fixture_entries (fixture_id, entry_id, seed_order)
 select f.id, e.id, source.seed_order
 from seed_update_race_entries source
@@ -4457,9 +4531,14 @@ insert into seed_update_schedule values
   ('cau-long','doi-nam-tren-51','2026-09-05T15:00:00+07','group','Thi đấu 3 lượt'),
   ('cau-long','doi-nam-nu-41-50','2026-09-06T07:30:00+07','knockout','Bán kết - Chung kết'),
   ('cau-long','doi-nam-nu-31-40','2026-09-06T08:00:00+07','knockout','Bán kết - Chung kết'),
-  ('boi-loi','50m-nam','2026-09-05T08:00:00+07','all','50m Nam'),
-  ('boi-loi','50m-nu','2026-09-05T08:15:00+07','all','50m Nữ'),
-  ('boi-loi','100m-nam','2026-09-05T08:15:00+07','all','100m Nam'),
+  ('boi-loi','50m-nam-duoi-30','2026-09-05T08:00:00+07','all','50m Nam - Dưới 30 tuổi'),
+  ('boi-loi','50m-nam-31-40','2026-09-05T08:00:00+07','all','50m Nam - 31–40 tuổi'),
+  ('boi-loi','50m-nam-41-50','2026-09-05T08:00:00+07','all','50m Nam - 41–50 tuổi'),
+  ('boi-loi','50m-nam-tren-50','2026-09-05T08:00:00+07','all','50m Nam - Trên 50 tuổi'),
+  ('boi-loi','50m-nu-duoi-30','2026-09-05T08:15:00+07','all','50m Nữ - Dưới 30 tuổi'),
+  ('boi-loi','50m-nu-31-40','2026-09-05T08:15:00+07','all','50m Nữ - 31–40 tuổi'),
+  ('boi-loi','100m-nam-duoi-30','2026-09-05T08:15:00+07','all','100m Nam - Dưới 30 tuổi'),
+  ('boi-loi','100m-nam-41-50','2026-09-05T08:15:00+07','all','100m Nam - 41–50 tuổi'),
   ('boi-loi','100m-nu','2026-09-05T08:15:00+07','all','100m Nữ'),
   ('boi-loi','4x50m-nam','2026-09-05T08:30:00+07','all','Đồng đội Nam 4x50m'),
   ('boi-loi','4x50m-nu','2026-09-05T08:30:00+07','all','Đồng đội Nữ 4x50m'),
@@ -4505,10 +4584,16 @@ insert into seed_update_metadata values
   ('bong-ban','doi-nam-nu-31-40','{"update_workbook":"updates/BÓNG BÀN EXCEL/bóng bàn.xlsx","update_sha256":"cbe5b0ea27892840d269928e03b89405a6c051b3422e643b61ce5c7b3ec73857","ignored_sheets":[]}'),
   ('bong-ban','doi-nam-nu-41-50','{"update_workbook":"updates/BÓNG BÀN EXCEL/bóng bàn.xlsx","update_sha256":"cbe5b0ea27892840d269928e03b89405a6c051b3422e643b61ce5c7b3ec73857","ignored_sheets":[]}'),
   ('boi-loi','100m-nu','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","ignored_sheets":[]}'),
-  ('boi-loi','50m-nam','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","ignored_sheets":[]}'),
-  ('boi-loi','100m-nam','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","ignored_sheets":[]}'),
-  ('boi-loi','50m-nu','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","ignored_sheets":[]}'),
-  ('boi-loi','4x50m-nam','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","ignored_sheets":[]}'),
+  ('boi-loi','50m-nam-duoi-30','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 3","ignored_sheets":[]}'),
+  ('boi-loi','50m-nam-31-40','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 3","ignored_sheets":[]}'),
+  ('boi-loi','50m-nam-41-50','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 4","ignored_sheets":[]}'),
+  ('boi-loi','50m-nam-tren-50','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 4","ignored_sheets":[]}'),
+  ('boi-loi','50m-nu-duoi-30','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 6","ignored_sheets":[]}'),
+  ('boi-loi','50m-nu-31-40','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 7","ignored_sheets":[]}'),
+  ('boi-loi','100m-nam-duoi-30','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 5","ignored_sheets":[]}'),
+  ('boi-loi','100m-nam-41-50','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 5","ignored_sheets":[]}'),
+  ('boi-loi','4x50m-nam','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 8","ignored_sheets":[]}'),
+  ('boi-loi','4x50m-nu','{"update_workbook":"updates/BƠI LỘI EXCEL/bơi lội.xlsx","update_sha256":"fe80c806c201ed547e0ee0159eebbaf5ca2e23f2fe606859c4704c1e61867c6d","supporting_sheet":"Trang 9","ignored_sheets":[]}'),
   ('cau-long','doi-nam-tren-51','{"update_workbook":"updates/CẦU LÔNG EXCEL/cầu lông.xlsx","update_sha256":"c5a0749d57368514ecb5fe9a902dba04d4ae9c29c11ed6d6c4f5bc65d93966e6","ignored_sheets":[]}'),
   ('cau-long','doi-nam-nu-31-40','{"update_workbook":"updates/CẦU LÔNG EXCEL/cầu lông.xlsx","update_sha256":"c5a0749d57368514ecb5fe9a902dba04d4ae9c29c11ed6d6c4f5bc65d93966e6","ignored_sheets":[]}'),
   ('cau-long','doi-nam-nu-41-50','{"update_workbook":"updates/CẦU LÔNG EXCEL/cầu lông.xlsx","update_sha256":"c5a0749d57368514ecb5fe9a902dba04d4ae9c29c11ed6d6c4f5bc65d93966e6","ignored_sheets":[]}'),

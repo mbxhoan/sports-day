@@ -37,14 +37,14 @@ insert into seed_individual_sports values
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',3,'individual','Lê Minh Quyết','VSP','Lê Minh Quyết'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',3,'individual','Trần Ngọc Minh','PVCFC','Trần Ngọc Minh'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',3,'individual','Nobuhiko MAKI','PVEP','Nobuhiko MAKI'),
-  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Lê Tiến Dũng','PETROVIETN AM','Lê Tiến Dũng'),
+  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Lê Tiến Dũng','BMĐH','Lê Tiến Dũng'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Nguyễn Dương Bình','PVEP','Nguyễn Dương Bình'),
-  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','nguyễn Vân Nam','PV GAS','nguyễn Vân Nam'),
-  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','PHẠM VĂN EM','PVCFC','PHẠM VĂN EM'),
+  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Nguyễn Vân Nam','PV GAS','Nguyễn Vân Nam'),
+  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Phạm Văn Em','PVCFC','Phạm Văn Em'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Ngô Thế Lạc','PVMR','Ngô Thế Lạc'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Vũ Hoàng Lập','VSP','Vũ Hoàng Lập'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Lê Ngọc Linh','PV GAS','Lê Ngọc Linh'),
-  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Lê Tiến Trung','PV Drilling','Lê Tiến Trung'),
+  ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Lê Tiến Trung','PV DRILLING','Lê Tiến Trung'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Vũ Trung Kiên','PTSC','Vũ Trung Kiên'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Hoàng Duy Thu','PV GAS','Hoàng Duy Thu'),
   ('boi-loi','50m-nam','2026-09-05 08:00:00+07',4,'individual','Hà Thiếu Sang','PVMR','Hà Thiếu Sang'),
@@ -64,16 +64,16 @@ insert into seed_individual_sports values
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Tăng Hoàng Nhân','PTSC','Tăng Hoàng Nhân'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Shumpei YONETSU','PVEP','Shumpei YONETSU'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Nguyễn Phú Nam','PVPMB','Nguyễn Phú Nam'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Lê Minh Hoàng','VSP','Lê Minh Hoàng'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Lê Minh Hoàng','VSP','Lê Minh Hoàng'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Trần Xuân Chánh','PTSC','Trần Xuân Chánh'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Trần Công Bằng','PV GAS','Trần Công Bằng'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Trần Văn Cường','PVTRANS','Trần Văn Cường'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Trương Trần Trung Tín','PVTRANS','Trương Trần Trung Tín'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Alexey','VSP','Alexey'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Phạm Ngọc Anh','PVEP','Phạm Ngọc Anh'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Phạm Hồng Minh','PV Drilling','Phạm Hồng Minh'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Phạm Hồng Minh','PV DRILLING','Phạm Hồng Minh'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Vũ Việt Bình','VSP','Vũ Việt Bình'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Lê Trọng Hiếu','PV Drilling','Lê Trọng Hiếu'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Lê Trọng Hiếu','PV DRILLING','Lê Trọng Hiếu'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Đỗ Công Hữu','PVCFC','Đỗ Công Hữu'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Nguyễn Văn Lếm','VSP','Nguyễn Văn Lếm'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Huỳnh Lương Sánh','PQPOC','Huỳnh Lương Sánh'),
@@ -84,34 +84,34 @@ insert into seed_individual_sports values
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Lâm Tất Thắng','VSP','Lâm Tất Thắng'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Nguyễn Tiến Trình','PV GAS','Nguyễn Tiến Trình'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Phạm Văn Thuận','PVOIL','Phạm Văn Thuận'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Nguyễn Hồng Phúc','PV Drilling','Nguyễn Hồng Phúc'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Bui Trung Kiên','PVTRANS','Bui Trung Kiên'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Trần Ngọc Thùy Dương','BMĐH PETROVIETNAM','Trần Ngọc Thùy Dương'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Nguyễn Hồng Phúc','PV DRILLING','Nguyễn Hồng Phúc'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',5,'individual','Bùi Trung Kiên','PVTRANS','Bùi Trung Kiên'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Trần Ngọc Thùy Dương','BMĐH','Trần Ngọc Thùy Dương'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Đỗ Hồ Minh Phương','PETROSETCO','Đỗ Hồ Minh Phương'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Lữ Thị Nhung','PTSC','Lữ Thị Nhung'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Phương Thị Huyền','VSP','Phương Thị Huyền'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Thị Lý','PVCFC','Nguyễn Thị Lý'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Thị Thanh Thanh','PVcomBank','Nguyễn Thị Thanh Thanh'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Thị Thanh Thanh','PVCOMBANK','Nguyễn Thị Thanh Thanh'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Trần Thị Quỳnh Vân','PVEP','Trần Thị Quỳnh Vân'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Thị Ngọc Lan','PVOIL','Nguyễn Thị Ngọc Lan'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Lê Thị Phượng Uyển','PVTRANS','Lê Thị Phượng Uyển'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Thị Thanh Nhã','PTSC','Nguyễn Thị Thanh Nhã'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Châu Pha Diễm','VSP','Châu Pha Diễm'),
-  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Minh Nguyệt','PV Drilling','Nguyễn Minh Nguyệt'),
+  ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Minh Nguyệt','PV DRILLING','Nguyễn Minh Nguyệt'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Hà Thị Trang','PVCFC','Hà Thị Trang'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Trịnh Thị Thanh','PV GAS','Trịnh Thị Thanh'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Ái Thanh Đan','PVEP','Nguyễn Ái Thanh Đan'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Lê Thị Hằng','PVMR','Lê Thị Hằng'),
   ('boi-loi','100m-nam','2026-09-05 08:30:00+07',6,'individual','Nguyễn Thị Thùy Dung','PTSC','Nguyễn Thị Thùy Dung'),
-  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','PTSC 01','PTSC 01','Nguyễn Mai Nam
+  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','PTSC 01','PTSC','Nguyễn Mai Nam
 Nguyễn Thị Thanh Nhã
 Nguyễn Thị Thùy Dung
 Trịnh Xuân Cảnh'),
-  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','PTSC 02','PTSC 02','Đinh Thị Hà Phương
+  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','PTSC 02','PTSC','Đinh Thị Hà Phương
 Lữ Thị Nhung
 Nguyễn Công Khiên
 Trần Xuân Chánh'),
-  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','PVG','PVG','Phạm Minh Tài
+  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','PV GAS','PV GAS','Phạm Minh Tài
 Trần Kim Trung
 Trịnh Thị Thanh
 Trương Thị Ngọc Thịnh'),
@@ -127,7 +127,7 @@ Trần Thị Quỳnh Vân'),
 Huỳnh Tấn Giang
 Nguyễn Quang Trung
 Nguyễn Thị Ngọc Lan'),
-  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','VSP','VSP','Lê Minh Hoàng
+  ('boi-loi','4x50m-nam','2026-09-05 15:30:00+07',7,'team','VSP','VSP','Lê Minh Hoàng
 Nguyễn Thị Ngọc Anh
 Nguyễn Thị Thùy
 Trần Văn Toàn'),
@@ -137,19 +137,19 @@ Trần Ngọc Thùy Dương'),
 Đặng Trần Anh Tuấn
 Tăng Hoàng Nhân
 Vũ Trung Kiên'),
-  ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','PVG','PVG','Hồ Tấn Đạt
+  ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','PVG','PV GAS','Hồ Tấn Đạt
 Lê Ngọc Linh
-nguyễn Vân Nam
+Nguyễn Vân Nam
 Trần Công Bằng'),
   ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','PVCFC','PVCFC','Nguyễn Duy Sơn
 Nguyễn Quách Thanh Nam
-PHẠM VĂN EM
+Phạm Văn Em
 Trần Ngọc Minh'),
-  ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','VSP01','VSP01','Alexey
+  ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','VSP01','VSP','Alexey
 Đặng Trọng Thông
 Nguyễn Anh Tuấn
 Vũ Việt Bình'),
-  ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','VSP02','VSP02','Điêu Lâm Thành
+  ('boi-loi','4x50m-nu','2026-09-05 15:30:00+07',8,'team','VSP02','VSP','Điêu Lâm Thành
 Lâm Tất Thắng
 Shamil
 Trần Linh Vương'),

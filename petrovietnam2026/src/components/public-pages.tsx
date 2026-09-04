@@ -60,7 +60,7 @@ export async function SportsPage({ locale }: { locale: Locale }) {
   return <SiteShell locale={locale}><div className="container page-container"><PageTitle emoji="🏆" title={t.sports} subtitle={localized(data.event,"subtitle",locale)}/><div className="sports-grid">{data.sports.map((sport) => <SportCard key={sport.id} locale={locale} sport={sport} data={data}/>)}</div></div></SiteShell>;
 }
 
-export async function SportPage({ locale, slug, tab = "info" }: { locale: Locale; slug: string; tab?: string }) {
+export async function SportPage({ locale, slug, tab = "info", tournamentSlug }: { locale: Locale; slug: string; tab?: string; tournamentSlug?: string }) {
   const data = await getSiteData();
   const sport = data.sports.find((item) => item.slug === slug);
   if (!sport) return <SiteShell locale={locale}><div className="container page-container"><PageTitle title="404" subtitle={copy[locale].empty}/></div></SiteShell>;
@@ -68,7 +68,7 @@ export async function SportPage({ locale, slug, tab = "info" }: { locale: Locale
   const allowedTabs = ["info", "teams", "times", "fixtures", "brackets"] as TabKey[];
   const active = allowedTabs.includes(tab as TabKey) ? tab as TabKey : "info";
   const hrefBase = `${locale === "en" ? "/en" : ""}/sports/${sport.slug}`;
-  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
+  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} initialTournamentSlug={tournamentSlug} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
 }
 
 export async function SchedulePage({ locale }: { locale: Locale }) {

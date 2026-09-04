@@ -6,7 +6,7 @@ create temporary table seed_roster (
 
 insert into seed_roster values
   ('co-vua','nu','Nguyễn Thị Thiềm','PV DRILLING'),
-  ('co-vua','nu','Phạm Nguyễn Như','PVE'),
+  ('co-vua','nu','Phạm Nguyễn Như Thường','PVE'),
   ('co-vua','nu','Bùi Trịnh Vân Anh','PVFCCO'),
   ('co-vua','nu','Nguyễn Thị Quế Châu','PVFCCO'),
   ('co-vua','nu','Đoàn Thị Loan','PVOIL'),
@@ -94,7 +94,7 @@ insert into seed_roster values
   ('co-tuong','nam-tren-45','Nguyễn Vỹ','PV GAS'),
   ('co-tuong','nam-tren-45','Vũ Ngọc Thạch','PV GAS'),
   ('co-tuong','nam-tren-45','Đái Quốc Triều','PVCFC'),
-  ('co-tuong','nam-tren-45','Nguyễn Bá Phương','PVFCCO'),
+  ('co-tuong','nam-tren-45','Nguyễn Bá Phượng','PVFCCO'),
   ('co-tuong','nam-tren-45','Nguyễn Thanh Mạnh','PVFCCO'),
   ('co-tuong','nam-tren-45','Nguyễn Trọng Nghĩa','PVFCCO'),
   ('co-tuong','nam-tren-45','Hoàng Văn Mười','PVOIL'),

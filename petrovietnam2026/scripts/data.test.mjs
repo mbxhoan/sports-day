@@ -51,6 +51,8 @@ const feedbackMigration = readFileSync(new URL("migrations/20260830090000_feedba
 const fullStandingsMigration = readFileSync(new URL("migrations/20260831100000_full_manual_standings.sql", supabaseRoot), "utf8");
 const sportExcelMigration = readFileSync(new URL("migrations/20260831120000_sport_excel_admin.sql", supabaseRoot), "utf8");
 const updateWorkbookSeed = readFileSync(new URL("../../supabase/seeds/052_updates_workbooks.sql", import.meta.url), "utf8");
+const chessRosterSeed = readFileSync(new URL("../../supabase/seeds/025_chess_rosters.sql", import.meta.url), "utf8");
+const customerFeedbackMigration = readFileSync(new URL("../../supabase/migrations/20260904100000_repair_chess_swimming_customer_feedback.sql", import.meta.url), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 
@@ -212,8 +214,8 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(adminCss, /\.bracket-edit-button\s*\{[^}]*position:\s*absolute[^}]*display:\s*inline-flex/);
   assert.match(competitionBoard, /className="gold-button bracket-inline-save"/);
   assert.match(adminCss, /\.bracket-inline-save\s*\{[^}]*display:\s*inline-flex/);
-  assert.match(competitionBoard, /const slotEntry = slot \? resolveSlotEntry/);
-  assert.match(competitionBoard, /const row = sideRow \?\? \(slotEntry \? rows\.find/);
+  assert.match(competitionBoard, /resolveMatchEntry/);
+  assert.match(competitionBoard, /slots\.length > 0 \? \(entry \? rows\.find/);
 });
 
 test("result editor accepts teams resolved from bracket slots", () => {
@@ -248,6 +250,27 @@ test("entry variants are merged without leaving duplicate group rows", () => {
   assert.match(source, /archived_at/);
   assert.match(source, /select distinct on \(merge\.keeper_id, member\.participant_id\)/);
   assert.match(source, /select distinct on \(member\.group_id, merge\.keeper_id\)/);
+});
+
+test("customer feedback keeps chess rosters exact and splits swimming age groups", () => {
+  assert.match(chessRosterSeed, /'co-vua','nu','Phạm Nguyễn Như Thường','PVE'/);
+  assert.doesNotMatch(chessRosterSeed, /'co-vua','nu','Phạm Nguyễn Như','PVE'/);
+  assert.match(chessRosterSeed, /'co-tuong','nam-tren-45','Đái Quốc Triều','PVCFC'/);
+  assert.match(chessRosterSeed, /'co-tuong','nam-tren-45','Nguyễn Bá Phượng','PVFCCO'/);
+  assert.doesNotMatch(updateWorkbookSeed, /Chu Ðình Quang Vinh/);
+  assert.doesNotMatch(updateWorkbookSeed, /Nguyễn Bá Phương/);
+  for (const slug of ["50m-nam-duoi-30", "50m-nam-31-40", "50m-nam-41-50", "50m-nam-tren-50", "50m-nu-duoi-30", "50m-nu-31-40", "100m-nam-duoi-30", "100m-nam-41-50"]) {
+    assert.match(competition, new RegExp(`'boi-loi','${slug}'`));
+    assert.match(updateWorkbookSeed, new RegExp(`'${slug}'`));
+  }
+  assert.match(updateWorkbookSeed, /'boi-loi','4x50m-nu','team','VSP02'/);
+  assert.match(updateWorkbookSeed, /'boi-loi','4x50m-nu','VSP02','Trần Linh Vương'/);
+  assert.match(customerFeedbackMigration, /repair_chess_swimming_customer_feedback/);
+  assert.match(customerFeedbackMigration, /UPD-BOI-/);
+  assert.match(siteLib, /from\("entries"\)[\s\S]*is\("archived_at", null\)/);
+  assert.match(siteLib, /entry_members!inner\(entries!inner\(kind\)\)/);
+  assert.match(siteLib, /teamParticipants/);
+  assert.match(competitionBoard, /entry-member-list/);
 });
 
 test("dedupe handles Vietnamese Unicode variants and removes teams or athletes from the event", () => {
@@ -328,9 +351,9 @@ test("results derive winners and recalculate unique standings ranks", () => {
   assert.match(siteLib, /played: "Trận"/);
 });
 
-test("result editor uses persisted fixture side before a stale slot resolution", () => {
-  assert.match(competitionBoard, /const entry = sideRow \? entriesById\.get\(sideRow\.entry_id\) : slotEntry/);
-  assert.match(competitionBoard, /const row = sideRow \?\? \(slotEntry \? rows\.find\(\(item\) => item\.entry_id === slotEntry\.id\) : undefined\)/);
+test("result editor uses source slots before stale persisted fixture rows", () => {
+  assert.match(competitionBoard, /const entry = resolveMatchEntry/);
+  assert.match(competitionBoard, /const row = slots\.length > 0 \? \(entry \? rows\.find/);
 });
 
 test("result scores auto-select the higher-scoring winner", () => {
@@ -351,7 +374,7 @@ test("fixture result summaries keep score formatting and bracket rows", () => {
 });
 
 test("bracket resolves mapped names and exposes standings editing below", () => {
-  assert.match(competitionBoard, /resolveSlotEntry/);
+  assert.match(competitionBoard, /resolveMatchEntry/);
   assert.match(competitionBoard, /standingsAction/);
   assert.match(competitionBoard, /scoreLabel/);
   assert.match(adminSportPage, /standingsAction: saveManualStandings/);

@@ -152,7 +152,7 @@ const tournamentNames: Record<string, Array<[string, string]>> = {
   pickleball: [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nam từ 51 tuổi","Men’s Doubles 51+"],["Đôi nữ dưới 30 tuổi","Women’s Doubles Under 30"],["Đôi nữ 31–40 tuổi","Women’s Doubles 31–40"],["Đôi nữ 41–50 tuổi","Women’s Doubles 41–50"],["Đôi nữ từ 50 tuổi","Women’s Doubles 50+"],["Đôi nam nữ dưới 30 tuổi","Mixed Doubles Under 30"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"],["Đôi nam nữ từ 51 tuổi","Mixed Doubles 51+"]],
   "bong-ban": [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nữ","Women’s Doubles"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"]],
   "cau-long": [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nam từ 51 tuổi","Men’s Doubles 51+"],["Đôi nam nữ dưới 30 tuổi","Mixed Doubles Under 30"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"],["Đôi nữ dưới 30 tuổi","Women’s Doubles Under 30"],["Đôi nữ 31–40 tuổi","Women’s Doubles 31–40"]],
-  "boi-loi": [["50m tự do nam","Men’s 50m Freestyle"],["50m tự do nữ","Women’s 50m Freestyle"],["100m tự do nam","Men’s 100m Freestyle"],["100m tự do nữ","Women’s 100m Freestyle"],["Tiếp sức nam 4×50m","Men’s 4×50m Relay"],["Tiếp sức nữ 4×50m","Women’s 4×50m Relay"]],
+  "boi-loi": [["50m tự do nam dưới 30 tuổi","Men’s 50m Freestyle Under 30"],["50m tự do nam 31–40 tuổi","Men’s 50m Freestyle 31–40"],["50m tự do nam 41–50 tuổi","Men’s 50m Freestyle 41–50"],["50m tự do nam trên 50 tuổi","Men’s 50m Freestyle 50+"],["50m tự do nữ dưới 30 tuổi","Women’s 50m Freestyle Under 30"],["50m tự do nữ 31–40 tuổi","Women’s 50m Freestyle 31–40"],["100m tự do nam dưới 30 tuổi","Men’s 100m Freestyle Under 30"],["100m tự do nam 41–50 tuổi","Men’s 100m Freestyle 41–50"],["100m tự do nữ","Women’s 100m Freestyle"],["Tiếp sức nam 4×50m","Men’s 4×50m Relay"],["Tiếp sức nữ 4×50m","Women’s 4×50m Relay"]],
   "keo-co": [["Kéo co nam","Men’s Tug of War"],["Kéo co nữ","Women’s Tug of War"]],
   "dien-kinh": [["400m nữ","Women’s 400m"],["800m nam","Men’s 800m"],["Tiếp sức nữ 4×100m","Women’s 4×100m Relay"],["Tiếp sức nam 4×100m","Men’s 4×100m Relay"],["3.000m nữ","Women’s 3,000m"],["5.000m nam","Men’s 5,000m"]],
   "co-vua": [["Cờ vua nữ","Women’s Chess"],["Cờ vua nam dưới 45 tuổi","Men’s Chess Under 45"],["Cờ vua nam trên 45 tuổi","Men’s Chess Over 45"]],
@@ -211,26 +211,27 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
   const { data: tenant, error: tenantError } = await db.from("tenants").select("id").eq("slug", tenantSlug).maybeSingle();
   if (tenantError || !tenant) return fallback;
   const tenantId = tenant.id;
-  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
+  const [event, sports, tournamentsResult, organizations, participants, teamParticipants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureEntries, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
-    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).order("full_name"),
-    db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).order("name_vi"),
-    db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order,standings_confirmed_at").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("group_entries").select("id,group_id,entry_id,seed_order").eq("tenant_id", tenantId).order("seed_order"),
-    db.from("venues").select("id,name_vi,name_en,address_vi,address_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("courts").select("id,venue_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("fixtures").select("id,tournament_id,group_id,venue_id,court_id,starts_at,ends_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id,source_code").eq("tenant_id", tenantId).order("starts_at"),
+    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).is("archived_at", null).order("full_name"),
+    db.from("participants").select("id,organization_id,full_name,full_name_en,entry_members!inner(entries!inner(kind))").eq("tenant_id", tenantId).eq("entry_members.entries.kind", "team").is("archived_at", null),
+    db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).is("archived_at", null).order("name_vi"),
+    db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order,entries!inner(kind)").eq("tenant_id", tenantId).eq("entries.kind", "team").is("archived_at", null).order("sort_order"),
+    db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order,standings_confirmed_at").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("group_entries").select("id,group_id,entry_id,seed_order").eq("tenant_id", tenantId).is("archived_at", null).order("seed_order"),
+    db.from("venues").select("id,name_vi,name_en,address_vi,address_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("courts").select("id,venue_id,name_vi,name_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("fixtures").select("id,tournament_id,group_id,venue_id,court_id,starts_at,ends_at,status,round_vi,round_en,result_summary_vi,result_summary_en,round_order,bracket_position,next_fixture_id,winner_entry_id,source_code").eq("tenant_id", tenantId).is("archived_at", null).order("starts_at"),
     db.from("fixture_entries").select("id,fixture_id,entry_id,side,lane,seed_order,score,score_numeric,rank,result_status").eq("tenant_id", tenantId).is("archived_at", null).order("seed_order"),
-    db.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en").eq("tenant_id", tenantId),
-    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,score_for,score_against,points,rank").eq("tenant_id", tenantId).order("rank"),
-    db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("tenant_id", tenantId).eq("kind", "gallery").order("sort_order"),
-    db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").eq("tenant_id", tenantId).order("sort_order"),
-    db.from("footer_links").select("id,label_vi,label_en,href,sort_order").eq("tenant_id", tenantId).order("sort_order"),
+    db.from("fixture_slots").select("id,fixture_id,side,source_kind,source_entry_id,source_group_id,source_fixture_id,source_rank,label_vi,label_en").eq("tenant_id", tenantId).is("archived_at", null),
+    db.from("standings").select("id,tournament_id,group_id,entry_id,played,won,drawn,lost,score_for,score_against,points,rank").eq("tenant_id", tenantId).is("archived_at", null).order("rank"),
+    db.from("awards").select("id,organization_id,entry_id,participant_id,medal,title_vi,title_en").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("media").select("id,storage_path,sport_id,title_vi,title_en,alt_vi,alt_en,filter_tag,album_vi,album_en,sort_order").eq("tenant_id", tenantId).eq("kind", "gallery").is("archived_at", null).order("sort_order"),
+    db.from("contacts").select("id,label_vi,label_en,value,href,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("footer_links").select("id,label_vi,label_en,href,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
   ]);
 
   if (event.error || sports.error || tournamentsResult.error || fixtures.error || !event.data) return fallback;
@@ -247,7 +248,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     }),
     tournaments: tournamentsResult.data as Tournament[],
     organizations: (organizations.data ?? []) as Organization[],
-    participants: (participants.data ?? []) as Participant[],
+    participants: [...new Map([...participants.data ?? [], ...teamParticipants.data ?? []].map((participant) => [participant.id, participant])).values()] as Participant[],
     entries: (entries.data ?? []) as Entry[],
     entryMembers: (entryMembers.data ?? []) as EntryMember[],
     groups: (groups.data ?? []) as Group[],
@@ -265,7 +266,7 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
     counts: {
       sports: sports.data.length,
       organizations: organizations.data?.length ?? 0,
-      participants: participants.data?.length ?? 0,
+      participants: new Set([...(participants.data ?? []), ...(teamParticipants.data ?? [])].map((participant) => participant.id)).size,
       fixtures: fixtures.data.length,
     },
   };

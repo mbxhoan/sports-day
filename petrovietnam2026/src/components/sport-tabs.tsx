@@ -21,6 +21,7 @@ type Props = {
   active: TabKey;
   hrefBase: string;
   tournaments: Tournament[];
+  initialTournamentSlug?: string;
   organizations: Organization[];
   participants: Participant[];
   entries: Entry[];
@@ -38,10 +39,10 @@ type Props = {
 export type TabKey = "info" | "teams" | "times" | "fixtures" | "brackets";
 type SportTab = [TabKey, string, ComponentType<{ size?: number }>];
 
-export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, venues, courts }: Props) {
+export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, initialTournamentSlug, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, venues, courts }: Props) {
   const t = copy[locale];
   const tournamentIds = new Set(tournaments.map((item) => item.id));
-  const [selectedTournamentId, setSelectedTournamentId] = useState("");
+  const [selectedTournamentId, setSelectedTournamentId] = useState(() => tournaments.find((item) => item.slug === initialTournamentSlug)?.id ?? "");
   const sportFixtures = fixtures.filter((fixture) => tournamentIds.has(fixture.tournament_id));
   const sportEntries = entries.filter((entry) => tournamentIds.has(entry.tournament_id));
   const sportGroups = groups.filter((group) => tournamentIds.has(group.tournament_id));
@@ -136,6 +137,6 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
 
     {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} participants={participants} entryMembers={entryMembers} defaultVenue={venue}/>}
 
-    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} showTournamentSelector={false}/>}
+    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} participants={participants} entryMembers={entryMembers} showTournamentSelector={false}/>} 
   </>;
 }

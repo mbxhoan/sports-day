@@ -58,15 +58,23 @@ export function resolveSlotEntry(slot: Pick<FixtureSlot, "source_kind" | "source
   }
   if (slot.source_kind === "fixture_winner") {
     const fixture = context.fixtures.find((item) => item.id === slot.source_fixture_id);
-    return entriesById.get(fixture?.winner_entry_id ?? "");
+    const winnerEntryId = fixture?.winner_entry_id;
+    if (!fixture || !winnerEntryId || !["live", "completed"].includes(fixture.status)) return undefined;
+    if (!context.fixtureEntries.some((item) => item.fixture_id === fixture.id && item.entry_id === winnerEntryId)) return undefined;
+    return entriesById.get(winnerEntryId);
   }
   if (slot.source_kind === "fixture_loser") {
     const fixture = context.fixtures.find((item) => item.id === slot.source_fixture_id);
-    if (!fixture?.winner_entry_id) return undefined;
+    if (!fixture || !["live", "completed"].includes(fixture.status) || !fixture.winner_entry_id) return undefined;
     const loser = context.fixtureEntries.filter((item) => item.fixture_id === slot.source_fixture_id).find((item) => item.entry_id !== fixture.winner_entry_id);
     return entriesById.get(loser?.entry_id ?? "");
   }
   return undefined;
+}
+
+export function resolveMatchEntry(slot: Pick<FixtureSlot, "source_kind" | "source_entry_id" | "source_group_id" | "source_fixture_id" | "source_rank"> | undefined, legacyRow: Pick<FixtureEntry, "entry_id"> | undefined, context: SlotResolutionContext, fixtureUsesSlots: boolean) {
+  if (fixtureUsesSlots) return slot ? resolveSlotEntry(slot, context) : undefined;
+  return context.entries.find((entry) => entry.id === legacyRow?.entry_id);
 }
 
 export function slotGroupCandidates(slot: Pick<FixtureSlot, "source_kind" | "source_group_id">, groupEntries: GroupEntry[], entries: Entry[]) {
@@ -95,14 +103,20 @@ export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[], ca
   }
   const targetGroups = [...groupBy(slots.filter((slot) => slot.source_fixture_id && byId.has(slot.source_fixture_id) && byId.has(slot.fixture_id)), (slot) => slot.fixture_id)];
   const targetsByColumn = groupBy(targetGroups, ([targetId]) => byId.get(targetId)!.x);
-  const targetLanes = new Map<string, { index: number; count: number }>();
+  const targetLanes = new Map<string, { index: number; count: number; detour: boolean }>();
   for (const columnTargets of targetsByColumn.values()) {
-    columnTargets.sort((a, b) => byId.get(a[0])!.y - byId.get(b[0])!.y);
-    columnTargets.forEach(([targetId], index) => targetLanes.set(targetId, { index, count: columnTargets.length }));
+    const sharedSourceGroups = columnTargets.some(([, targetSlots], index) => columnTargets.slice(index + 1).some(([, otherSlots]) => targetSlots.some((slot) => otherSlots.some((otherSlot) => slot.source_fixture_id === otherSlot.source_fixture_id))));
+    columnTargets.sort((a, b) => (sharedSourceGroups ? 1 : -1) * (byId.get(a[0])!.y - byId.get(b[0])!.y));
+    columnTargets.forEach(([targetId, targetSlots], index) => {
+      const sourceYs = targetSlots.map((slot) => byId.get(slot.source_fixture_id!)!.y + cardHeight / 2);
+      const targetY = byId.get(targetId)!.y + cardHeight / 2;
+      const detour = sharedSourceGroups && targetSlots.length > 1 && targetY > Math.max(...sourceYs);
+      targetLanes.set(targetId, { index, count: columnTargets.length, detour });
+    });
   }
   const connectors = targetGroups.flatMap(([targetId, targetSlots]) => {
     const target = byId.get(targetId)!;
-    const sources = targetSlots.map((slot) => ({ slot, node: byId.get(slot.source_fixture_id!)! }));
+    const sources = targetSlots.map((slot) => ({ slot, node: byId.get(slot.source_fixture_id!)! })).sort((a, b) => a.node.y - b.node.y);
     const x1 = sources[0].node.x + CARD_WIDTH;
     const x2 = target.x;
     const y2 = target.y + cardHeight / 2;
@@ -111,13 +125,19 @@ export function layoutBracket(fixtures: LayoutFixture[], slots: LayoutSlot[], ca
     const sourceYs = sources.map(({ node }) => node.y + cardHeight / 2);
     const minY = Math.min(y2, ...sourceYs);
     const maxY = Math.max(y2, ...sourceYs);
+    const detourTop = minY - cardHeight / 2 - 16;
+    const detourBottom = maxY + cardHeight / 2 + 16;
     return sources.map(({ node }, index) => ({
       sourceId: node.id,
       targetId: target.id,
       path: index === 0 && sources.length > 1
-        ? `M${x1} ${sourceYs[index]} H${middle} M${middle} ${minY} V${maxY} M${middle} ${y2} H${x2}`
+        ? lane.detour
+          ? `M${x1} ${sourceYs[index]} V${detourTop} H${middle} V${detourBottom} M${middle} ${y2} H${x2}`
+          : `M${x1} ${sourceYs[index]} H${middle} M${middle} ${minY} V${maxY} M${middle} ${y2} H${x2}`
+        : lane.detour && index === sources.length - 1
+          ? `M${x1} ${sourceYs[index]} V${detourBottom} H${middle}`
         : index === 0
-          ? `M${x1} ${sourceYs[index]} H${middle} H${x2}`
+          ? `M${x1} ${sourceYs[index]} H${middle} V${y2} H${x2}`
           : `M${x1} ${sourceYs[index]} H${middle}`,
     }));
   });

@@ -222,6 +222,7 @@ tbody tr:last-child td { border: 0; }
 .entry-card b { color: #fff; font-size: 12px; line-height: 1.45; }
 .entry-card p { margin: 7px 0 0; color: var(--primary); font-size: 10px; }
 .entry-card > span { margin: 7px 0; color: var(--muted-foreground); font-size: 11px; }
+.entry-member-list { display: block; margin-top: 3px; color: var(--muted-foreground); font-size: 10px; font-weight: 400; line-height: 1.35; }
 .entry-card > small { margin-top: auto; color: #a8cfda; }
 .entry-card div small { display: inline-flex; align-items: center; gap: 3px; color: var(--muted-foreground); }
 .entry-number { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--muted); color: var(--primary); font-size: 10px; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -278,6 +279,8 @@ tbody tr:last-child td { border: 0; }
 .drive-gallery p { color: var(--muted-foreground); }
 .drive-gallery .gold-button { width: fit-content; text-decoration: none; }
 .manual-results table { min-width: 560px; }
+.manual-results td:nth-child(2) { min-width: 210px; }
+.manual-results-stack { display: grid; gap: 1rem; }
 .board-warning { display: -webkit-box; max-width: 100%; margin: -5px 0 10px; padding: 6px 9px; overflow: hidden; border-left: 2px solid var(--primary); background: #082b61; color: #ffd992; font-size: 10px; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .competition-board .group-grid { margin-bottom: 18px; }
 .source-bracket { position: relative; min-width: 100%; margin-bottom: 10px; }
@@ -356,7 +359,7 @@ tbody tr:last-child td { border: 0; }
 .bracket-canvas-toolbar > div { display: inline-flex; align-items: center; gap: 4px; }
 .bracket-canvas-toolbar button { min-width: 34px; min-height: 30px; padding: 0 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--card); color: #fff; font-size: 11px; }
 .bracket-canvas-toolbar button:hover, .bracket-canvas-toolbar button:focus-visible { border-color: var(--primary); color: var(--primary); }
-.bracket-canvas-viewport { width: 100%; min-width: 0; max-width: 100%; overflow: auto; padding: 2px 0 12px; border: 1px solid #123f6c; border-radius: 7px; background: #020a27; scrollbar-width: thin; }
+.bracket-canvas-viewport { width: 100%; min-width: 0; max-width: 100%; overflow: auto; padding: 16px 20px 20px; border: 1px solid #123f6c; border-radius: 7px; background: #020a27; scrollbar-width: thin; }
 .bracket-canvas-stage { position: relative; }
 .bracket-canvas .source-bracket { min-width: 0; margin: 0; transform-origin: top left; }
 .standings-inline-form { padding-bottom: 12px; }
