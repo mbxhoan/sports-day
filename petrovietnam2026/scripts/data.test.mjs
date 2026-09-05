@@ -302,6 +302,14 @@ test("dedupe handles Vietnamese Unicode variants and removes teams or athletes f
   assert.match(adminSportPage, /Xoá khỏi giải/);
 });
 
+test("admin roster inserts can run the duplicate identity trigger", () => {
+  const permissionMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("grant_entry_identity_to_authenticated"));
+  assert.ok(permissionMigration, "missing roster identity permission migration");
+  const source = readFileSync(new URL(`migrations/${permissionMigration}`, supabaseRoot), "utf8");
+  assert.match(source, /grant execute on function private\.entry_identity\(text, text\) to authenticated/);
+  assert.match(adminActions, /saveRosterRecord/);
+});
+
 test("competitor identity repairs attached organization suffixes and reversed pairs", () => {
   const repairMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("repair_competitor_identity"));
   assert.ok(repairMigration, "missing competitor identity repair migration");
