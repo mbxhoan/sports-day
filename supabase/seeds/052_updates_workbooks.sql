@@ -4657,6 +4657,7 @@ where t.sport_id = s.id and t.slug = source.tournament_slug and t.tenant_id = s.
 -- Normalize source/update spellings before exporting the current workbook snapshot.
 select private.merge_entry_variants(private.seed_tenant_id());
 select private.archive_obsolete_pickleball_pair(private.seed_tenant_id());
+select private.archive_legacy_pickleball_group_d_fixtures(private.seed_tenant_id());
 
 -- Register these reviewed current snapshots so the delivered workbooks can be re-imported safely.
 create temporary table seed_update_exports (export_id uuid, sport_slug text) on commit drop;

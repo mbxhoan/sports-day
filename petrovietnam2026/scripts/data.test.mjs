@@ -327,6 +327,19 @@ test("latest pickleball roster archives the superseded PDF pair", () => {
   assert.match(source, /set archived_at = now\(\)/);
 });
 
+test("latest pickleball group D keeps workbook fixtures instead of PDF duplicates", () => {
+  const repairMigration = readdirSync(new URL("migrations/", supabaseRoot)).find((file) => file.includes("repair_pickleball_group_d_fixtures"));
+  assert.ok(repairMigration, "missing pickleball group D repair migration");
+  const source = readFileSync(new URL(`migrations/${repairMigration}`, supabaseRoot), "utf8");
+  assert.match(source, /fixture\.source_code is null/);
+  assert.match(source, /fixture\.round_order between 10 and 12/);
+  assert.match(source, /UPD-DOI-NAM-31-40-BANG-D-02/);
+  assert.match(source, /UPD-DOI-NAM-31-40-BANG-D-03/);
+  assert.match(source, /set archived_at = coalesce\(archived_at, now\(\)\)/);
+  assert.match(source, /set score = null,[\s\S]*score_numeric = null/);
+  assert.match(updateWorkbookSeed, /archive_legacy_pickleball_group_d_fixtures/);
+});
+
 test("workbook updates reuse pair identity instead of creating suffix variants", () => {
   assert.match(migrations, /create or replace function private\.entry_identity/);
   assert.match(updateWorkbookSeed, /private\.entry_identity\(existing\.name_vi, existing\.kind\)/);
