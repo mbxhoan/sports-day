@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { createHash } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { adminEntities, type AdminEntity } from "@/lib/admin-config";
 import { formValue as valueOf } from "@/lib/admin-form";
@@ -47,6 +47,7 @@ export async function saveEvent(formData: FormData) {
   if (!validateGalleryDriveUrl(String(payload.gallery_drive_url ?? ""))) throw new Error("URL Google Drive không hợp lệ");
   const { error } = await supabase.from("event_settings").update(payload).eq("tenant_id", tenantId).eq("singleton_key", "main");
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
 }
 
@@ -63,6 +64,7 @@ async function saveRecordInternal(formData: FormData) {
     if (nameVi.length > 200) throw new Error("Tên đầy đủ của đơn vị quá dài");
     const { error } = await supabase.from("organizations").update({ name_vi: nameVi }).eq("tenant_id", tenantId).eq("id", id).is("archived_at", null);
     if (error) throw new Error(error.message);
+    revalidateTag("site-data", "max");
     revalidatePath("/", "layout");
     revalidatePath("/admin");
     return;
@@ -85,6 +87,7 @@ async function saveRecordInternal(formData: FormData) {
     const { error: syncError } = await supabase.rpc("sync_tournament_slots", { p_tournament_id: payload.tournament_id });
     if (syncError) throw new Error(syncError.message);
   }
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
   if (sportSlug) revalidatePath(`/admin/sports/${sportSlug}`);
@@ -131,6 +134,7 @@ export async function setArchived(formData: FormData) {
   const archived = formData.get("archived") === "true";
   const { error } = await supabase.from(entity).update({ archived_at: archived ? new Date().toISOString() : null }).eq("tenant_id", tenantId).eq("id", id);
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -148,6 +152,7 @@ export async function deleteMedia(formData: FormData) {
   }
   const { error } = await supabase.from("media").delete().eq("tenant_id", tenantId).in("id", ids);
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
   revalidatePath("/gallery");
@@ -200,6 +205,7 @@ export async function uploadHero(formData: FormData) {
   const column = variant === "mobile" ? "hero_mobile_path" : "hero_path";
   const { error } = await supabase.from("event_settings").update({ [column]: supabase.storage.from("event-media").getPublicUrl(path).data.publicUrl }).eq("tenant_id", tenantId).eq("singleton_key", "main");
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -218,6 +224,7 @@ export async function uploadSportIcon(formData: FormData) {
   const emoji = supabase.storage.from("event-media").getPublicUrl(path).data.publicUrl;
   const { error } = await supabase.from("sports").update({ emoji }).eq("tenant_id", tenantId).eq("id", sport.id);
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath(`/admin/sports/${sport.slug}`);
 }
@@ -285,6 +292,7 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     const summary = (field: "name_vi" | "name_en") => formatMatchResult(labelsById.get(entryIds[0])?.[field] ?? "", scores[0], scores[1], labelsById.get(entryIds[1])?.[field] ?? "");
     const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: winnerEntryId, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
     if (error) return actionFailure(new Error(error.message));
+    revalidateTag("site-data", "max");
     revalidatePath("/", "layout");
     revalidatePath("/admin");
     revalidatePath(`/admin/sports/${sport.slug}`);
@@ -318,6 +326,7 @@ export async function saveRaceResult(formData: FormData) {
   if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
   const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -352,6 +361,7 @@ export async function saveFixtureSlot(_previousState: AdminActionState, formData
     }
     const { error: syncError } = await supabase.rpc("save_fixture_slot_and_sync", { p_slot_id: slotId, p_source_kind: sourceKind, p_source_entry_id: sourceEntryId, p_source_group_id: sourceGroupId, p_source_fixture_id: sourceFixtureId, p_source_rank: sourceRank, p_label_vi: String(formData.get("label_vi") ?? "").trim(), p_label_en: String(formData.get("label_en") ?? "").trim() });
     if (syncError) return actionFailure(new Error(syncError.message));
+    revalidateTag("site-data", "max");
     revalidatePath("/", "layout");
     revalidatePath("/admin");
     return { ok: true, message: "Đã lưu cấu trúc nhánh" };
@@ -429,6 +439,7 @@ export async function saveManualStandings(formData: FormData) {
     const { error: raceError } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixture.id, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
     if (raceError) throw new Error(raceError.message);
   }
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -439,6 +450,7 @@ export async function confirmGroupStandings(formData: FormData) {
   const { supabase } = await adminClient();
   const { error } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -455,6 +467,7 @@ export async function saveManualLeaderboard(formData: FormData) {
   const { supabase } = await adminClient();
   const { error } = await supabase.rpc("save_manual_leaderboard", { p_rows: rows });
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }
@@ -475,6 +488,7 @@ export async function confirmFixtureReset(formData: FormData) {
   const { supabase } = await adminClient();
   const { error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: true });
   if (error) throw new Error(error.message);
+  revalidateTag("site-data", "max");
   revalidatePath("/", "layout");
   revalidatePath("/admin");
 }

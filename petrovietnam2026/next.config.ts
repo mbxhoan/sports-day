@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
+    // Supabase serves the originals directly; avoid routing large uploads through Vercel's optimizer.
+    unoptimized: true,
     remotePatterns: process.env.NEXT_PUBLIC_SUPABASE_URL
       ? [new URL("/storage/v1/object/public/event-media/**", process.env.NEXT_PUBLIC_SUPABASE_URL)]
       : [],

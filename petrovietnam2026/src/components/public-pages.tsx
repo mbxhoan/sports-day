@@ -14,7 +14,7 @@ function PageTitle({ emoji, title, subtitle }: { emoji?: string; title: string; 
 }
 
 function SportIcon({ value }: { value: string }) {
-  return value.startsWith("/") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} /> : <span className="sport-emoji">{value}</span>;
+  return value.startsWith("/") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} unoptimized={value.startsWith("http")} /> : <span className="sport-emoji">{value}</span>;
 }
 
 function SportCard({ locale, sport, data }: { locale: Locale; sport: Sport; data: SiteData }) {
@@ -42,7 +42,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
     [Users, 1500, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale}>
-    {(data.event.hero_path || data.event.hero_mobile_path) && <section className="hero">{data.event.hero_path && <Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" />}{data.event.hero_mobile_path && <Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill priority sizes="100vw" />}</section>}
+    {(data.event.hero_path || data.event.hero_mobile_path) && <section className="hero">{data.event.hero_path && <Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill sizes="100vw" unoptimized={data.event.hero_path.startsWith("http")} />}{data.event.hero_mobile_path && <Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill sizes="100vw" unoptimized={data.event.hero_mobile_path.startsWith("http")} />}</section>}
     {data.event.start_at && <Countdown target={data.event.start_at} locale={locale}/>}
     <div className="container home-content">
       <section className="stats-grid">

@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   description: "Hội thao Petrovietnam 2026 khu vực phía Nam",
 };
 
-export const dynamic = "force-dynamic";
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="vi"><body><Suspense fallback={null}><LoadingFeedback /></Suspense>{children}</body></html>;
 }

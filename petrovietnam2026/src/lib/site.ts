@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { unstable_noStore as noStore } from "next/cache.js";
+import { unstable_cache } from "next/cache.js";
 import { cache } from "react";
 import { tenantHeaders, tenantSlug } from "./tenant.ts";
 
@@ -259,8 +259,7 @@ const fallback: SiteData = {
   counts: { sports: 8, organizations: 24, participants: 0, fixtures: 10 },
 };
 
-export const getSiteData = cache(async function getSiteData(): Promise<SiteData> {
-  noStore();
+const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<SiteData> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key || !tenantSlug) return fallback;
@@ -339,7 +338,9 @@ export const getSiteData = cache(async function getSiteData(): Promise<SiteData>
       fixtures: fixtures.data.length,
     },
   };
-});
+}, ["site-data"], { revalidate: 60, tags: ["site-data"] });
+
+export const getSiteData = cache(getCachedSiteData);
 
 export function rankOrganizations(awards: Award[], organizations: Organization[], entries: Entry[], participants: Participant[] = []): LeaderboardRow[] {
   if (organizations.some((organization) => organization.gold_medals !== undefined || organization.leaderboard_rank !== undefined)) {

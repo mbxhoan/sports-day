@@ -28,9 +28,9 @@ export function GalleryGrid({ locale, media, sports }: { locale: Locale; media: 
     </div>
     {albums.length > 1 && <div className="filter-pills gallery-albums" aria-label={locale === "vi" ? "Lọc nhóm ảnh" : "Filter albums"}><button className={album === "all" ? "active" : ""} onClick={() => setAlbum("all")}>{locale === "vi" ? "Tất cả nhóm" : "All albums"}</button>{albums.map((item) => <button key={item} className={album === item ? "active" : ""} onClick={() => setAlbum(item)}>{item}</button>)}</div>}
     {visible.length ? <section className="gallery-grid">{visible.map((item) => <button className="gallery-card" key={item.id} onClick={() => setSelected(item)} aria-label={label(item)}>
-      <div><Image src={item.public_url} alt={label(item)} fill sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"/></div>
+      <div><Image src={item.public_url} alt={label(item)} fill sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw" unoptimized/></div>
       {localized(item, "title", locale) && <h2>{localized(item, "title", locale)}</h2>}
     </button>)}</section> : <section className="panel empty-state gallery-empty"><Camera/><h2>{t.galleryEmpty}</h2></section>}
-    <dialog ref={dialogRef} className="gallery-dialog" onClose={() => setSelected(null)}>{selected && <><button className="gallery-close" onClick={() => setSelected(null)} aria-label={locale === "vi" ? "Đóng" : "Close"}><X/></button><div className="gallery-dialog-image"><Image src={selected.public_url} alt={label(selected)} fill sizes="90vw"/></div><div className="gallery-dialog-actions"><b>{localized(selected, "title", locale)}</b><a href={`${selected.public_url}?download`} download><Download size={16}/>{locale === "vi" ? "Tải xuống" : "Download"}</a></div></>}</dialog>
+    <dialog ref={dialogRef} className="gallery-dialog" onClose={() => setSelected(null)}>{selected && <><button className="gallery-close" onClick={() => setSelected(null)} aria-label={locale === "vi" ? "Đóng" : "Close"}><X/></button><div className="gallery-dialog-image"><Image src={selected.public_url} alt={label(selected)} fill sizes="90vw" unoptimized/></div><div className="gallery-dialog-actions"><b>{localized(selected, "title", locale)}</b><a href={`${selected.public_url}?download`} download><Download size={16}/>{locale === "vi" ? "Tải xuống" : "Download"}</a></div></>}</dialog>
   </>;
 }
