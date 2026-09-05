@@ -148,7 +148,7 @@ function canonicalOrganizationCode(code: string) {
   return organizationAliases[code] ?? code;
 }
 
-function normalizeOrganizations(source: Organization[]) {
+export function normalizeOrganizations(source: Organization[]) {
   const grouped = new Map<string, Organization[]>();
   for (const organization of source) {
     const code = canonicalOrganizationCode(organization.code);
@@ -158,7 +158,7 @@ function normalizeOrganizations(source: Organization[]) {
     const matches = grouped.get(item.code) ?? [];
     const primary = matches.find((organization) => organization.code === item.code) ?? matches[0];
     const values = (field: "gold_medals" | "silver_medals" | "bronze_medals") => matches.some((organization) => organization[field] !== undefined) ? matches.reduce((sum, organization) => sum + Number(organization[field] ?? 0), 0) : undefined;
-    return { id: primary?.id ?? `canonical-${item.code}`, ...item, logo_path: primary?.logo_path ?? null, leaderboard_rank: matches.map((organization) => organization.leaderboard_rank).filter((rank): rank is number => rank != null).sort((a, b) => a - b)[0] ?? null, gold_medals: values("gold_medals"), silver_medals: values("silver_medals"), bronze_medals: values("bronze_medals") };
+    return { id: primary?.id ?? `canonical-${item.code}`, ...item, name_vi: primary?.name_vi ?? item.name_vi, name_en: primary?.name_en ?? item.name_en, logo_path: primary?.logo_path ?? null, leaderboard_rank: matches.map((organization) => organization.leaderboard_rank).filter((rank): rank is number => rank != null).sort((a, b) => a - b)[0] ?? null, gold_medals: values("gold_medals"), silver_medals: values("silver_medals"), bronze_medals: values("bronze_medals") };
   });
 }
 

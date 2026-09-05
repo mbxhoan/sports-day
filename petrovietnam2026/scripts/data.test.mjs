@@ -819,6 +819,11 @@ test("leaderboard ranks medal totals and resolves organization from entry", () =
   ]);
 });
 
+test("organization normalization keeps admin-edited names", () => {
+  const rows = site.normalizeOrganizations([{ id: "pvgas", code: "PVGAS", name_vi: "Tổng công ty Khí Việt Nam đã sửa", name_en: "Updated Petrovietnam Gas", logo_path: null, sort_order: 1 }]);
+  assert.equal(rows.find((row) => row.code === "PVGAS")?.name_vi, "Tổng công ty Khí Việt Nam đã sửa");
+});
+
 test("manual leaderboard keeps explicit rank and puts unranked units last", () => {
   const organizations = [
     { id: "a", name_vi: "A", name_en: "A", code: "A", logo_path: null, sort_order: 1, leaderboard_rank: 2, gold_medals: 1, silver_medals: 0, bronze_medals: 1 },
