@@ -338,7 +338,7 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
       fixtures: fixtures.data.length,
     },
   };
-}, ["site-data"], { revalidate: 60, tags: ["site-data"] });
+}, ["site-data"], { revalidate: 300, tags: ["site-data"] });
 
 export const getSiteData = cache(getCachedSiteData);
 

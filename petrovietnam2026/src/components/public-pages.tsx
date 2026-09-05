@@ -9,12 +9,12 @@ import { copy, getSiteData, localized, rankOrganizations, type Locale, type Site
 import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 
 function PageTitle({ emoji, title, subtitle }: { emoji?: string; title: string; subtitle?: string }) {
-  const mark = emoji?.startsWith("/") || emoji?.startsWith("http") ? <Image className="page-heading-icon" src={emoji} alt="" width={42} height={42} unoptimized={emoji.startsWith("http")} /> : emoji ? <span>{emoji}</span> : null;
+  const mark = emoji?.startsWith("/") || emoji?.startsWith("http") ? <Image className="page-heading-icon" src={emoji} alt="" width={42} height={42} /> : emoji ? <span>{emoji}</span> : null;
   return <div className="page-heading">{mark}<div><h1>{title}</h1>{subtitle && <p>{subtitle}</p>}</div></div>;
 }
 
 function SportIcon({ value }: { value: string }) {
-  return value.startsWith("/") || value.startsWith("http") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} unoptimized={value.startsWith("http")} /> : <span className="sport-emoji">{value}</span>;
+  return value.startsWith("/") || value.startsWith("http") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} /> : <span className="sport-emoji">{value}</span>;
 }
 
 function SportCard({ locale, sport, data }: { locale: Locale; sport: Sport; data: SiteData }) {
@@ -42,7 +42,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
     [Users, 1500, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale}>
-    {(data.event.hero_path || data.event.hero_mobile_path) && <section className="hero">{data.event.hero_path && <Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill sizes="100vw" unoptimized={data.event.hero_path.startsWith("http")} />}{data.event.hero_mobile_path && <Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill sizes="100vw" unoptimized={data.event.hero_mobile_path.startsWith("http")} />}</section>}
+    {(data.event.hero_path || data.event.hero_mobile_path) && <section className="hero">{data.event.hero_path && <Image className="hero-desktop" src={data.event.hero_path} alt={localized(data.event,"event_name",locale)} fill sizes="100vw" />}{data.event.hero_mobile_path && <Image className="hero-mobile" src={data.event.hero_mobile_path} alt={localized(data.event,"event_name",locale)} fill sizes="100vw" />}</section>}
     {data.event.start_at && <Countdown target={data.event.start_at} locale={locale}/>}
     <div className="container home-content">
       <section className="stats-grid">
@@ -65,10 +65,20 @@ export async function SportPage({ locale, slug, tab = "info", tournamentSlug }: 
   const sport = data.sports.find((item) => item.slug === slug);
   if (!sport) return <SiteShell locale={locale}><div className="container page-container"><PageTitle title="404" subtitle={copy[locale].empty}/></div></SiteShell>;
   const tournaments = data.tournaments.filter((item) => item.sport_id === sport.id);
+  const tournamentIds = new Set(tournaments.map((item) => item.id));
+  const entries = data.entries.filter((item) => tournamentIds.has(item.tournament_id));
+  const entryIds = new Set(entries.map((item) => item.id));
+  const groups = data.groups.filter((item) => tournamentIds.has(item.tournament_id));
+  const groupIds = new Set(groups.map((item) => item.id));
+  const fixtures = data.fixtures.filter((item) => tournamentIds.has(item.tournament_id));
+  const fixtureIds = new Set(fixtures.map((item) => item.id));
+  const entryMembers = data.entryMembers.filter((item) => entryIds.has(item.entry_id));
+  const participantIds = new Set(entryMembers.map((item) => item.participant_id));
+  const organizationIds = new Set(entries.map((item) => item.organization_id).filter((id): id is string => Boolean(id)));
   const allowedTabs = ["info", "teams", "times", "fixtures", "brackets"] as TabKey[];
   const active = allowedTabs.includes(tab as TabKey) ? tab as TabKey : "info";
   const hrefBase = `${locale === "en" ? "/en" : ""}/sports/${sport.slug}`;
-  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} initialTournamentSlug={tournamentSlug} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;
+  return <SiteShell locale={locale}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(data.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={tournaments} initialTournamentSlug={tournamentSlug} organizations={data.organizations.filter((item) => organizationIds.has(item.id))} participants={data.participants.filter((item) => participantIds.has(item.id))} entries={entries} entryMembers={entryMembers} groups={groups} groupEntries={data.groupEntries.filter((item) => groupIds.has(item.group_id))} fixtures={fixtures} fixtureEntries={data.fixtureEntries.filter((item) => fixtureIds.has(item.fixture_id))} fixtureSlots={data.fixtureSlots.filter((item) => fixtureIds.has(item.fixture_id))} standings={data.standings.filter((item) => tournamentIds.has(item.tournament_id))} venues={data.venues} courts={data.courts}/></div></SiteShell>;
 }
 
 export async function SchedulePage({ locale }: { locale: Locale }) {

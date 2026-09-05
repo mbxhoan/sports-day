@@ -104,13 +104,20 @@ test("public bracket shows source rank labels without candidate predictions", ()
 });
 
 test("public pages refresh live competition data", () => {
-  assert.match(refreshDataButton, /setInterval/);
-  assert.match(refreshDataButton, /30000/);
   assert.match(refreshDataButton, /router\.refresh\(\)/);
+  assert.match(refreshDataButton, /visibilityState === "visible"/);
+  assert.match(refreshDataButton, /300000/);
   assert.match(siteLib, /unstable_cache/);
-  assert.match(siteLib, /revalidate: 60/);
+  assert.match(siteLib, /revalidate: 300/);
   assert.match(siteLib, /tags: \["site-data"\]/);
   assert.match(siteLib, /\.range\(offset, offset \+ 999\)/);
+});
+
+test("public delivery avoids repeated origin image downloads and full sport payloads", () => {
+  assert.doesNotMatch(nextConfig, /unoptimized:\s*true/);
+  assert.match(nextConfig, /minimumCacheTTL: 31_536_000/);
+  assert.match(publicPages, /const tournamentIds = new Set\(tournaments\.map/);
+  assert.match(publicPages, /entryMembers\.filter\(\(item\) => entryIds\.has/);
 });
 
 test("source topology covers every supplied category", () => {
