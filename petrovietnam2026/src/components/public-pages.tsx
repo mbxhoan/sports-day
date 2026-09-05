@@ -9,12 +9,12 @@ import { copy, getSiteData, localized, rankOrganizations, type Locale, type Site
 import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 
 function PageTitle({ emoji, title, subtitle }: { emoji?: string; title: string; subtitle?: string }) {
-  const mark = emoji?.startsWith("/") ? <Image className="page-heading-icon" src={emoji} alt="" width={42} height={42} /> : emoji ? <span>{emoji}</span> : null;
+  const mark = emoji?.startsWith("/") || emoji?.startsWith("http") ? <Image className="page-heading-icon" src={emoji} alt="" width={42} height={42} unoptimized={emoji.startsWith("http")} /> : emoji ? <span>{emoji}</span> : null;
   return <div className="page-heading">{mark}<div><h1>{title}</h1>{subtitle && <p>{subtitle}</p>}</div></div>;
 }
 
 function SportIcon({ value }: { value: string }) {
-  return value.startsWith("/") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} unoptimized={value.startsWith("http")} /> : <span className="sport-emoji">{value}</span>;
+  return value.startsWith("/") || value.startsWith("http") ? <Image className="sport-icon" src={value} alt="" width={48} height={48} unoptimized={value.startsWith("http")} /> : <span className="sport-emoji">{value}</span>;
 }
 
 function SportCard({ locale, sport, data }: { locale: Locale; sport: Sport; data: SiteData }) {

@@ -134,6 +134,11 @@ test("sports with supplied artwork use dedicated image icons", () => {
   assert.match(migrations, /update public\.sports[\s\S]*set emoji = '\/icons\/xiangqi\.png'[\s\S]*where slug = 'co-tuong'/);
 });
 
+test("public sport renderers treat uploaded absolute URLs as images", () => {
+  assert.match(publicPages, /emoji\?\.startsWith\("\/"\) \|\| emoji\?\.startsWith\("http"\)/);
+  assert.match(publicPages, /value\.startsWith\("\/"\) \|\| value\.startsWith\("http"\)/);
+});
+
 test("standing difference uses score for minus score against", () => {
   assert.equal(standingDifference({ score_for: 8, score_against: 3 }), 5);
   assert.equal(standingDifference({ score_for: null, score_against: null }), 0);
