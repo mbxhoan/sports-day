@@ -8,9 +8,10 @@ import { MarkdownInput } from "@/components/markdown-input";
 import { toVietnamLocalInput } from "@/lib/datetime";
 import { relationEntity } from "@/lib/admin-relations";
 import { SubmitButton } from "@/components/submit-button";
+import { AdminRecordForm } from "@/components/admin-record-form";
 import { getTenantId } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
-import { logout, saveEvent, saveManualLeaderboard, saveOrganizationName, saveRecord, setArchived, uploadHero } from "./actions";
+import { logout, saveEvent, saveManualLeaderboard, saveOrganizationName, saveRecordAction, setArchived, uploadHero } from "./actions";
 
 type Row = Record<string, string | number | null> & { id: string; archived_at: string | null };
 
@@ -18,7 +19,7 @@ function Fields({ fields, row = {}, rows }: { fields: readonly AdminField[]; row
   return <div className="admin-fields">{fields.map((field) => {
     const relation = relationEntity(field.name);
     const options = relation ? rows[relation].filter((item) => !item.archived_at) : [];
-    return <label key={field.name}><span>{field.label}</span>{field.type === "textarea" ? <MarkdownInput name={field.name} defaultValue={String(row[field.name] ?? "")}/> : relation ? <select name={field.name} defaultValue={String(row[field.name] ?? "")}><option value="">Chọn / Select</option>{options.map((item) => <option value={item.id} key={item.id}>{summary(item)}</option>)}</select> : <input name={field.name} type={field.type ?? "text"} defaultValue={String(row[field.name] ?? "")}/>}</label>;
+    return <label key={field.name}><span>{field.label}</span>{field.type === "textarea" ? <MarkdownInput name={field.name} defaultValue={String(row[field.name] ?? "")}/> : relation || field.options ? <select name={field.name} defaultValue={String(row[field.name] ?? "")} required={field.required}><option value="">Chọn / Select</option>{relation ? options.map((item) => <option value={item.id} key={item.id}>{summary(item)}</option>) : field.options?.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select> : <input name={field.name} type={field.type ?? "text"} defaultValue={String(row[field.name] ?? "")} required={field.required}/>}</label>;
   })}</div>;
 }
 
@@ -29,8 +30,8 @@ function summary(row: Row) {
 function CrudSection({ entity, rows, allRows }: { entity: AdminEntity; rows: Row[]; allRows: Record<AdminEntity, Row[]> }) {
   const config = adminEntities[entity];
   return <details className="admin-section"><summary><span>{config.title}</span><small>{rows.length}</small></summary><div className="admin-section-body">
-    <details className="record-form"><summary>＋ Thêm / Add</summary><form action={saveRecord}><input type="hidden" name="entity" value={entity}/><Fields fields={config.fields} rows={allRows}/><SubmitButton className="gold-button"><Save size={15}/>Lưu / Save</SubmitButton></form></details>
-    <div className="record-list">{rows.map((row) => <details className={`record ${row.archived_at ? "archived" : ""}`} key={row.id}><summary><span>{summary(row)}</span>{row.archived_at && <em>Archived</em>}</summary><form action={saveRecord}><input type="hidden" name="entity" value={entity}/><input type="hidden" name="id" value={row.id}/><Fields fields={config.fields} row={row} rows={allRows}/><SubmitButton className="gold-button"><Save size={15}/>Lưu / Save</SubmitButton></form><form action={setArchived}><input type="hidden" name="entity" value={entity}/><input type="hidden" name="id" value={row.id}/><input type="hidden" name="archived" value={row.archived_at ? "false" : "true"}/><SubmitButton className="archive-button">{row.archived_at ? <RotateCcw size={15}/> : <Archive size={15}/>} {row.archived_at ? "Khôi phục / Restore" : "Lưu trữ / Archive"}</SubmitButton></form></details>)}</div>
+    <details className="record-form"><summary>＋ Thêm / Add</summary><AdminRecordForm action={saveRecordAction}><input type="hidden" name="entity" value={entity}/><Fields fields={config.fields} rows={allRows}/><SubmitButton className="gold-button"><Save size={15}/>Lưu / Save</SubmitButton></AdminRecordForm></details>
+    <div className="record-list">{rows.map((row) => <details className={`record ${row.archived_at ? "archived" : ""}`} key={row.id}><summary><span>{summary(row)}</span>{row.archived_at && <em>Archived</em>}</summary><AdminRecordForm action={saveRecordAction}><input type="hidden" name="entity" value={entity}/><input type="hidden" name="id" value={row.id}/><Fields fields={config.fields} row={row} rows={allRows}/><SubmitButton className="gold-button"><Save size={15}/>Lưu / Save</SubmitButton></AdminRecordForm><form action={setArchived}><input type="hidden" name="entity" value={entity}/><input type="hidden" name="id" value={row.id}/><input type="hidden" name="archived" value={row.archived_at ? "false" : "true"}/><SubmitButton className="archive-button">{row.archived_at ? <RotateCcw size={15}/> : <Archive size={15}/>} {row.archived_at ? "Khôi phục / Restore" : "Lưu trữ / Archive"}</SubmitButton></form></details>)}</div>
   </div></details>;
 }
 

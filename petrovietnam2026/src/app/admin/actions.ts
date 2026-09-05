@@ -69,6 +69,13 @@ async function saveRecordInternal(formData: FormData) {
   }
   const config = adminEntities[entity];
   const payload = Object.fromEntries(config.fields.map((field) => [field.name, valueOf(formData, field.name, "type" in field ? field.type : undefined)]));
+  if (entity === "tournaments") {
+    if (!payload.sport_id) throw new Error("Vui lòng chọn môn thể thao");
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(String(payload.slug ?? ""))) throw new Error("Slug chỉ dùng chữ thường, số và dấu gạch ngang");
+    if (!String(payload.name_vi ?? "").trim() || !String(payload.name_en ?? "").trim()) throw new Error("Vui lòng nhập tên hạng mục bằng tiếng Việt và tiếng Anh");
+    if (!["male", "female", "mixed", "open"].includes(String(payload.gender ?? ""))) throw new Error("Vui lòng chọn giới tính hợp lệ");
+    if (!Number.isInteger(payload.sort_order) || Number(payload.sort_order) < 0) throw new Error("Thứ tự phải là số nguyên từ 0 trở lên");
+  }
   await validateRelations(supabase, tenantId, payload);
   const id = String(formData.get("id") ?? "");
   const query = id ? supabase.from(entity).update(payload).eq("tenant_id", tenantId).eq("id", id) : supabase.from(entity).insert({ ...payload, tenant_id: tenantId });
@@ -85,6 +92,16 @@ async function saveRecordInternal(formData: FormData) {
 
 export async function saveRecord(formData: FormData) {
   await saveRecordInternal(formData);
+}
+
+export async function saveRecordAction(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
+  try {
+    await saveRecordInternal(formData);
+    return { ok: true, message: "Đã lưu dữ liệu" };
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "digest" in error && String(error.digest).startsWith("NEXT_REDIRECT")) throw error;
+    return actionFailure(error);
+  }
 }
 
 export async function saveRosterRecord(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
@@ -209,7 +226,17 @@ function actionFailure(error: unknown): AdminActionState {
   const rawMessage = error instanceof Error ? error.message : "Không thể lưu dữ liệu";
   const message = /entry_members.*unique|duplicate key.*entry_members/i.test(rawMessage)
     ? "VĐV này đã được gán vào đội / cặp này"
-    : rawMessage;
+    : /tournaments_gender_check/i.test(rawMessage)
+      ? "Giới tính không hợp lệ. Hãy chọn Nam, Nữ, Hỗn hợp hoặc Mở."
+      : /null value in column "sport_id"/i.test(rawMessage)
+        ? "Vui lòng chọn môn thể thao"
+        : /null value in column "sort_order"/i.test(rawMessage)
+          ? "Vui lòng nhập thứ tự hạng mục"
+          : /duplicate key.*tournaments|tournaments_tenant_sport_slug_key/i.test(rawMessage)
+            ? "Slug này đã tồn tại trong môn thể thao"
+            : /violates not-null constraint|violates check constraint|invalid input syntax/i.test(rawMessage)
+              ? "Dữ liệu chưa hợp lệ. Vui lòng kiểm tra lại các trường bắt buộc."
+              : "Không thể lưu dữ liệu. Vui lòng kiểm tra lại thông tin đã nhập.";
   return { ok: false, message, code: /phụ thuộc|reset|vòng sau/i.test(message) ? "DEPENDENT_RESULTS" : "VALIDATION" };
 }
 
