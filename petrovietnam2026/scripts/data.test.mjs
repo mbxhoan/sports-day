@@ -335,6 +335,8 @@ test("latest pickleball group D keeps workbook fixtures instead of PDF duplicate
   assert.match(source, /fixture\.round_order between 10 and 12/);
   assert.match(source, /UPD-DOI-NAM-31-40-BANG-D-02/);
   assert.match(source, /UPD-DOI-NAM-31-40-BANG-D-03/);
+  assert.match(source, /doi-nam-duoi-30/);
+  assert.match(source, /round_order >= 200/);
   assert.match(source, /set archived_at = coalesce\(archived_at, now\(\)\)/);
   assert.match(source, /set score = null,[\s\S]*score_numeric = null/);
   assert.match(updateWorkbookSeed, /archive_legacy_pickleball_group_d_fixtures/);

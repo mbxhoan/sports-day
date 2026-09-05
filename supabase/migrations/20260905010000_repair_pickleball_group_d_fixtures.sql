@@ -103,6 +103,79 @@ begin
 
     perform private.recalculate_group_standings(tournament_row.tournament_id, tournament_row.group_id);
   end loop;
+
+  -- The same PDF import pattern exists in the under-30 group D schedule.
+  for tournament_row in
+    select tournament.id as tournament_id, group_row.id as group_id
+    from public.tournaments tournament
+    join public.sports sport on sport.id = tournament.sport_id
+    join public.groups group_row on group_row.tournament_id = tournament.id
+      and group_row.name_vi = 'Bảng D'
+      and group_row.archived_at is null
+    where tournament.tenant_id = p_tenant_id
+      and sport.slug = 'pickleball'
+      and tournament.slug = 'doi-nam-duoi-30'
+      and tournament.archived_at is null
+  loop
+    update public.fixture_entries item
+    set archived_at = coalesce(item.archived_at, now())
+    where item.tenant_id = p_tenant_id
+      and item.archived_at is null
+      and exists (
+        select 1
+        from public.fixtures fixture
+        where fixture.id = item.fixture_id
+          and fixture.tenant_id = p_tenant_id
+          and fixture.tournament_id = tournament_row.tournament_id
+          and fixture.group_id = tournament_row.group_id
+          and fixture.source_code is null
+          and fixture.round_order >= 200
+          and exists (
+            select 1
+            from public.fixture_entries other
+            join public.entries entry on entry.id = other.entry_id
+            where other.fixture_id = fixture.id
+              and other.archived_at is null
+              and entry.archived_at is null
+              and entry.name_vi = 'Bùi Tiến Thành / Trần Thái - PVTRANS'
+          )
+          and exists (
+            select 1
+            from public.fixture_entries other
+            join public.entries entry on entry.id = other.entry_id
+            where other.fixture_id = fixture.id
+              and other.archived_at is null
+              and entry.archived_at is null
+              and entry.name_vi = 'Huỳnh Hữu Đức / Lê Thanh Bình - PVEP'
+          )
+      );
+
+    update public.fixtures fixture
+    set archived_at = coalesce(fixture.archived_at, now())
+    where fixture.tenant_id = p_tenant_id
+      and fixture.tournament_id = tournament_row.tournament_id
+      and fixture.group_id = tournament_row.group_id
+      and fixture.source_code is null
+      and fixture.round_order >= 200
+      and exists (
+        select 1
+        from public.fixture_entries item
+        join public.entries entry on entry.id = item.entry_id
+        where item.fixture_id = fixture.id
+          and item.archived_at is null
+          and entry.name_vi = 'Bùi Tiến Thành / Trần Thái - PVTRANS'
+      )
+      and exists (
+        select 1
+        from public.fixture_entries item
+        join public.entries entry on entry.id = item.entry_id
+        where item.fixture_id = fixture.id
+          and item.archived_at is null
+          and entry.name_vi = 'Huỳnh Hữu Đức / Lê Thanh Bình - PVEP'
+      );
+
+    perform private.recalculate_group_standings(tournament_row.tournament_id, tournament_row.group_id);
+  end loop;
 end
 $$;
 
