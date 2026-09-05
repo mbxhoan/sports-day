@@ -118,6 +118,19 @@ function InlineBracketResult({ fixture, rows, action, manualWinner }: { fixture:
   </form>;
 }
 
+function GroupStageResult({ fixture, rows, action }: { fixture: Fixture; rows: MatchRow[]; action: AdminAction }) {
+  const [state, formAction, pending] = useActionState(action, initialAdminActionState);
+  const ready = Boolean(rows[0]?.entry && rows[1]?.entry && rows[0].entry.id !== rows[1].entry.id);
+  return <form className="group-stage-result" action={formAction}>
+    <input type="hidden" name="fixture_id" value={fixture.id}/>
+    <input type="hidden" name="status" value="completed"/>
+    <span className="group-stage-match-label">{fixture.source_code ?? "Trận"}</span>
+    {rows.map((item, index) => <label key={item.row?.id ?? index}><span title={item.label}>{item.label}</span><input name={`score_${index + 1}`} type="number" min="0" step="any" defaultValue={scoreValue(item.row)} aria-label={`Tỷ số ${item.label}`} disabled={!item.entry || !ready}/></label>)}
+    {state.message && <small className={state.ok ? "form-success" : "form-error"} role={state.ok ? "status" : "alert"}>{state.message}</small>}
+    <button className="gold-button" type="submit" disabled={pending || !ready}>{pending ? "Đang lưu..." : <><Save size={13} aria-hidden="true"/>Lưu điểm</>}</button>
+  </form>;
+}
+
 export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, standingsAction, sportSlug, showTournamentSelector = true, participants = [], entryMembers = [] }: Props) {
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
@@ -248,6 +261,15 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         })}</ZoomableBracket>;
       })()}
       {tournament.competition_mode === "group_knockout" && table(tournament, tournamentGroups)}
+      {tournament.competition_mode === "group_knockout" && (() => {
+        const groupFixtures = tournamentFixtures.filter((fixture) => fixture.group_id !== null && fixture.bracket_position === null);
+        if (!groupFixtures.length) return null;
+        return <section className="group-stage-results"><h3>{locale === "vi" ? "Kết quả vòng bảng" : "Group-stage results"}</h3>{tournamentGroups.map((group) => {
+          const items = groupFixtures.filter((fixture) => fixture.group_id === group.id);
+          if (!items.length) return null;
+          return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{resultAction ? items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} rows={matchRows(fixture)} action={resultAction}/>) : matchesTable(items)}</div>;
+        })}</section>;
+      })()}
       {tournament.competition_mode === "round_robin" && <>{table(tournament, tournamentGroups)}{matchesTable(tournamentFixtures)}</>}
       {(tournament.competition_mode === "race" || tournament.competition_mode === "swiss") && manualTable(tournament)}
       {!tournamentFixtures.length && !tournamentGroups.length && !entriesByTournament.get(tournament.id)?.length && <div className="panel board-empty">{t.empty}</div>}

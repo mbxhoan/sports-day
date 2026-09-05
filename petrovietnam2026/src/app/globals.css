@@ -380,6 +380,17 @@ tbody tr:last-child td { border: 0; }
 .standings-inline-form > .gold-button { margin: 12px; }
 .board-matches { margin-top: 14px; }
 .board-matches table, .board-race table { min-width: 660px; }
+.group-stage-results { margin-top: 18px; display: grid; gap: 12px; }
+.group-stage-results > h3 { margin: 0; color: var(--primary); font-size: 14px; }
+.group-stage-results-group { display: grid; gap: 7px; }
+.group-stage-results-group > h4 { margin: 0; color: #fff; font-size: 12px; }
+.group-stage-result { min-width: 0; padding: 10px; display: grid; grid-template-columns: minmax(72px, .45fr) minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; gap: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); }
+.group-stage-result label { min-width: 0; display: grid; gap: 4px; }
+.group-stage-result label > span { overflow: hidden; color: #fff; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.group-stage-result input { min-width: 0; min-height: 36px; padding: 0 8px; }
+.group-stage-match-label { color: var(--primary); font-size: 10px; font-weight: 700; }
+.group-stage-result small { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 4px 6px; overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.group-stage-result .gold-button { min-height: 36px; justify-content: center; white-space: nowrap; }
 .board-empty { color: var(--muted-foreground); }
 .admin-board-card { overflow: hidden; }
 .admin-board-card .group-grid { grid-template-columns: minmax(0, 1fr); }
@@ -416,6 +427,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .login-form .gold-button { justify-content: center; min-height: 44px; margin-top: 4px; }
 .back-link { display: block; margin-top: 22px; color: var(--muted-foreground); text-align: center; font-size: 12px; }
 .form-error { margin-bottom: 16px; padding: 10px 12px; border: 1px solid #7f1d1d; border-radius: 6px; background: #450a0a; color: #fecaca; font-size: 12px; }
+.form-success { margin-bottom: 16px; padding: 10px 12px; border: 1px solid #166534; border-radius: 6px; background: #052e16; color: #bbf7d0; font-size: 12px; }
 
 .admin-page { min-height: 100vh; background: #063b72; }
 .admin-header { position: sticky; top: 0; z-index: 20; height: 60px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: #064067; }
@@ -869,6 +881,9 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .slot-source-form { grid-template-columns: 1fr; }
   .slot-source-form > b, .slot-source-form .search-combobox, .slot-source-form > .slot-candidates, .slot-source-form > .form-error, .slot-source-form > .gold-button { grid-column: auto; }
   .slot-readonly { grid-template-columns: 1fr; gap: 4px; }
+  .group-stage-result { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .group-stage-match-label, .group-stage-result small, .group-stage-result .gold-button { grid-column: 1 / -1; }
+  .group-stage-result .gold-button { width: fit-content; }
   .race-result-list > div, .slot-editor form { grid-template-columns: 1fr; }
   .leaderboard-admin-row, .manual-standings-row { grid-template-columns: 1fr 1fr; }
   .leaderboard-admin-row b, .manual-standings-row b, .leaderboard-admin-row span { grid-column: 1 / -1; }

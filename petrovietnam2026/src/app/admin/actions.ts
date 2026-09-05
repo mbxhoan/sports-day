@@ -50,9 +50,11 @@ export async function saveEvent(formData: FormData) {
   revalidatePath("/", "layout");
 }
 
-export async function saveRecord(formData: FormData) {
+async function saveRecordInternal(formData: FormData) {
   const entity = String(formData.get("entity")) as AdminEntity;
   if (!(entity in adminEntities)) throw new Error("Entity không hợp lệ");
+  const sportSlug = String(formData.get("sport_slug") ?? "").trim();
+  if (sportSlug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(sportSlug)) throw new Error("Môn thi không hợp lệ");
   const { supabase, tenantId } = await adminClient();
   if (entity === "organizations") {
     const id = String(formData.get("id") ?? "").trim();
@@ -78,6 +80,21 @@ export async function saveRecord(formData: FormData) {
   }
   revalidatePath("/", "layout");
   revalidatePath("/admin");
+  if (sportSlug) revalidatePath(`/admin/sports/${sportSlug}`);
+}
+
+export async function saveRecord(formData: FormData) {
+  await saveRecordInternal(formData);
+}
+
+export async function saveRosterRecord(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
+  try {
+    await saveRecordInternal(formData);
+    return { ok: true, message: "Đã lưu dữ liệu" };
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "digest" in error && String(error.digest).startsWith("NEXT_REDIRECT")) throw error;
+    return actionFailure(error);
+  }
 }
 
 export async function saveOrganizationName(formData: FormData) {
@@ -189,7 +206,10 @@ export async function uploadSportIcon(formData: FormData) {
 }
 
 function actionFailure(error: unknown): AdminActionState {
-  const message = error instanceof Error ? error.message : "Không thể lưu dữ liệu";
+  const rawMessage = error instanceof Error ? error.message : "Không thể lưu dữ liệu";
+  const message = /entry_members.*unique|duplicate key.*entry_members/i.test(rawMessage)
+    ? "VĐV này đã được gán vào đội / cặp này"
+    : rawMessage;
   return { ok: false, message, code: /phụ thuộc|reset|vòng sau/i.test(message) ? "DEPENDENT_RESULTS" : "VALIDATION" };
 }
 
