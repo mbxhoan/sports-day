@@ -6,6 +6,11 @@ export function heroStoragePath(variant: string, mimeType: string, id: string) {
   return `hero/${variant}/${id}.${extensions[mimeType as keyof typeof extensions]}`;
 }
 
+export function sportIconStoragePath(slug: string, mimeType: string, id: string) {
+  if (!slug || !(mimeType in extensions)) throw new Error("Logo môn thể thao không hợp lệ");
+  return `sports/${slug}/icon/${id}.${extensions[mimeType as keyof typeof extensions]}`;
+}
+
 export function assertImageFile(file: File, maxBytes = DEFAULT_MAX_IMAGE_BYTES) {
   if (!file.size || !(file.type in extensions) || file.size > maxBytes) throw new Error(`Chỉ nhận PNG/JPEG/WebP tối đa ${maxBytes / 1024 / 1024}MB`);
   return extensions[file.type as keyof typeof extensions];

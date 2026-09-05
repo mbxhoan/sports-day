@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { adminEntities, type AdminEntity } from "@/lib/admin-config";
 import { formValue as valueOf } from "@/lib/admin-form";
 import { eventFieldNames } from "@/lib/admin-event";
-import { assertImageFile, heroStoragePath, mediaDeletionIds } from "@/lib/admin-media";
+import { assertImageFile, heroStoragePath, mediaDeletionIds, sportIconStoragePath } from "@/lib/admin-media";
 import { relationEntity } from "@/lib/admin-relations";
 import { headToHeadRule } from "@/lib/standings";
 import { formatMatchResult } from "@/lib/competition-display";
@@ -54,6 +54,17 @@ export async function saveRecord(formData: FormData) {
   const entity = String(formData.get("entity")) as AdminEntity;
   if (!(entity in adminEntities)) throw new Error("Entity không hợp lệ");
   const { supabase, tenantId } = await adminClient();
+  if (entity === "organizations") {
+    const id = String(formData.get("id") ?? "").trim();
+    const nameVi = String(formData.get("name_vi") ?? "").trim();
+    if (!id || !nameVi) throw new Error("Tên đầy đủ của đơn vị không được để trống");
+    if (nameVi.length > 200) throw new Error("Tên đầy đủ của đơn vị quá dài");
+    const { error } = await supabase.from("organizations").update({ name_vi: nameVi }).eq("tenant_id", tenantId).eq("id", id).is("archived_at", null);
+    if (error) throw new Error(error.message);
+    revalidatePath("/", "layout");
+    revalidatePath("/admin");
+    return;
+  }
   const config = adminEntities[entity];
   const payload = Object.fromEntries(config.fields.map((field) => [field.name, valueOf(formData, field.name, "type" in field ? field.type : undefined)]));
   await validateRelations(supabase, tenantId, payload);
@@ -69,10 +80,19 @@ export async function saveRecord(formData: FormData) {
   revalidatePath("/admin");
 }
 
+export async function saveOrganizationName(formData: FormData) {
+  const request = new FormData();
+  request.set("entity", "organizations");
+  request.set("id", String(formData.get("id") ?? ""));
+  request.set("name_vi", String(formData.get("name_vi") ?? ""));
+  return saveRecord(request);
+}
+
 export async function setArchived(formData: FormData) {
   const entity = String(formData.get("entity")) as AdminEntity;
   const id = String(formData.get("id") ?? "");
   if (!(entity in adminEntities) || !id) throw new Error("Yêu cầu không hợp lệ");
+  if (entity === "organizations") throw new Error("Không thể xoá hoặc lưu trữ đơn vị");
   const { supabase, tenantId } = await adminClient();
   const archived = formData.get("archived") === "true";
   const { error } = await supabase.from(entity).update({ archived_at: archived ? new Date().toISOString() : null }).eq("tenant_id", tenantId).eq("id", id);
@@ -148,6 +168,24 @@ export async function uploadHero(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidatePath("/", "layout");
   revalidatePath("/admin");
+}
+
+export async function uploadSportIcon(formData: FormData) {
+  const file = formData.get("file");
+  const sportId = String(formData.get("sport_id") ?? "").trim();
+  if (!(file instanceof File) || !sportId) throw new Error("Chưa chọn logo môn thể thao");
+  const { supabase, tenantId } = await adminClient();
+  assertImageFile(file);
+  const { data: sport, error: sportError } = await supabase.from("sports").select("id,slug").eq("tenant_id", tenantId).eq("id", sportId).is("archived_at", null).maybeSingle();
+  if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
+  const path = `${tenantSlug}/${sportIconStoragePath(sport.slug, file.type, randomUUID())}`;
+  const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
+  if (uploadError) throw new Error(uploadError.message);
+  const emoji = supabase.storage.from("event-media").getPublicUrl(path).data.publicUrl;
+  const { error } = await supabase.from("sports").update({ emoji }).eq("tenant_id", tenantId).eq("id", sport.id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/", "layout");
+  revalidatePath(`/admin/sports/${sport.slug}`);
 }
 
 function actionFailure(error: unknown): AdminActionState {
