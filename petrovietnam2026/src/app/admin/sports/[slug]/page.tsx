@@ -156,11 +156,11 @@ export default async function SportAdminPage({ params, searchParams }: { params:
     try {
       const [entriesResult, fixturesResult, standingsResult, awardsResult, groupsResult, entryMembersResult, participantsResult] = await withTimeout(() => Promise.all([scoped("entries", "tournament_id", tournamentIds), scoped("fixtures", "tournament_id", tournamentIds), scoped("standings", "tournament_id", tournamentIds), scoped("awards", "tournament_id", tournamentIds), scoped("groups", "tournament_id", tournamentIds), all("entry_members"), all("participants")]), 10_000);
       if ([entriesResult, fixturesResult, standingsResult, awardsResult, groupsResult, entryMembersResult, participantsResult].some((result) => result.error)) throw new Error("Results query failed");
-      rows.entries = asRows(entriesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
-      rows.fixtures = asRows(fixturesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
-      rows.standings = asRows(standingsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
-      rows.awards = asRows(awardsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
-      rows.groups = asRows(groupsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)));
+      rows.entries = asRows(entriesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)) && !item.archived_at);
+      rows.fixtures = asRows(fixturesResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)) && !item.archived_at);
+      rows.standings = asRows(standingsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)) && !item.archived_at);
+      rows.awards = asRows(awardsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)) && !item.archived_at);
+      rows.groups = asRows(groupsResult.data).filter((item) => tournamentIdSet.has(String(item.tournament_id)) && !item.archived_at);
       const resultEntryIds = new Set(rows.entries.map((item) => item.id));
       rows.entry_members = asRows(entryMembersResult.data).filter((item) => resultEntryIds.has(String(item.entry_id)));
       const resultParticipantIds = new Set(rows.entry_members.map((item) => String(item.participant_id)));
@@ -178,7 +178,7 @@ export default async function SportAdminPage({ params, searchParams }: { params:
       rows.fixture_entries = asRows(fixtureEntriesResult.data).filter((item) => fixtureIdSet.has(String(item.fixture_id)));
       const tournamentByFixture = new Map(rows.fixtures.map((fixture) => [fixture.id, fixture.tournament_id]));
       rows.standings = [...rows.standings, ...rows.fixture_entries.map((row) => ({ ...row, tournament_id: tournamentByFixture.get(String(row.fixture_id)), group_id: null, points: 0 }))];
-      rows.group_entries = asRows(groupEntriesResult.data).filter((item) => groupIdSet.has(String(item.group_id)));
+      rows.group_entries = asRows(groupEntriesResult.data).filter((item) => groupIdSet.has(String(item.group_id)) && !item.archived_at && entryIds.has(String(item.entry_id)));
       fixtureSlots = asRows(fixtureSlotsResult.data).filter((item) => fixtureIdSet.has(String(item.fixture_id)));
     } catch { resultsLoadError = true; }
   } else if (section === "gallery") {

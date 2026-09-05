@@ -599,6 +599,7 @@ test("admin results scope database reads before loading competition data", () =>
   assert.match(adminSportPage, /scoped\("fixtures", "tournament_id", tournamentIds\)/);
   assert.match(adminSportPage, /all\("fixture_entries"\)/);
   assert.match(adminSportPage, /all\("group_entries"\)/);
+  assert.match(adminSportPage, /!item\.archived_at && entryIds\.has\(String\(item\.entry_id\)\)/);
   assert.match(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
 });
 
