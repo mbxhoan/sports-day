@@ -128,17 +128,17 @@ const organizationCatalog: Array<Pick<Organization, "code" | "name_vi" | "name_e
   ["BĐPOC", "CĐ Công ty Điều hành Dầu khí Biển Đông", "Bien Dong Petroleum Operating Company"],
   ["SWPOC", "CĐ Công ty Điều hành Đường ống Tây Nam", "Southwest Pipeline Operating Company"],
   ["PQPOC", "CĐ Công ty Điều hành Dầu khí Phú Quốc", "Phu Quoc Petroleum Operating Company"],
-  ["PVPMP", "CĐ Ban QLDA chuyên ngành Điện", "Power Projects Management Board"],
+  ["PVPMB", "CĐ Ban QLDA chuyên ngành Điện", "Power Projects Management Board"],
   ["LP1PP", "CĐ Ban QLDA Điện lực Dầu khí Long Phú 1", "Long Phu 1 Power Project Management Board"],
   ["PVE", "CĐ TCT Tư vấn Thiết kế Dầu khí", "Petrovietnam Design and Consulting Joint Stock Corporation"],
 ].map(([code, name_vi, name_en], sort_order) => ({ code, name_vi, name_en, sort_order: sort_order + 1 }));
 
 const organizationAliases: Record<string, string> = {
-  "PV DRILLING": "PVD", "PV Drilling": "PVD", "PV GAS": "PVGAS", PVPMB: "PVPMP",
+  "PV DRILLING": "PVD", "PV Drilling": "PVD", "PV GAS": "PVGAS", PVPMP: "PVPMB",
   PVFCCO: "PVFCCo", PCFCCo: "PVFCCo", PCFCCCo: "PVFCCo", NCKHĐT: "NCKH&ĐT", NCKH: "NCKH&ĐT",
   "Đội 2 - NCKHĐT": "NCKH&ĐT", PETOCONs: "PETROCONs", PTROCONs: "PETROCONs", PETRCONs: "PETROCONs",
   PVCCHEM: "PVCHEM", PVChem: "PVCHEM", "PV CHEM": "PVCHEM", "PV POWER": "PVPOWER", POWER: "PVPOWER",
-  PVG: "PVGAS", PVFC: "PVCFC", PVMB: "PVPMP", PVMP: "PVPMP", "MNĐH PETRO": "BMĐH",
+  PVG: "PVGAS", PVFC: "PVCFC", PVMB: "PVPMB", PVMP: "PVPMB", "MNĐH PETRO": "BMĐH",
   "BMĐH PETROVIETNAM": "BMĐH", "BỘ MÁY QL&ĐH PETROVN": "BMĐH", PVTANS: "PVTRANS", PVTRAN: "PVTRANS",
   PVTRAS: "PVTRANS", PCTRANS: "PVTRANS", PCOIL: "PVOIL", "PVI HOLDINGS": "PVI", PET: "PETROSETCO",
   Vietsovpetro: "VSP",

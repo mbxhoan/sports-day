@@ -29,7 +29,7 @@ insert into desired_organizations values
   ('BĐPOC','CĐ Công ty Điều hành Dầu khí Biển Đông','Bien Dong Petroleum Operating Company',19),
   ('SWPOC','CĐ Công ty Điều hành Đường ống Tây Nam','Southwest Pipeline Operating Company',20),
   ('PQPOC','CĐ Công ty Điều hành Dầu khí Phú Quốc','Phu Quoc Petroleum Operating Company',21),
-  ('PVPMP','CĐ Ban QLDA chuyên ngành Điện','Power Projects Management Board',22),
+  ('PVPMB','CĐ Ban QLDA chuyên ngành Điện','Power Projects Management Board',22),
   ('LP1PP','CĐ Ban QLDA Điện lực Dầu khí Long Phú 1','Long Phu 1 Power Project Management Board',23),
   ('PVE','CĐ TCT Tư vấn Thiết kế Dầu khí','Petrovietnam Design and Consulting Joint Stock Corporation',24);
 
@@ -39,12 +39,12 @@ create temporary table organization_aliases (
 ) on commit drop;
 
 insert into organization_aliases values
-  ('PV DRILLING','PVD'), ('PV Drilling','PVD'), ('PV GAS','PVGAS'), ('PVPMB','PVPMP'),
+  ('PV DRILLING','PVD'), ('PV Drilling','PVD'), ('PV GAS','PVGAS'), ('PVPMP','PVPMB'),
   ('PVFCCO','PVFCCo'), ('PCFCCo','PVFCCo'), ('PCFCCCo','PVFCCo'), ('NCKHĐT','NCKH&ĐT'),
   ('NCKH','NCKH&ĐT'), ('Đội 2 - NCKHĐT','NCKH&ĐT'), ('PETOCONs','PETROCONs'),
   ('PTROCONs','PETROCONs'), ('PETRCONs','PETROCONs'), ('PVCCHEM','PVCHEM'),
   ('PVChem','PVCHEM'), ('PV CHEM','PVCHEM'), ('PV POWER','PVPOWER'), ('POWER','PVPOWER'),
-  ('PVG','PVGAS'), ('PVFC','PVCFC'), ('PVMB','PVPMP'), ('PVMP','PVPMP'),
+  ('PVG','PVGAS'), ('PVFC','PVCFC'), ('PVMB','PVPMB'), ('PVMP','PVPMB'),
   ('MNĐH PETRO','BMĐH'), ('BMĐH PETROVIETNAM','BMĐH'), ('BỘ MÁY QL&ĐH PETROVN','BMĐH'),
   ('PVTANS','PVTRANS'), ('PVTRAN','PVTRANS'), ('PVTRAS','PVTRANS'), ('PCTRANS','PVTRANS'),
   ('PCOIL','PVOIL'), ('PVI HOLDINGS','PVI'), ('PET','PETROSETCO'), ('Vietsovpetro','VSP'),
