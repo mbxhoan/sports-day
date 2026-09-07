@@ -703,6 +703,12 @@ test("manual competition keeps source order while ranked rows move first", () =>
   assert.doesNotMatch(adminActions, /const ranks = new Map\(deriveRaceRanks/);
 });
 
+test("race results sort by saved rank and split admin forms by fixture", () => {
+  assert.match(competitionBoard, /orderManualStandings/);
+  assert.match(adminSportPage, /saveRaceResult/);
+  assert.match(adminSportPage, /fixtureEntriesByFixture/);
+});
+
 test("gallery Drive URL accepts only HTTPS drive.google.com folders", () => {
   assert.equal(validateGalleryDriveUrl("https://drive.google.com/drive/folders/demo"), true);
   assert.equal(validateGalleryDriveUrl("http://drive.google.com/drive/folders/demo"), false);
