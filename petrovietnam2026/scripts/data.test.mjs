@@ -106,6 +106,7 @@ test("public bracket shows source rank labels without candidate predictions", ()
 test("public pages refresh live competition data", () => {
   assert.match(refreshDataButton, /router\.refresh\(\)/);
   assert.match(refreshDataButton, /visibilityState === "visible"/);
+  assert.match(refreshDataButton, /autoRefreshUntil/);
   assert.match(refreshDataButton, /300000/);
   assert.match(siteLib, /unstable_cache/);
   assert.match(siteLib, /revalidate: 300/);
@@ -292,8 +293,7 @@ test("customer feedback keeps chess rosters exact and splits swimming age groups
   assert.match(customerFeedbackMigration, /repair_chess_swimming_customer_feedback/);
   assert.match(customerFeedbackMigration, /UPD-BOI-/);
   assert.match(siteLib, /from\("entries"\)[\s\S]*is\("archived_at", null\)/);
-  assert.match(siteLib, /entry_members!inner\(entries!inner\(kind\)\)/);
-  assert.match(siteLib, /teamParticipants/);
+  assert.doesNotMatch(siteLib, /teamParticipants/);
   assert.match(competitionBoard, /entry-member-list/);
 });
 

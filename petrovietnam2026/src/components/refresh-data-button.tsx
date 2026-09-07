@@ -4,16 +4,17 @@ import { RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function RefreshDataButton({ label }: { label: string }) {
+export function RefreshDataButton({ label, autoRefreshUntil }: { label: string; autoRefreshUntil?: string | null }) {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    if (autoRefreshUntil && Date.parse(autoRefreshUntil) <= Date.now()) return;
     const interval = window.setInterval(() => {
       if (document.visibilityState === "visible") router.refresh();
     }, 300000);
     return () => window.clearInterval(interval);
-  }, [router]);
+  }, [autoRefreshUntil, router]);
 
   const refresh = () => {
     setRefreshing(true);

@@ -268,13 +268,12 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
   const { data: tenant, error: tenantError } = await db.from("tenants").select("id").eq("slug", tenantSlug).maybeSingle();
   if (tenantError || !tenant) return fallback;
   const tenantId = tenant.id;
-  const [event, sports, tournamentsResult, organizations, participants, teamParticipants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
+  const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).is("archived_at", null).order("full_name"),
-    db.from("participants").select("id,organization_id,full_name,full_name_en,entry_members!inner(entries!inner(kind))").eq("tenant_id", tenantId).eq("entry_members.entries.kind", "team").is("archived_at", null),
     db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).is("archived_at", null).order("name_vi"),
     db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order,entries!inner(kind)").eq("tenant_id", tenantId).eq("entries.kind", "team").is("archived_at", null).order("sort_order"),
     db.from("groups").select("id,tournament_id,name_vi,name_en,sort_order,standings_confirmed_at").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
@@ -316,7 +315,7 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
     }),
     tournaments: tournamentsResult.data as Tournament[],
     organizations: normalizedOrganizations,
-    participants: [...new Map([...participants.data ?? [], ...teamParticipants.data ?? []].map((participant) => [participant.id, { ...participant, organization_id: normalizeOrganizationId(participant.organization_id) }])).values()] as Participant[],
+    participants: (participants.data ?? []).map((participant) => ({ ...participant, organization_id: normalizeOrganizationId(participant.organization_id) })) as Participant[],
     entries: (entries.data ?? []).map((entry) => ({ ...entry, organization_id: normalizeOrganizationId(entry.organization_id) })) as Entry[],
     entryMembers: (entryMembers.data ?? []) as EntryMember[],
     groups: (groups.data ?? []) as Group[],
@@ -334,7 +333,7 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
     counts: {
       sports: sports.data.length,
       organizations: normalizedOrganizations.length,
-      participants: new Set([...(participants.data ?? []), ...(teamParticipants.data ?? [])].map((participant) => participant.id)).size,
+      participants: participants.data?.length ?? 0,
       fixtures: fixtures.data.length,
     },
   };

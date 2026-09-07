@@ -12,7 +12,7 @@ const nav = [
   ["schedule", "/schedule", CalendarDays],
 ] as const;
 
-export function Header({ locale }: { locale: Locale }) {
+export function Header({ locale, autoRefreshUntil }: { locale: Locale; autoRefreshUntil?: string | null }) {
   const t = copy[locale];
   const prefix = locale === "en" ? "/en" : "";
   return <header className="site-header">
@@ -25,7 +25,7 @@ export function Header({ locale }: { locale: Locale }) {
         {nav.map(([key, href]) => <Link key={key} href={`${prefix}${href}` || "/"}>{t[key]}</Link>)}
       </nav>
       <div className="header-actions">
-        <RefreshDataButton label={t.refreshData} />
+        <RefreshDataButton label={t.refreshData} autoRefreshUntil={autoRefreshUntil} />
         <LanguageSwitch locale={locale} />
         <Link className="login-link" href={`${prefix}/login`}><LogIn size={16} />{t.login}</Link>
         <details className="mobile-menu">
@@ -52,5 +52,5 @@ export function Footer({ locale, data }: { locale: Locale; data: SiteData }) {
 
 export async function SiteShell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
   const data = await getSiteData();
-  return <><Header locale={locale}/><main>{children}</main><Footer locale={locale} data={data}/></>;
+  return <><Header locale={locale} autoRefreshUntil={data.event.end_at}/><main>{children}</main><Footer locale={locale} data={data}/></>;
 }
