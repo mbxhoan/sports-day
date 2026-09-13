@@ -4,18 +4,24 @@ Một số lưu ý, cập nhật cho phiên bản mới ptsc (/ptsc):
 1. Tạo tenant ptsc, data trống hoàn toàn và chúng ta bắt đầu seeding từ đây.
 2. Picklerball chia ra như 2 môn: PICKLEBALL LÃNH ĐẠO PTSC & PICKLEBALL PTSC @1.png.
 3. Có tổng cộng 11 môn thể thao thi đấu:
-BÓNG BÀN: https://canva.link/aeb2y434iu0bo1v
-CẦU LÔNG: https://canva.link/8glvf0qomf2c4q2
-TENNIS: https://canva.link/7vjorro5hyikoyp
-ĐIỀN KINH: https://canva.link/aep4lm4hl8fedpl
-PICKLEBALL: https://canva.link/l88xcmaww9f8zlb
-PICKLEBALL LÃNH ĐẠO: https://canva.link/9d0s9ojadzhbk7m
-BƠI LỘI: https://canva.link/itk78t5pw5ul61u
-KÉO CO: https://canva.link/0pttxal5tn0nbud
-BÓNG ĐÁ NỮ: https://canva.link/uwzfoig3clj8wvm
-BÓNG ĐÁ NAM A: https://canva.link/z6h56h1naedzamk
-BÓNG ĐÁ NAM B: https://canva.link/g7wc8fuzgofxrny
+BÓNG bàn
+CẦU LÔNG
+TENNIS
+ĐIỀN KINH
+PICKLEBALL
+PICKLEBALL LÃNH ĐẠO
+BƠI LỘI
+KÉO CO
+BÓNG ĐÁ NỮ
+BÓNG ĐÁ NAM A
+BÓNG ĐÁ NAM B
 4. Một số thông tin về hạng mục từng môn: @THONG-TIN-11-MON-THI-DAU-PTSC-2026-CAP-NHAT.md
+5. Các môn xếp hạng như điền kinh- bơi lội chỉ cần các thông tin: thứ tự hạng- tên vận động viên( + đơn vị) - thành tích- trạng thái @2.png.
+---------------------------
+CRUD đơn vị hoạt động, có tính năng nạp excel danh sách đơn vị.
+Đảm bảo CRUD môn thể thao hoạt động được => Cho phép thay đổi KV sau (upload file).
+Đảm bảo CRUD  Cho phép đổi tên web và đổi theme màu sau.
+---------------------------
 4.1. Bơi lội: Có 5 hạng mục:
 NAM TỪ 45 TUỔI TRỞ XUỐNG (20 vđv)
 NAM TỪ 46 TUỔI TRỞ LÊN (6 vđv)
@@ -28,7 +34,3 @@ NỮ TỪ 45 TUỔI TRỞ XUỐNG (23 vđv)
 ĐƠN NỮ TỪ 45 TUỔI TRỞ XUỐNG (2 bảng - 6 vđv) @3.png
 ĐÔI NAM TỪ 45 TUỔI TRỞ XUỐNG (4 bảng - 12 vđv) @4.png
 ĐÔI NAM NỮ TỪ 45 TUỔI TRỞ XUỐNG (2 bảng - 6 vđv) @5.png
-5. Các môn xếp hạng như điền kinh- bơi lội chỉ cần các thông tin: thứ tự hạng- tên vận động viên( + đơn vị) - thành tích- trạng thái @2.png
----------------------------
-Đảm bảo CRUD môn thể thao hoạt động được => Cho phép thay đổi KV sau (upload file).
-Đảm bảo CRUD  Cho phép đổi tên web và đổi theme màu sau.
