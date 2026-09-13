@@ -2,13 +2,15 @@ import { LockKeyhole, Mail, Trophy } from "lucide-react";
 import Link from "next/link";
 import { login } from "@/app/login/actions";
 import { SiteShell } from "./site-shell";
+import { getShellData } from "@/lib/public-data";
 import { SubmitButton } from "./submit-button";
 import type { Locale } from "@/lib/site";
 
 export async function LoginPage({ locale, searchParams }: { locale: Locale; searchParams: Promise<{ error?: string }> }) {
+  const { shell } = await getShellData();
   const { error } = await searchParams;
   const en = locale === "en";
-  return <SiteShell locale={locale}><div className="login-wrap"><section className="login-card">
+  return <SiteShell locale={locale} shell={shell}><div className="login-wrap"><section className="login-card">
     <div className="login-icon"><Trophy/></div>
     <h1>{en ? "Administrator sign in" : "Đăng nhập quản trị"}</h1>
     <p>{en ? "Manage Petrovietnam Sports Day 2026" : "Quản lý Hội thao Petrovietnam 2026"}</p>

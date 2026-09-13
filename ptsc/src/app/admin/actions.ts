@@ -2,12 +2,12 @@
 
 import { randomUUID } from "node:crypto";
 import { createHash } from "node:crypto";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { adminEntities, type AdminEntity } from "@/lib/admin-config";
 import { formValue as valueOf } from "@/lib/admin-form";
 import { eventFieldNames } from "@/lib/admin-event";
-import { assertImageFile, heroStoragePath, mediaDeletionIds, sportIconStoragePath } from "@/lib/admin-media";
+import { assertImageContent, heroStoragePath, mediaDeletionIds, sportIconStoragePath } from "@/lib/admin-media";
 import { relationEntity } from "@/lib/admin-relations";
 import { headToHeadRule } from "@/lib/standings";
 import { formatMatchResult } from "@/lib/competition-display";
@@ -17,6 +17,8 @@ import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
 import { buildOperations, parseSportWorkbook, previewOperations, SPORT_EXCEL_MAX_BYTES, SPORT_EXCEL_VERSION, type SportExcelSnapshot } from "@/lib/sport-excel";
 import { fixtureSides } from "@/lib/brackets";
+import { invalidatePublic, publicDomainForEntity } from "@/lib/invalidate";
+import { isSafeHref } from "@/lib/safe-url";
 export type AdminActionState = import("@/lib/admin-action").AdminActionState;
 
 async function adminClient() {
@@ -31,6 +33,12 @@ async function adminClient() {
   return { supabase, tenantId };
 }
 
+async function removeUploadedObjects(supabase: Awaited<ReturnType<typeof adminClient>>["supabase"], paths: string[], context: string) {
+  if (!paths.length) return;
+  const { error } = await supabase.storage.from("event-media").remove(paths);
+  if (error && !/not found/i.test(error.message)) console.error("[storage-reconciliation]", { context, paths, error: error.message });
+}
+
 async function validateRelations(supabase: Awaited<ReturnType<typeof adminClient>>["supabase"], tenantId: string, payload: Record<string, unknown>) {
   for (const [field, value] of Object.entries(payload)) {
     const entity = relationEntity(field);
@@ -41,14 +49,20 @@ async function validateRelations(supabase: Awaited<ReturnType<typeof adminClient
   }
 }
 
+async function sportSlugForTournament(supabase: Awaited<ReturnType<typeof adminClient>>["supabase"], tenantId: string, tournamentId: string) {
+  const { data: tournament, error: tournamentError } = await supabase.from("tournaments").select("sport_id").eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null).maybeSingle();
+  if (tournamentError || !tournament) return null;
+  const { data: sport, error: sportError } = await supabase.from("sports").select("slug").eq("tenant_id", tenantId).eq("id", tournament.sport_id).is("archived_at", null).maybeSingle();
+  return sportError ? null : sport?.slug ?? null;
+}
+
 export async function saveEvent(formData: FormData) {
   const { supabase, tenantId } = await adminClient();
   const payload = Object.fromEntries(eventFieldNames.map((name) => [name, valueOf(formData, name, name.endsWith("_at") ? "datetime-local" : undefined)]));
-  if (!validateGalleryDriveUrl(String(payload.gallery_drive_url ?? ""))) throw new Error("URL Google Drive không hợp lệ");
+  if (!validateGalleryDriveUrl(String(payload.gallery_drive_url ?? "")) || !isSafeHref(String(payload.gallery_drive_url ?? ""))) throw new Error("URL Google Drive không hợp lệ");
   const { error } = await supabase.from("event_settings").update(payload).eq("tenant_id", tenantId).eq("singleton_key", "main");
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic("event");
 }
 
 async function saveRecordInternal(formData: FormData) {
@@ -64,13 +78,13 @@ async function saveRecordInternal(formData: FormData) {
     if (nameVi.length > 200) throw new Error("Tên đầy đủ của đơn vị quá dài");
     const { error } = await supabase.from("organizations").update({ name_vi: nameVi }).eq("tenant_id", tenantId).eq("id", id).is("archived_at", null);
     if (error) throw new Error(error.message);
-    revalidateTag("site-data", "max");
-    revalidatePath("/", "layout");
+    invalidatePublic("leaderboard");
     revalidatePath("/admin");
     return;
   }
   const config = adminEntities[entity];
   const payload = Object.fromEntries(config.fields.map((field) => [field.name, valueOf(formData, field.name, "type" in field ? field.type : undefined)]));
+  for (const field of ["href"]) if (field in payload && !isSafeHref(String(payload[field] ?? ""))) throw new Error("Liên kết không hợp lệ");
   if (entity === "tournaments") {
     if (!payload.sport_id) throw new Error("Vui lòng chọn môn thể thao");
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(String(payload.slug ?? ""))) throw new Error("Slug chỉ dùng chữ thường, số và dấu gạch ngang");
@@ -87,8 +101,7 @@ async function saveRecordInternal(formData: FormData) {
     const { error: syncError } = await supabase.rpc("sync_tournament_slots", { p_tournament_id: payload.tournament_id });
     if (syncError) throw new Error(syncError.message);
   }
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic(publicDomainForEntity(entity), sportSlug || undefined);
   revalidatePath("/admin");
   if (sportSlug) revalidatePath(`/admin/sports/${sportSlug}`);
 }
@@ -134,8 +147,7 @@ export async function setArchived(formData: FormData) {
   const archived = formData.get("archived") === "true";
   const { error } = await supabase.from(entity).update({ archived_at: archived ? new Date().toISOString() : null }).eq("tenant_id", tenantId).eq("id", id);
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic(publicDomainForEntity(entity));
   revalidatePath("/admin");
 }
 
@@ -146,14 +158,10 @@ export async function deleteMedia(formData: FormData) {
   const { data: media, error: mediaError } = await supabase.from("media").select("id,storage_path").eq("tenant_id", tenantId).in("id", ids).is("archived_at", null);
   if (mediaError || !media || media.length !== ids.length) throw new Error("Không tìm thấy ảnh");
   const paths = media.map((item) => item.storage_path).filter(Boolean);
-  if (paths.length) {
-    const { error: storageError } = await supabase.storage.from("event-media").remove(paths);
-    if (storageError && !/not found/i.test(storageError.message)) throw new Error(storageError.message);
-  }
   const { error } = await supabase.from("media").delete().eq("tenant_id", tenantId).in("id", ids);
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  await removeUploadedObjects(supabase, paths, "delete-media");
+  invalidatePublic("media");
   revalidatePath("/admin");
   revalidatePath("/gallery");
   revalidatePath("/en/gallery");
@@ -163,7 +171,7 @@ export async function uploadMedia(formData: FormData) {
   const files = formData.getAll("file");
   const imageFiles = files.filter((file): file is File => file instanceof File && file.size > 0);
   if (!imageFiles.length || imageFiles.length !== files.length) throw new Error("Chưa chọn ảnh");
-  imageFiles.forEach((file) => assertImageFile(file, 10 * 1024 * 1024));
+  const extensions = await Promise.all(imageFiles.map((file) => assertImageContent(file, 10 * 1024 * 1024)));
   const { supabase, tenantId } = await adminClient();
   const requestedTag = String(formData.get("filter_tag") ?? "all").trim();
   let sportId = String(formData.get("sport_id") ?? "").trim() || null;
@@ -178,15 +186,23 @@ export async function uploadMedia(formData: FormData) {
   }
   const metadata = { tenant_id: tenantId, kind: "gallery", sport_id: sportId, filter_tag: filterTag, album_vi: String(formData.get("album_vi") ?? "").trim(), album_en: String(formData.get("album_en") ?? "").trim(), title_vi: String(formData.get("title_vi") ?? "").trim(), title_en: String(formData.get("title_en") ?? "").trim(), alt_vi: String(formData.get("alt_vi") ?? "").trim(), alt_en: String(formData.get("alt_en") ?? "").trim() };
   const mediaRows = [];
-  for (const file of imageFiles) {
-    const extension = assertImageFile(file, 10 * 1024 * 1024);
+  const uploadedPaths: string[] = [];
+  try {
+  for (const [index, file] of imageFiles.entries()) {
+    const extension = extensions[index];
     const path = `${tenantSlug}/gallery/${randomUUID()}.${extension}`;
-    const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
+    const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
     if (uploadError) throw new Error(uploadError.message);
+    uploadedPaths.push(path);
     mediaRows.push({ ...metadata, storage_path: path });
   }
   const { error } = await supabase.from("media").insert(mediaRows);
   if (error) throw new Error(error.message);
+  } catch (error) {
+    await removeUploadedObjects(supabase, uploadedPaths, "gallery-upload-rollback");
+    throw error;
+  }
+  invalidatePublic("media", sportSlug || undefined);
   revalidatePath("/gallery");
   revalidatePath("/en/gallery");
   revalidatePath("/admin");
@@ -198,15 +214,14 @@ export async function uploadHero(formData: FormData) {
   const variant = String(formData.get("variant"));
   if (!(file instanceof File)) throw new Error("Chưa chọn ảnh");
   const { supabase, tenantId } = await adminClient();
-  assertImageFile(file);
+  await assertImageContent(file);
   const path = `${tenantSlug}/${heroStoragePath(variant, file.type, randomUUID())}`;
-  const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
+  const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
   if (uploadError) throw new Error(uploadError.message);
   const column = variant === "mobile" ? "hero_mobile_path" : "hero_path";
   const { error } = await supabase.from("event_settings").update({ [column]: supabase.storage.from("event-media").getPublicUrl(path).data.publicUrl }).eq("tenant_id", tenantId).eq("singleton_key", "main");
-  if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  if (error) { await removeUploadedObjects(supabase, [path], "hero-db-rollback"); throw new Error(error.message); }
+  invalidatePublic("event");
   revalidatePath("/admin");
 }
 
@@ -215,17 +230,16 @@ export async function uploadSportIcon(formData: FormData) {
   const sportId = String(formData.get("sport_id") ?? "").trim();
   if (!(file instanceof File) || !sportId) throw new Error("Chưa chọn logo môn thể thao");
   const { supabase, tenantId } = await adminClient();
-  assertImageFile(file);
+  await assertImageContent(file);
   const { data: sport, error: sportError } = await supabase.from("sports").select("id,slug").eq("tenant_id", tenantId).eq("id", sportId).is("archived_at", null).maybeSingle();
   if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
   const path = `${tenantSlug}/${sportIconStoragePath(sport.slug, file.type, randomUUID())}`;
-  const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, upsert: false });
+  const { error: uploadError } = await supabase.storage.from("event-media").upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
   if (uploadError) throw new Error(uploadError.message);
   const emoji = supabase.storage.from("event-media").getPublicUrl(path).data.publicUrl;
   const { error } = await supabase.from("sports").update({ emoji }).eq("tenant_id", tenantId).eq("id", sport.id);
-  if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  if (error) { await removeUploadedObjects(supabase, [path], "sport-icon-db-rollback"); throw new Error(error.message); }
+  invalidatePublic("sport", sport.slug);
   revalidatePath(`/admin/sports/${sport.slug}`);
 }
 
@@ -292,8 +306,7 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     const summary = (field: "name_vi" | "name_en") => formatMatchResult(labelsById.get(entryIds[0])?.[field] ?? "", scores[0], scores[1], labelsById.get(entryIds[1])?.[field] ?? "");
     const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: status, p_winner_entry_id: winnerEntryId, p_result_summary_vi: summary("name_vi"), p_result_summary_en: summary("name_en"), p_entries: entries, p_standings: null });
     if (error) return actionFailure(new Error(error.message));
-    revalidateTag("site-data", "max");
-    revalidatePath("/", "layout");
+    invalidatePublic("result", sport.slug);
     revalidatePath("/admin");
     revalidatePath(`/admin/sports/${sport.slug}`);
     return { ok: true, message: "Đã lưu kết quả" };
@@ -322,12 +335,13 @@ export async function saveRaceResult(formData: FormData) {
   });
   const entries = raw.map((row) => ({ ...row, result_detail: {} }));
   const { supabase, tenantId } = await adminClient();
-  const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
+  const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
   if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
+  const sportSlug = await sportSlugForTournament(supabase, tenantId, fixture.tournament_id);
+  if (!sportSlug) throw new Error("Không tìm thấy môn thi");
   const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic("result", sportSlug);
   revalidatePath("/admin");
 }
 
@@ -347,6 +361,8 @@ export async function saveFixtureSlot(_previousState: AdminActionState, formData
     if (slotError || !slot) return actionFailure(new Error("Không tìm thấy ô nhánh"));
     const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id,group_id").eq("tenant_id", tenantId).eq("id", slot.fixture_id).is("archived_at", null).single();
     if (fixtureError || !fixture) return actionFailure(new Error("Không tìm thấy trận đấu"));
+    const sportSlug = await sportSlugForTournament(supabase, tenantId, fixture.tournament_id);
+    if (!sportSlug) return actionFailure(new Error("Không tìm thấy môn thi"));
     if (sourceKind === "entry") {
       const { data: sourceEntry } = await supabase.from("entries").select("id").eq("tenant_id", tenantId).eq("tournament_id", fixture.tournament_id).eq("id", sourceEntryId).is("archived_at", null).maybeSingle();
       if (!sourceEntry) return actionFailure(new Error("Đội/cặp không thuộc hạng mục"));
@@ -361,8 +377,7 @@ export async function saveFixtureSlot(_previousState: AdminActionState, formData
     }
     const { error: syncError } = await supabase.rpc("save_fixture_slot_and_sync", { p_slot_id: slotId, p_source_kind: sourceKind, p_source_entry_id: sourceEntryId, p_source_group_id: sourceGroupId, p_source_fixture_id: sourceFixtureId, p_source_rank: sourceRank, p_label_vi: String(formData.get("label_vi") ?? "").trim(), p_label_en: String(formData.get("label_en") ?? "").trim() });
     if (syncError) return actionFailure(new Error(syncError.message));
-    revalidateTag("site-data", "max");
-    revalidatePath("/", "layout");
+    invalidatePublic("result", sportSlug);
     revalidatePath("/admin");
     return { ok: true, message: "Đã lưu cấu trúc nhánh" };
   } catch (error) {
@@ -410,6 +425,8 @@ export async function saveManualStandings(formData: FormData) {
   const { supabase, tenantId } = await adminClient();
   const { data: tournamentRule, error: tournamentRuleError } = await supabase.from("tournaments").select("scoring_rule").eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null).maybeSingle();
   if (tournamentRuleError) throw new Error(tournamentRuleError.message);
+  const sportSlug = await sportSlugForTournament(supabase, tenantId, tournamentId);
+  if (!sportSlug) throw new Error("Không tìm thấy môn thi");
   const rule = tournamentRule?.scoring_rule as { type?: string; win?: number; draw?: number; loss?: number } | undefined;
   const ruleValues = [rule?.win, rule?.draw, rule?.loss].map(Number);
   const scoredRows = !race && rule?.type === "head-to-head" && ruleValues.every(Number.isFinite)
@@ -439,19 +456,20 @@ export async function saveManualStandings(formData: FormData) {
     const { error: raceError } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixture.id, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
     if (raceError) throw new Error(raceError.message);
   }
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic("result", sportSlug);
   revalidatePath("/admin");
 }
 
 export async function confirmGroupStandings(formData: FormData) {
   const groupId = String(formData.get("group_id") ?? "");
   if (!groupId) throw new Error("Bảng đấu không hợp lệ");
-  const { supabase } = await adminClient();
+  const { supabase, tenantId } = await adminClient();
+  const { data: group, error: groupError } = await supabase.from("groups").select("tournament_id").eq("tenant_id", tenantId).eq("id", groupId).is("archived_at", null).maybeSingle();
+  const sportSlug = group && !groupError ? await sportSlugForTournament(supabase, tenantId, group.tournament_id) : null;
+  if (!sportSlug) throw new Error("Bảng đấu không hợp lệ");
   const { error } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic("result", sportSlug);
   revalidatePath("/admin");
 }
 
@@ -467,8 +485,7 @@ export async function saveManualLeaderboard(formData: FormData) {
   const { supabase } = await adminClient();
   const { error } = await supabase.rpc("save_manual_leaderboard", { p_rows: rows });
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic("leaderboard");
   revalidatePath("/admin");
 }
 
@@ -485,11 +502,13 @@ export async function previewFixtureReset(formData: FormData) {
 export async function confirmFixtureReset(formData: FormData) {
   const fixtureId = String(formData.get("fixture_id") ?? "");
   if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận đặt lại vòng sau");
-  const { supabase } = await adminClient();
+  const { supabase, tenantId } = await adminClient();
+  const { data: fixture, error: fixtureLookupError } = await supabase.from("fixtures").select("tournament_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).maybeSingle();
+  const sportSlug = fixture && !fixtureLookupError ? await sportSlugForTournament(supabase, tenantId, fixture.tournament_id) : null;
+  if (!sportSlug) throw new Error("Trận đấu không hợp lệ");
   const { error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: true });
   if (error) throw new Error(error.message);
-  revalidateTag("site-data", "max");
-  revalidatePath("/", "layout");
+  invalidatePublic("result", sportSlug);
   revalidatePath("/admin");
 }
 
@@ -498,8 +517,13 @@ export async function saveScoringRule(formData: FormData) {
   if (!tournamentId) throw new Error("Hạng mục không hợp lệ");
   const rule = headToHeadRule(String(formData.get("scoring_type") ?? "manual"), String(formData.get("win_points") ?? ""), String(formData.get("draw_points") ?? ""), String(formData.get("loss_points") ?? ""));
   const { supabase, tenantId } = await adminClient();
+  const { data: tournament, error: tournamentError } = await supabase.from("tournaments").select("sport_id").eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null).maybeSingle();
+  if (tournamentError || !tournament) throw new Error("Hạng mục không hợp lệ");
+  const { data: sport, error: sportError } = await supabase.from("sports").select("slug").eq("tenant_id", tenantId).eq("id", tournament.sport_id).is("archived_at", null).maybeSingle();
+  if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
   const { error } = await supabase.from("tournaments").update({ scoring_rule: rule }).eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null);
   if (error) throw new Error(error.message);
+  invalidatePublic("scoring", sport.slug);
   revalidatePath("/admin");
 }
 
@@ -555,7 +579,7 @@ export async function applySportExcelImport(formData: FormData) {
     const { supabase } = await adminClient();
     const { error } = await supabase.rpc("apply_sport_excel_import", { p_import_id: importId, p_confirm: formData.get("confirm") === "yes" });
     if (error) throw new Error(error.message);
-    revalidatePath("/", "layout");
+    invalidatePublic("excel", slug);
     revalidatePath(`/admin/sports/${slug}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Không thể áp dụng import";
@@ -572,7 +596,7 @@ export async function rollbackSportExcelImport(formData: FormData) {
     const { supabase } = await adminClient();
     const { error } = await supabase.rpc("rollback_sport_excel_import", { p_import_id: importId });
     if (error) throw new Error(error.message);
-    revalidatePath("/", "layout");
+    invalidatePublic("excel", slug);
     revalidatePath(`/admin/sports/${slug}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Không thể rollback import";

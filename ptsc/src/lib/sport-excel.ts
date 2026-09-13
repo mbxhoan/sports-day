@@ -4,10 +4,48 @@ export const SPORT_EXCEL_VERSION = 1;
 export const SPORT_EXCEL_MAX_BYTES = 10 * 1024 * 1024;
 export const SPORT_EXCEL_MAX_ROWS = 20_000;
 export const SPORT_EXCEL_MAX_CELLS = 250_000;
+export const SPORT_EXCEL_MAX_UNCOMPRESSED_BYTES = 100 * 1024 * 1024;
+export const SPORT_EXCEL_MAX_ZIP_ENTRIES = 2_000;
 
 export const SPORT_EXCEL_SPORTS = [
   "pickleball", "bong-ban", "cau-long", "boi-loi", "keo-co", "dien-kinh", "co-vua", "co-tuong",
 ] as const;
+
+function u16le(bytes: Uint8Array, offset: number) { return bytes[offset] | (bytes[offset + 1] << 8); }
+function u32le(bytes: Uint8Array, offset: number) { return bytes[offset] | (bytes[offset + 1] << 8) | (bytes[offset + 2] << 16) | (bytes[offset + 3] * 0x1000000); }
+
+export async function preflightZip(input: Buffer | ArrayBuffer) {
+  const bytes = Buffer.isBuffer(input) ? input : Buffer.from(input);
+  const start = Math.max(0, bytes.length - 65_557);
+  let eocd = -1;
+  for (let offset = bytes.length - 22; offset >= start; offset -= 1) if (u32le(bytes, offset) === 0x06054b50) { eocd = offset; break; }
+  if (eocd < 0) throw new Error("Workbook không phải ZIP hợp lệ");
+  const entries = u16le(bytes, eocd + 10);
+  const directorySize = u32le(bytes, eocd + 12);
+  const directoryOffset = u32le(bytes, eocd + 16);
+  if (!entries || entries > SPORT_EXCEL_MAX_ZIP_ENTRIES || directoryOffset + directorySize > bytes.length) throw new Error("Workbook ZIP vượt giới hạn cấu trúc");
+  let offset = directoryOffset;
+  let uncompressed = 0;
+  for (let index = 0; index < entries; index += 1) {
+    if (u32le(bytes, offset) !== 0x02014b50 || offset + 46 > bytes.length) throw new Error("Workbook ZIP bị hỏng");
+    const compressedSize = u32le(bytes, offset + 20);
+    const uncompressedSize = u32le(bytes, offset + 24);
+    const nameLength = u16le(bytes, offset + 28);
+    const extraLength = u16le(bytes, offset + 30);
+    const commentLength = u16le(bytes, offset + 32);
+    if (offset + 46 + nameLength + extraLength + commentLength > directoryOffset + directorySize) throw new Error("Workbook ZIP có central directory không hợp lệ");
+    const name = new TextDecoder().decode(bytes.slice(offset + 46, offset + 46 + nameLength));
+    if (name.startsWith("/") || name.split("/").includes("..")) throw new Error("Workbook ZIP chứa đường dẫn không an toàn");
+    if (uncompressedSize > SPORT_EXCEL_MAX_UNCOMPRESSED_BYTES - uncompressed) throw new Error("Workbook ZIP vượt giới hạn dung lượng giải nén");
+    uncompressed += uncompressedSize;
+    const localOffset = u32le(bytes, offset + 42);
+    const localNameLength = localOffset + 30 <= bytes.length ? u16le(bytes, localOffset + 26) : 0;
+    const localExtraLength = localOffset + 30 <= bytes.length ? u16le(bytes, localOffset + 28) : 0;
+    if (localOffset + 30 + localNameLength + localExtraLength + compressedSize > bytes.length || u32le(bytes, localOffset) !== 0x04034b50) throw new Error("Workbook ZIP có entry không hợp lệ");
+    offset += 46 + nameLength + extraLength + commentLength;
+  }
+  if (offset > directoryOffset + directorySize) throw new Error("Workbook ZIP có central directory không hợp lệ");
+}
 
 export type SportExcelMode = "current" | "blank";
 export type SportExcelView = "full" | "results";
@@ -320,6 +358,7 @@ function allowedSheetMap(slug: string) {
 export async function parseSportWorkbook(buffer: Buffer | ArrayBuffer): Promise<ParsedSportWorkbook> {
   const bytes = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer);
   if (!bytes.length || bytes.length > SPORT_EXCEL_MAX_BYTES) throw new Error("File Excel phải từ 1 byte đến 10 MB");
+  await preflightZip(bytes);
   const workbook = new ExcelJS.Workbook();
   const xlsxBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
   try { await workbook.xlsx.load(xlsxBuffer as Parameters<typeof workbook.xlsx.load>[0]); } catch { throw new Error("File Excel không đọc được hoặc bị hỏng"); }

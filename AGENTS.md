@@ -1,0 +1,1 @@
+petrovietnam2026 chỉ giữ lại như là legacy, mọi cập nhật hay thay đổi chỉ áp dụng cho ptsc (/ptsc), không cập nhật gì cho petrovietnam2026 (/petrovietnam2026).

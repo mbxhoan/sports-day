@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { CalendarDays, ImageIcon, ListOrdered, LogIn, Menu, Trophy, X } from "lucide-react";
-import { copy, getSiteData, localized, type Locale, type SiteData } from "@/lib/site";
+import { copy, localized, type Locale } from "@/lib/site";
+import type { ShellData } from "@/lib/public-data";
 import { LanguageSwitch } from "./language-switch";
 import { RefreshDataButton } from "./refresh-data-button";
+import { isSafeHref } from "@/lib/safe-url";
 
 const nav = [
   ["home", "", Trophy],
@@ -40,17 +42,16 @@ export function Header({ locale, autoRefreshUntil }: { locale: Locale; autoRefre
   </header>;
 }
 
-export function Footer({ locale, data }: { locale: Locale; data: SiteData }) {
+export function Footer({ locale, shell }: { locale: Locale; shell: ShellData }) {
   return <footer className="site-footer">
-    <div className="footer-mark"><Trophy size={19}/><b>{localized(data.event, "event_name", locale) || copy[locale].footer}</b></div>
+    <div className="footer-mark"><Trophy size={19}/><b>{localized(shell.event, "event_name", locale) || copy[locale].footer}</b></div>
     <p>{locale === "vi" ? "Tập đoàn Công nghiệp - Năng lượng Quốc gia Việt Nam" : "Vietnam National Industry - Energy Group"}</p>
-    <p>{localized(data.event, "subtitle", locale)}</p>
-    {data.contacts.map((item) => <p key={item.id}><a href={item.href}>{localized(item, "label", locale)}: {item.value}</a></p>)}
-    {data.footerLinks.length > 0 && <nav className="footer-links" aria-label="Footer">{data.footerLinks.map((item) => <a href={item.href} key={item.id}>{localized(item, "label", locale)}</a>)}</nav>}
+    <p>{localized(shell.event, "subtitle", locale)}</p>
+    {shell.contacts.map((item) => <p key={item.id}><a href={isSafeHref(item.href) ? item.href : "#"}>{localized(item, "label", locale)}: {item.value}</a></p>)}
+    {shell.footerLinks.length > 0 && <nav className="footer-links" aria-label="Footer">{shell.footerLinks.map((item) => <a href={isSafeHref(item.href) ? item.href : "#"} key={item.id}>{localized(item, "label", locale)}</a>)}</nav>}
   </footer>;
 }
 
-export async function SiteShell({ locale, children }: { locale: Locale; children: React.ReactNode }) {
-  const data = await getSiteData();
-  return <><Header locale={locale} autoRefreshUntil={data.event.end_at}/><main>{children}</main><Footer locale={locale} data={data}/></>;
+export function SiteShell({ locale, shell, children }: { locale: Locale; shell: ShellData; children: React.ReactNode }) {
+  return <><Header locale={locale} autoRefreshUntil={shell.event.end_at}/><main>{children}</main><Footer locale={locale} shell={shell}/></>;
 }

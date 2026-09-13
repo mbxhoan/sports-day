@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: process.cwd(),
   experimental: {
     serverActions: {
       // Gallery accepts multiple images; each image is validated at 10MB in uploadMedia.

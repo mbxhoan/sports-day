@@ -57,6 +57,7 @@ const relayRepairMigration = readFileSync(new URL("../../supabase/migrations/202
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
 const refreshDataButton = readFileSync(new URL("../src/components/refresh-data-button.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
+const publicDataMigration = readFileSync(new URL("../../supabase/migrations/20260913090000_public_data_read_models.sql", import.meta.url), "utf8");
 
 test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
@@ -114,11 +115,37 @@ test("public pages refresh live competition data", () => {
   assert.match(siteLib, /\.range\(offset, offset \+ 999\)/);
 });
 
+test("public data exposes route loaders with isolated cache contracts", async () => {
+  const publicData = await import("../src/lib/public-data.ts");
+  assert.deepEqual(publicData.PUBLIC_CACHE_TAGS, ["shell", "home", "sports-index", "sport:{slug}", "schedule", "leaderboard", "gallery"]);
+  assert.deepEqual(publicData.PUBLIC_ROUTE_TAGS, { home: "home", sportsIndex: "sports-index", sport: "sport", schedule: "schedule", leaderboard: "leaderboard", gallery: "gallery" });
+  assert.deepEqual(publicData.PUBLIC_QUERY_BUDGET, { home: 4, sport: 8, cacheHit: 0 });
+  for (const name of ["getHomeData", "getSportsIndexData", "getSportData", "getScheduleData", "getLeaderboardData", "getGalleryData"]) assert.equal(typeof publicData[name], "function");
+  assert.match(publicData.publicDataSource, /PUBLIC_DATA_LOADER/);
+  assert.match(publicData.publicDataSource, /correlation ID/);
+});
+
+test("public read model and invalidation stay tenant-safe", () => {
+  const invalidation = readFileSync(new URL("../src/lib/invalidate.ts", import.meta.url), "utf8");
+  assert.match(publicDataMigration, /security invoker/i);
+  assert.match(publicDataMigration, /tenant_id = v_tenant_id/);
+  assert.match(publicDataMigration, /archived_at is null/);
+  assert.match(publicDataMigration, /revoke select on table public\.source_documents, public\.media from anon/i);
+  assert.match(publicDataMigration, /grant select \(id, organization_id, full_name, full_name_en\) on table public\.participants to anon/i);
+  assert.doesNotMatch(publicDataMigration, /media.*jsonb_build_object|source_documents.*jsonb_build_object|birth_date.*jsonb_build_object|gender.*jsonb_build_object/i);
+  assert.match(invalidation, /shell|home|sports-index|schedule|leaderboard|gallery/);
+  assert.match(invalidation, /sport:\$\{sportSlug\}/);
+  assert.match(invalidation, /revalidateTag\("site-data", "max"\)/);
+});
+
 test("public delivery avoids repeated origin image downloads and full sport payloads", () => {
   assert.doesNotMatch(nextConfig, /unoptimized:\s*true/);
   assert.match(nextConfig, /minimumCacheTTL: 31_536_000/);
-  assert.match(publicPages, /const tournamentIds = new Set\(tournaments\.map/);
-  assert.match(publicPages, /entryMembers\.filter\(\(item\) => entryIds\.has/);
+  assert.match(publicPages, /getHomeData/);
+  assert.match(publicPages, /getSportsIndexData/);
+  assert.match(publicPages, /getSportData/);
+  assert.doesNotMatch(publicPages, /getSiteData/);
+  assert.doesNotMatch(publicPages, /const tournamentIds = new Set/);
 });
 
 test("source topology covers every supplied category", () => {
@@ -222,7 +249,7 @@ test("search controls expose accessible autocomplete on public and admin views",
 test("admin schedule renders relationship labels instead of UUIDs", () => {
   assert.match(adminSportPage, /function summary\(row: Row, entity\?: AdminEntity/);
   assert.match(adminSportPage, /entity === "fixture_entries"/);
-  assert.match(adminSportPage, /all\("entries"\)/);
+  assert.match(adminSportPage, /scoped\("entries",\s*"tournament_id"/);
   assert.match(adminSportPage, /summary\(item, relation, rows\)/);
   assert.doesNotMatch(adminSportPage, /\{summary\(item\)\}<\/option>/);
 });
@@ -487,8 +514,12 @@ test("database supports mobile heroes, sport albums, and ungrouped standings", (
 });
 
 test("home renders separate desktop and mobile KV sources", () => {
-  assert.match(publicPages, /hero-mobile/);
+  assert.match(publicPages, /<picture>/);
+  assert.match(publicPages, /media=\"\(max-width: 767px\)\"/);
   assert.match(publicPages, /hero_mobile_path/);
+  assert.match(publicPages, /kv\.webp/);
+  assert.equal(existsSync(new URL("../public/kv.webp", import.meta.url)), true);
+  assert.equal(existsSync(new URL("../public/kv-mobile.webp", import.meta.url)), true);
 });
 
 test("sport detail tabs keep untimed fixtures and bracket category filter", () => {
@@ -510,6 +541,45 @@ test("sport gallery keeps legacy media but removes new uploads", () => {
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024)], "ok.png", { type: "image/png" }), 2 * 1024 * 1024));
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024)], "large.png", { type: "image/png" }), 10 * 1024 * 1024));
   assert.throws(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024 + 1)], "too-large.png", { type: "image/png" }), 10 * 1024 * 1024), /tối đa 10MB/);
+});
+
+test("asset and link trust boundaries reject spoofed inputs", async () => {
+  const media = await import("../src/lib/admin-media.ts");
+  const safeUrl = await import("../src/lib/safe-url.ts");
+  const excel = await import("../src/lib/sport-excel.ts");
+  const png = new Uint8Array([137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,1,0,0,0,1]);
+  assert.deepEqual(media.imageDimensions(png, "image/png"), { width: 1, height: 1 });
+  await assert.doesNotReject(() => media.assertImageContent(new File([png], "one.png", { type: "image/png" })));
+  await assert.rejects(() => media.assertImageContent(new File([png], "spoof.jpg", { type: "image/jpeg" })), /signature|magic/i);
+  assert.equal(safeUrl.isSafeHref("/admin"), true);
+  assert.equal(safeUrl.isSafeHref("mailto:admin@example.com"), true);
+  assert.equal(safeUrl.isSafeHref("tel:+84123456789"), true);
+  assert.equal(safeUrl.isSafeHref("https://example.com"), true);
+  assert.equal(safeUrl.isSafeHref("javascript:alert(1)"), false);
+  await assert.rejects(() => excel.preflightZip(Buffer.from("not a zip")), /ZIP|workbook/i);
+  const zipBomb = Buffer.alloc(30 + 46 + 22);
+  zipBomb.writeUInt32LE(0x04034b50, 0);
+  zipBomb.writeUInt32LE(0x02014b50, 30);
+  zipBomb.writeUInt32LE(101 * 1024 * 1024, 30 + 24);
+  zipBomb.writeUInt32LE(0, 30 + 42);
+  zipBomb.writeUInt16LE(1, 30 + 10);
+  zipBomb.writeUInt32LE(46, 30 + 12);
+  zipBomb.writeUInt32LE(30, 30 + 16);
+  zipBomb.writeUInt32LE(0x06054b50, 76);
+  zipBomb.writeUInt16LE(1, 76 + 8);
+  zipBomb.writeUInt16LE(1, 76 + 10);
+  zipBomb.writeUInt32LE(46, 76 + 12);
+  zipBomb.writeUInt32LE(30, 76 + 16);
+  await assert.rejects(() => excel.preflightZip(zipBomb), /giải nén|cấu trúc/i);
+});
+
+test("storage mutations use immutable tenant paths and recoverable cleanup", () => {
+  assert.match(adminActions, /cacheControl:\s*["']31536000["']/);
+  assert.match(adminActions, /removeUploadedObjects/);
+  assert.match(adminActions, /reconciliation/);
+  const deleteStart = adminActions.indexOf("export async function deleteMedia");
+  const deleteBody = adminActions.slice(deleteStart, adminActions.indexOf("export async function uploadMedia", deleteStart));
+  assert.ok(deleteBody.indexOf('from("media").delete') < deleteBody.indexOf("removeUploadedObjects"));
 });
 
 test("media deletion uses the trash target alone or every selected image", () => {
@@ -617,9 +687,8 @@ test("admin auth has a bounded wait instead of an infinite loading shell", async
 test("admin results scope database reads before loading competition data", () => {
   assert.match(adminSportPage, /scoped\("entries", "tournament_id", tournamentIds\)/);
   assert.match(adminSportPage, /scoped\("fixtures", "tournament_id", tournamentIds\)/);
-  assert.match(adminSportPage, /all\("fixture_entries"\)/);
-  assert.match(adminSportPage, /all\("group_entries"\)/);
-  assert.match(adminSportPage, /!item\.archived_at && resultEntryIds\.has\(String\(item\.entry_id\)\)/);
+  assert.match(adminSportPage, /scoped\("fixture_entries",\s*"fixture_id",\s*\[\.\.\.fixtureIds\]\)/);
+  assert.match(adminSportPage, /scoped\("group_entries",\s*"group_id",\s*groupIds\)/);
   assert.match(adminSportPage, /\.in\("fixture_id", fixtureIds\)/);
 });
 
@@ -728,10 +797,10 @@ test("feedback migration adds additive safe admin flow", () => {
   assert.match(feedbackMigration, /winner_entry_id[\s\S]*score_numeric/);
 });
 
-test("admin results avoid oversized fixture-id filters", () => {
+test("admin results apply fixture scopes without oversized filters", () => {
   const page = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(page, /scoped\("fixture_entries",\s*"fixture_id",\s*fixtureIds\)/);
-  assert.doesNotMatch(page, /fixtureSlotsQuery\.in\("fixture_id",\s*fixtureIds\)/);
+  assert.match(page, /scoped\("fixture_entries",\s*"fixture_id",\s*\[\.\.\.fixtureIds\]\)/);
+  assert.match(page, /fixtureSlotsQuery\.in\("fixture_id",\s*fixtureIds\)/);
 });
 
 test("PDF inventory tracks current source set", () => {

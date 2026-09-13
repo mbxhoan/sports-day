@@ -15,6 +15,14 @@ import { logout, saveEvent, saveManualLeaderboard, saveOrganizationName, saveRec
 
 type Row = Record<string, string | number | null> & { id: string; archived_at: string | null };
 
+const dashboardColumns = {
+  event_settings: "id,event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url,archived_at",
+  sports: "id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order,archived_at",
+  organizations: "id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals,archived_at",
+  contacts: "id,label_vi,label_en,value,href,sort_order,archived_at",
+  footer_links: "id,label_vi,label_en,href,sort_order,archived_at",
+} as const;
+
 function Fields({ fields, row = {}, rows }: { fields: readonly AdminField[]; row?: Partial<Row>; rows: Record<AdminEntity, Row[]> }) {
   return <div className="admin-fields">{fields.map((field) => {
     const relation = relationEntity(field.name);
@@ -48,12 +56,12 @@ export default async function AdminPage() {
 
   const dashboardEntities = ["sports", "organizations", "contacts", "footer_links"] as const;
   const [eventResult, ...rowResults] = await Promise.all([
-    supabase.from("event_settings").select("*").eq("tenant_id", tenantId).eq("singleton_key", "main").single(),
-    ...dashboardEntities.map((entity) => supabase.from(entity).select("*").eq("tenant_id", tenantId).order("archived_at", { ascending: true, nullsFirst: true }).limit(100)),
+    supabase.from("event_settings").select(dashboardColumns.event_settings).eq("tenant_id", tenantId).eq("singleton_key", "main").single(),
+    ...dashboardEntities.map((entity) => supabase.from(entity).select(dashboardColumns[entity]).eq("tenant_id", tenantId).order("archived_at", { ascending: true, nullsFirst: true }).range(0, 99)),
   ]);
   const event = eventResult.data as Row;
   const rows = Object.fromEntries(Object.keys(adminEntities).map((entity) => [entity, [] as Row[]])) as Record<AdminEntity, Row[]>;
-  dashboardEntities.forEach((entity, index) => { rows[entity] = (rowResults[index].data ?? []) as Row[]; });
+  dashboardEntities.forEach((entity, index) => { rows[entity] = (rowResults[index].data ?? []) as unknown as Row[]; });
 
   return <main className="admin-page"><header className="admin-header"><div><Trophy/><span><b>Petrovietnam 2026</b><small>Admin / Quản trị</small></span></div><form action={logout}><SubmitButton><LogOut size={16}/>Đăng xuất</SubmitButton></form></header><div className="admin-layout"><aside><a href="#content">Nội dung / Content</a><a href="#organizations">Đơn vị / Organizations</a><a href="#media">Hình ảnh / Media</a><a href="#data">Dữ liệu thi đấu / Competition</a></aside><div className="admin-main">
     <div className="admin-title"><div><h1>Dashboard</h1><p>Xin chào, {admin.display_name}</p></div><a href="/" target="_blank">Xem website ↗</a></div>
