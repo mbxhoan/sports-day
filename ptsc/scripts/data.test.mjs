@@ -61,6 +61,8 @@ const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx
 const publicDataMigration = readFileSync(new URL("../../supabase/migrations/20260913090000_public_data_read_models.sql", import.meta.url), "utf8");
 const competitionDisplayMigration = readFileSync(new URL("../../supabase/migrations/20260914074118_ptsc_competition_display.sql", import.meta.url), "utf8");
 const pdfBracketMigration = readFileSync(new URL("../../supabase/migrations/20260914110000_ptsc_pdf_brackets.sql", import.meta.url), "utf8");
+const ptscPropagationMigration = readFileSync(new URL("../../supabase/migrations/20260914140000_ptsc_result_propagation.sql", import.meta.url), "utf8");
+const ptscExcelOrderMigration = readFileSync(new URL("../../supabase/migrations/20260914140100_ptsc_excel_result_order.sql", import.meta.url), "utf8");
 
 test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
@@ -226,9 +228,17 @@ test("public standings query includes both score sources", () => {
 test("fixture actions use database sides and return inline state", () => {
   assert.match(adminActions, /export type AdminActionState/);
   assert.match(adminActions, /saveFixtureResult\(_previousState: AdminActionState, formData: FormData\)/);
+  assert.match(adminActions, /saveRaceResult\(_previousState: AdminActionState, formData: FormData\): Promise<AdminActionState>/);
+  assert.match(adminActions, /saveManualStandings\(_previousState: AdminActionState, formData: FormData\): Promise<AdminActionState>/);
+  assert.match(adminActions, /confirmGroupStandings\(_previousState: AdminActionState, formData: FormData\): Promise<AdminActionState>/);
+  assert.match(adminActions, /const dependent =/);
+  assert.match(adminActions, /code: dependent \? "DEPENDENT_RESULTS"/);
   assert.match(adminActions, /fixture_entries/);
   assert.match(adminActions, /return \{ ok: false, message[,}]/);
   assert.doesNotMatch(adminActions, /formData\.get\(`entry_\$\{index\}`\)/);
+  assert.match(adminSportPage, /<AdminRecordForm action=\{saveManualStandings\}/);
+  assert.match(adminSportPage, /<AdminRecordForm action=\{saveRaceResult\}/);
+  assert.match(adminSportPage, /requested\.error && section === "results"[\s\S]*role="alert"/);
 });
 
 test("bracket has one read-only-side dialog and no duplicate result form", () => {
@@ -249,6 +259,16 @@ test("Excel admin keeps imports atomic and bracket sources read-only", () => {
   assert.match(sportExcelMigration, /create or replace function public\.rollback_sport_excel_import/);
   assert.match(sportExcelMigration, /NGUỒN_NHÁNH chỉ đọc trong Excel/);
   assert.match(sportExcelMigration, /Rollback không khôi phục đúng snapshot ban đầu/);
+  assert.match(ptscExcelOrderMigration, /order by[\s\S]*fixture\.round_order[\s\S]*fixture\.bracket_position[\s\S]*fixture\.id/);
+  assert.match(ptscExcelOrderMigration, /save_fixture_result\(v_fixture_id/);
+});
+
+test("PTSC propagation is recursive while legacy tenants keep direct sync", () => {
+  assert.match(ptscPropagationMigration, /sync_fixture_slots\(p_source_fixture_id uuid, p_path uuid\[\]\)/);
+  assert.match(ptscPropagationMigration, /current_path \|\| slot\.fixture_id/);
+  assert.match(ptscPropagationMigration, /slot\.fixture_id = any\(current_path\)/);
+  assert.match(ptscPropagationMigration, /tenant\.slug = 'ptsc2026'/);
+  assert.match(ptscPropagationMigration, /sync_fixture_slots\(p_source_fixture_id uuid\)/);
 });
 
 test("search suggestions cover participants, entries, and fixtures", () => {

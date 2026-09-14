@@ -6,7 +6,7 @@ const migration = readFileSync(new URL("../../supabase/migrations/20260914110000
 
 test("PTSC PDF bracket migration keeps the confirmed source decisions", () => {
   assert.match(migration, /set app\.tenant_slug = 'ptsc2026'/);
-  assert.match(migration, /v_tenant_id uuid := private\.seed_tenant_id\(\)/);
+  assert.match(migration, /v_tenant_id uuid := '22222222-2222-2222-2222-222222222222'/);
   assert.match(migration, /DK-NU45-5K\|X\|16/);
   assert.match(migration, /Hà Thị Thảo Trinh/);
   assert.match(migration, /PB-DOI-NAM46.*PB-DOI-NU45/s);

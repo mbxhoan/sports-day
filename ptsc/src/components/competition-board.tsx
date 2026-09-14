@@ -10,8 +10,10 @@ import { orderManualStandings } from "@/lib/manual-competition";
 import { buildSearchSuggestions } from "@/lib/search";
 import { copy, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Organization, type Participant, type Standing, type Tournament } from "@/lib/site";
 import { deriveStandings } from "@/lib/standings";
+import { AdminRecordForm } from "./admin-record-form";
 import { SearchCombobox } from "./search-combobox";
 import { EntryLabel } from "./entry-label";
+import { SubmitButton } from "./submit-button";
 
 type AdminAction = (previousState: AdminActionState, formData: FormData) => Promise<AdminActionState>;
 type PreviewAction = (formData: FormData) => void | Promise<void>;
@@ -30,7 +32,7 @@ type Props = {
   resultAction?: AdminAction;
   slotAction?: AdminAction;
   previewAction?: PreviewAction;
-  standingsAction?: PreviewAction;
+  standingsAction?: AdminAction;
   sportSlug?: string;
   showTournamentSelector?: boolean;
   organizations?: Organization[];
@@ -235,8 +237,8 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       const guide = autoStandings ? `${locale === "vi" ? "Tự tính từ bracket" : "Calculated from bracket"}: ${t.played} = ${locale === "vi" ? "trận đã hoàn tất" : "completed matches"}; ${locale === "vi" ? "Ghi/Thua" : "For/Against"} = ${locale === "vi" ? "tổng tỷ số" : "score totals"}; +/- = ${locale === "vi" ? "Ghi - Thua" : "For - Against"}; ${t.points} = ${t.wins}×${ruleValues[0]} + ${t.draws}×${ruleValues[1]} + ${t.losses}×${ruleValues[2]}.` : `${locale === "vi" ? "Manual" : "Manual"}: ${t.played} = ${t.wins} + ${t.draws} + ${t.losses}; +/- = ${locale === "vi" ? "Ghi - Thua" : "For - Against"}.`;
       const readonlyRow = ({ id, row, stats }: { id: string; row?: Standing; stats: { played: number; won: number; drawn: number; lost: number; score_for: number; score_against: number; points: number; rank?: number | null } }) => <tr key={id}><td>{stats.rank ?? row?.rank ?? "—"}</td><td>{entryCell(id)}</td><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{stats.score_for} / {stats.score_against}<output className="standings-difference">+/- {standingDifference(stats)}</output></td><td><b>{stats.points}</b></td></tr>;
       const manualRow = ({ id, row, stats }: { id: string; row?: Standing; stats: Standing | { played: number; won: number; drawn: number; lost: number; score_for: number; score_against: number; points: number; rank: number | null } }) => <tr key={id}><td><output className="auto-rank-cell">{row?.rank ?? "Tự động"}</output></td><td><input type="hidden" name="entry_id" value={id}/>{entryCell(id)}</td><td><input name="played" type="number" min="0" defaultValue={stats.played} aria-label={`Số trận ${entryName(id)}`}/></td><td><input name="won" type="number" min="0" defaultValue={stats.won} aria-label={`Thắng ${entryName(id)}`}/></td><td><input name="drawn" type="number" min="0" defaultValue={stats.drawn} aria-label={`Hòa ${entryName(id)}`}/></td><td><input name="lost" type="number" min="0" defaultValue={stats.lost} aria-label={`Thua ${entryName(id)}`}/></td><td><span className="standings-score-pair"><label>Ghi<input name="score_for" type="number" min="0" step="any" defaultValue={stats.score_for} aria-label={`Điểm ghi ${entryName(id)}`}/></label><label>Thua<input name="score_against" type="number" min="0" step="any" defaultValue={stats.score_against} aria-label={`Điểm thua ${entryName(id)}`}/></label></span><output className="standings-difference">+/- {standingDifference(stats)}</output></td><td><input name="points" type="number" min="0" step="any" defaultValue={stats.points} aria-label={`Điểm ${entryName(id)}`}/></td></tr>;
-      const tableContent = <><p className="standings-guide" hidden={!standingsAction}>{standingsAction ? guide : ""}</p><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>{locale === "vi" ? "Ghi/Thua (+/-)" : "For/Against (+/-)"}</th><th>{t.points}</th></tr></thead><tbody>{rows.map(autoStandings || !standingsAction ? readonlyRow : manualRow)}</tbody></table>{standingsAction && !autoStandings && <button className="gold-button" type="submit">Lưu bảng / Save standings</button>}</>;
-      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3>{standingsAction && !autoStandings ? <form className="standings-inline-form" action={standingsAction}><input type="hidden" name="tournament_id" value={tournament.id}/><input type="hidden" name="group_id" value={group.id}/><input type="hidden" name="manual_mode" value="standings"/>{tableContent}</form> : tableContent}</div>;
+      const tableContent = <><p className="standings-guide" hidden={!standingsAction}>{standingsAction ? guide : ""}</p><table><thead><tr><th>{t.rank}</th><th>{t.teams}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>{locale === "vi" ? "Ghi/Thua (+/-)" : "For/Against (+/-)"}</th><th>{t.points}</th></tr></thead><tbody>{rows.map(autoStandings || !standingsAction ? readonlyRow : manualRow)}</tbody></table>{standingsAction && !autoStandings && <SubmitButton className="gold-button">Lưu bảng / Save standings</SubmitButton>}</>;
+      return <div className="panel table-scroll" key={group.id || tournament.id}><h3 className="table-title">{localized(group, "name", locale)}</h3>{standingsAction && !autoStandings ? <AdminRecordForm action={standingsAction} className="standings-inline-form"><input type="hidden" name="tournament_id" value={tournament.id}/><input type="hidden" name="group_id" value={group.id}/><input type="hidden" name="manual_mode" value="standings"/>{tableContent}</AdminRecordForm> : tableContent}</div>;
     })}</div>;
   };
 

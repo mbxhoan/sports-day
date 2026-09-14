@@ -280,7 +280,10 @@ export async function uploadSportIcon(formData: FormData) {
 
 function actionFailure(error: unknown): AdminActionState {
   const rawMessage = error instanceof Error ? error.message : "Không thể lưu dữ liệu";
-  const message = /entry_members.*unique|duplicate key.*entry_members/i.test(rawMessage)
+  const dependent = /phụ thuộc|reset|vòng sau/i.test(rawMessage);
+  const message = dependent
+    ? "Vòng sau đã có kết quả; hãy xem ảnh hưởng và xác nhận reset trước khi sửa."
+    : /entry_members.*unique|duplicate key.*entry_members/i.test(rawMessage)
     ? "VĐV này đã được gán vào đội / cặp này"
     : /tournaments_gender_check/i.test(rawMessage)
       ? "Giới tính không hợp lệ. Hãy chọn Nam, Nữ, Hỗn hợp hoặc Mở."
@@ -293,12 +296,12 @@ function actionFailure(error: unknown): AdminActionState {
             : /violates not-null constraint|violates check constraint|invalid input syntax/i.test(rawMessage)
               ? "Dữ liệu chưa hợp lệ. Vui lòng kiểm tra lại các trường bắt buộc."
               : "Không thể lưu dữ liệu. Vui lòng kiểm tra lại thông tin đã nhập.";
-  return { ok: false, message, code: /phụ thuộc|reset|vòng sau/i.test(message) ? "DEPENDENT_RESULTS" : "VALIDATION" };
+  return { ok: false, message, code: dependent ? "DEPENDENT_RESULTS" : "VALIDATION" };
 }
 
 export async function saveFixtureResult(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
-  const { supabase, tenantId } = await adminClient();
   try {
+    const { supabase, tenantId } = await adminClient();
     const fixtureId = String(formData.get("fixture_id") ?? "");
     const status = String(formData.get("status") ?? "completed");
     if (!fixtureId) return actionFailure(new Error("Không tìm thấy trận đấu"));
@@ -346,35 +349,42 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
     revalidatePath(`/admin/sports/${sport.slug}`);
     return { ok: true, message: "Đã lưu kết quả" };
   } catch (error) {
+    if (isRedirectError(error)) throw error;
     return actionFailure(error);
   }
 }
 
-export async function saveRaceResult(formData: FormData) {
-  const fixtureId = String(formData.get("fixture_id") ?? "");
-  const entryIds = formData.getAll("entry_id").map(String);
-  const ranks = formData.getAll("rank").map(String);
-  const scores = formData.getAll("score").map(String);
-  const statuses = formData.getAll("result_status").map(String);
-  if (!fixtureId || !entryIds.length || new Set(entryIds).size !== entryIds.length || ranks.length !== entryIds.length || scores.length !== entryIds.length || statuses.length !== entryIds.length) throw new Error("Danh sách thi đấu không hợp lệ");
-  const raw = entryIds.map((entryId, index) => {
-    const rank = ranks[index]?.trim() ?? "";
-    const score = scores[index]?.trim() ?? "";
-    const rankNumber = rank ? Number(rank) : null;
-    if (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) throw new Error("Hạng không hợp lệ");
-    const scoreNumeric = score && Number.isFinite(Number(score)) ? Number(score) : null;
-    return { entry_id: entryId, side: null, lane: null, score: score || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index]?.trim() || null };
-  });
-  const entries = raw.map((row) => ({ ...row, result_detail: {} }));
-  const { supabase, tenantId } = await adminClient();
-  const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
-  if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
-  const sportSlug = await sportSlugForTournament(supabase, tenantId, fixture.tournament_id);
-  if (!sportSlug) throw new Error("Không tìm thấy môn thi");
-  const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
-  if (error) throw new Error(error.message);
-  invalidatePublic("result", sportSlug);
-  revalidatePath("/admin");
+export async function saveRaceResult(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
+  try {
+    const fixtureId = String(formData.get("fixture_id") ?? "");
+    const entryIds = formData.getAll("entry_id").map(String);
+    const ranks = formData.getAll("rank").map(String);
+    const scores = formData.getAll("score").map(String);
+    const statuses = formData.getAll("result_status").map(String);
+    if (!fixtureId || !entryIds.length || new Set(entryIds).size !== entryIds.length || ranks.length !== entryIds.length || scores.length !== entryIds.length || statuses.length !== entryIds.length) throw new Error("Danh sách thi đấu không hợp lệ");
+    const raw = entryIds.map((entryId, index) => {
+      const rank = ranks[index]?.trim() ?? "";
+      const score = scores[index]?.trim() ?? "";
+      const rankNumber = rank ? Number(rank) : null;
+      if (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) throw new Error("Hạng không hợp lệ");
+      const scoreNumeric = score && Number.isFinite(Number(score)) ? Number(score) : null;
+      return { entry_id: entryId, side: null, lane: null, score: score || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index]?.trim() || null };
+    });
+    const entries = raw.map((row) => ({ ...row, result_detail: {} }));
+    const { supabase, tenantId } = await adminClient();
+    const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id,tournament_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).single();
+    if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
+    const sportSlug = await sportSlugForTournament(supabase, tenantId, fixture.tournament_id);
+    if (!sportSlug) throw new Error("Không tìm thấy môn thi");
+    const { error } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixtureId, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
+    if (error) throw new Error(error.message);
+    invalidatePublic("result", sportSlug);
+    revalidatePath("/admin");
+    return { ok: true, message: "Đã lưu kết quả" };
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    return actionFailure(error);
+  }
 }
 
 export async function saveFixtureSlot(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
@@ -417,99 +427,111 @@ export async function saveFixtureSlot(_previousState: AdminActionState, formData
   }
 }
 
-export async function saveManualStandings(formData: FormData) {
-  const tournamentId = String(formData.get("tournament_id") ?? "");
-  const groupId = String(formData.get("group_id") ?? "") || null;
-  const entryIds = formData.getAll("entry_id").map(String);
-  const ranks = formData.getAll("rank").map(String);
-  const played = formData.getAll("played").map(String);
-  const won = formData.getAll("won").map(String);
-  const drawn = formData.getAll("drawn").map(String);
-  const lost = formData.getAll("lost").map(String);
-  const scoreFor = formData.getAll("score_for").map(String);
-  const scoreAgainst = formData.getAll("score_against").map(String);
-  const points = formData.getAll("points").map(String);
-  const race = formData.get("manual_mode") === "race";
-  const performances = formData.getAll("score").map(String);
-  const statuses = formData.getAll("result_status").map(String);
-  if (!tournamentId || !entryIds.length || (race ? [ranks, performances, statuses] : [played, won, drawn, lost, scoreFor, scoreAgainst, points]).some((items) => items.length !== entryIds.length)) throw new Error("Bảng xếp hạng không hợp lệ");
-  const integerValue = (value: string | undefined) => value?.trim() ? Number(value) : 0;
-  const numericValue = (value: string | undefined) => value?.trim() ? Number(value) : 0;
-  const rows = entryIds.map((entryId, index) => {
-    const rank = race ? ranks[index].trim() : "";
-    return race ? {
-      entry_id: entryId,
-      played: 0,
-      won: 0,
-      drawn: 0,
-      lost: 0,
-      score_for: 0,
-      score_against: 0,
-      points: 0,
-      rank: rank ? Number(rank) : null,
-    } : {
-      entry_id: entryId,
-      played: integerValue(played[index]),
-      won: integerValue(won[index]),
-      drawn: integerValue(drawn[index]),
-      lost: integerValue(lost[index]),
-      score_for: numericValue(scoreFor[index]),
-      score_against: numericValue(scoreAgainst[index]),
-      points: numericValue(points[index]),
-      rank: null,
-    };
-  });
-  if (rows.some((row) => !row.entry_id || [row.played, row.won, row.drawn, row.lost].some((value) => !Number.isInteger(value) || value < 0) || [row.score_for, row.score_against, row.points].some((value) => !Number.isFinite(value) || value < 0) || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)))) throw new Error("Hạng hoặc chỉ số bảng không hợp lệ");
-  if (rows.some((row) => row.played !== row.won + row.drawn + row.lost)) throw new Error("Số trận phải bằng Thắng + Hòa + Thua");
-  const explicitRanks = rows.filter((row) => row.rank !== null).map((row) => row.rank);
-  if (new Set(explicitRanks).size !== explicitRanks.length) throw new Error("Hạng trong bảng không được trùng");
-  const { supabase, tenantId } = await adminClient();
-  const { data: tournamentRule, error: tournamentRuleError } = await supabase.from("tournaments").select("scoring_rule").eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null).maybeSingle();
-  if (tournamentRuleError) throw new Error(tournamentRuleError.message);
-  const sportSlug = await sportSlugForTournament(supabase, tenantId, tournamentId);
-  if (!sportSlug) throw new Error("Không tìm thấy môn thi");
-  const rule = tournamentRule?.scoring_rule as { type?: string; win?: number; draw?: number; loss?: number } | undefined;
-  const ruleValues = [rule?.win, rule?.draw, rule?.loss].map(Number);
-  const scoredRows = !race && rule?.type === "head-to-head" && ruleValues.every(Number.isFinite)
-    ? rows.map((row) => ({ ...row, points: row.won * ruleValues[0] + row.drawn * ruleValues[1] + row.lost * ruleValues[2] }))
-    : rows;
-  const automaticRanks = new Map([...scoredRows].sort((a, b) => b.points - a.points || (b.score_for - b.score_against) - (a.score_for - a.score_against) || b.score_for - a.score_for || a.entry_id.localeCompare(b.entry_id)).map((row, index) => [row.entry_id, index + 1]));
-  const persistedRows = race ? scoredRows : scoredRows.map((row) => ({ ...row, rank: automaticRanks.get(row.entry_id) ?? null }));
-  const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: persistedRows });
-  if (error) throw new Error(error.message);
-  if (groupId && !race) {
-    const { error: syncError } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
-    if (syncError) throw new Error(syncError.message);
-  }
-  if (race) {
-    const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("tournament_id", tournamentId).is("archived_at", null).order("round_order").limit(1).maybeSingle();
-    if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
-    const entries = entryIds.map((entryId, index) => {
-      const performance = performances[index].trim();
-      const rank = ranks[index].trim();
-      const rankNumber = rank ? Number(rank) : null;
-      const scoreNumeric = performance && Number.isFinite(Number(performance)) ? Number(performance) : null;
-      if (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) throw new Error("Hạng không hợp lệ");
-      return { entry_id: entryId, side: null, lane: null, score: performance || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index].trim() || null, result_detail: {} };
+export async function saveManualStandings(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
+  try {
+    const tournamentId = String(formData.get("tournament_id") ?? "");
+    const groupId = String(formData.get("group_id") ?? "") || null;
+    const entryIds = formData.getAll("entry_id").map(String);
+    const ranks = formData.getAll("rank").map(String);
+    const played = formData.getAll("played").map(String);
+    const won = formData.getAll("won").map(String);
+    const drawn = formData.getAll("drawn").map(String);
+    const lost = formData.getAll("lost").map(String);
+    const scoreFor = formData.getAll("score_for").map(String);
+    const scoreAgainst = formData.getAll("score_against").map(String);
+    const points = formData.getAll("points").map(String);
+    const race = formData.get("manual_mode") === "race";
+    const performances = formData.getAll("score").map(String);
+    const statuses = formData.getAll("result_status").map(String);
+    if (!tournamentId || !entryIds.length || (race ? [ranks, performances, statuses] : [played, won, drawn, lost, scoreFor, scoreAgainst, points]).some((items) => items.length !== entryIds.length)) throw new Error("Bảng xếp hạng không hợp lệ");
+    const integerValue = (value: string | undefined) => value?.trim() ? Number(value) : 0;
+    const numericValue = (value: string | undefined) => value?.trim() ? Number(value) : 0;
+    const rows = entryIds.map((entryId, index) => {
+      const rank = race ? ranks[index].trim() : "";
+      return race ? {
+        entry_id: entryId,
+        played: 0,
+        won: 0,
+        drawn: 0,
+        lost: 0,
+        score_for: 0,
+        score_against: 0,
+        points: 0,
+        rank: rank ? Number(rank) : null,
+      } : {
+        entry_id: entryId,
+        played: integerValue(played[index]),
+        won: integerValue(won[index]),
+        drawn: integerValue(drawn[index]),
+        lost: integerValue(lost[index]),
+        score_for: numericValue(scoreFor[index]),
+        score_against: numericValue(scoreAgainst[index]),
+        points: numericValue(points[index]),
+        rank: null,
+      };
     });
-    const { error: raceError } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixture.id, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
-    if (raceError) throw new Error(raceError.message);
+    if (rows.some((row) => !row.entry_id || [row.played, row.won, row.drawn, row.lost].some((value) => !Number.isInteger(value) || value < 0) || [row.score_for, row.score_against, row.points].some((value) => !Number.isFinite(value) || value < 0) || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)))) throw new Error("Hạng hoặc chỉ số bảng không hợp lệ");
+    if (rows.some((row) => row.played !== row.won + row.drawn + row.lost)) throw new Error("Số trận phải bằng Thắng + Hòa + Thua");
+    const explicitRanks = rows.filter((row) => row.rank !== null).map((row) => row.rank);
+    if (new Set(explicitRanks).size !== explicitRanks.length) throw new Error("Hạng trong bảng không được trùng");
+    const { supabase, tenantId } = await adminClient();
+    const { data: tournamentRule, error: tournamentRuleError } = await supabase.from("tournaments").select("scoring_rule").eq("tenant_id", tenantId).eq("id", tournamentId).is("archived_at", null).maybeSingle();
+    if (tournamentRuleError) throw new Error(tournamentRuleError.message);
+    const sportSlug = await sportSlugForTournament(supabase, tenantId, tournamentId);
+    if (!sportSlug) throw new Error("Không tìm thấy môn thi");
+    const rule = tournamentRule?.scoring_rule as { type?: string; win?: number; draw?: number; loss?: number } | undefined;
+    const ruleValues = [rule?.win, rule?.draw, rule?.loss].map(Number);
+    const scoredRows = !race && rule?.type === "head-to-head" && ruleValues.every(Number.isFinite)
+      ? rows.map((row) => ({ ...row, points: row.won * ruleValues[0] + row.drawn * ruleValues[1] + row.lost * ruleValues[2] }))
+      : rows;
+    const automaticRanks = new Map([...scoredRows].sort((a, b) => b.points - a.points || (b.score_for - b.score_against) - (a.score_for - a.score_against) || b.score_for - a.score_for || a.entry_id.localeCompare(b.entry_id)).map((row, index) => [row.entry_id, index + 1]));
+    const persistedRows = race ? scoredRows : scoredRows.map((row) => ({ ...row, rank: automaticRanks.get(row.entry_id) ?? null }));
+    const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: persistedRows });
+    if (error) throw new Error(error.message);
+    if (groupId && !race) {
+      const { error: syncError } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
+      if (syncError) throw new Error(syncError.message);
+    }
+    if (race) {
+      const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("tournament_id", tournamentId).is("archived_at", null).order("round_order").limit(1).maybeSingle();
+      if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
+      const entries = entryIds.map((entryId, index) => {
+        const performance = performances[index].trim();
+        const rank = ranks[index].trim();
+        const rankNumber = rank ? Number(rank) : null;
+        const scoreNumeric = performance && Number.isFinite(Number(performance)) ? Number(performance) : null;
+        if (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) throw new Error("Hạng không hợp lệ");
+        return { entry_id: entryId, side: null, lane: null, score: performance || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index].trim() || null, result_detail: {} };
+      });
+      const { error: raceError } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixture.id, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
+      if (raceError) throw new Error(raceError.message);
+    }
+    invalidatePublic("result", sportSlug);
+    revalidatePath("/admin");
+    return { ok: true, message: race ? "Đã lưu kết quả" : "Đã lưu bảng xếp hạng" };
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    return actionFailure(error);
   }
-  invalidatePublic("result", sportSlug);
-  revalidatePath("/admin");
 }
 
-export async function confirmGroupStandings(formData: FormData) {
-  const groupId = String(formData.get("group_id") ?? "");
-  if (!groupId) throw new Error("Bảng đấu không hợp lệ");
-  const { supabase, tenantId } = await adminClient();
-  const { data: group, error: groupError } = await supabase.from("groups").select("tournament_id").eq("tenant_id", tenantId).eq("id", groupId).is("archived_at", null).maybeSingle();
-  const sportSlug = group && !groupError ? await sportSlugForTournament(supabase, tenantId, group.tournament_id) : null;
-  if (!sportSlug) throw new Error("Bảng đấu không hợp lệ");
-  const { error } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
-  if (error) throw new Error(error.message);
-  invalidatePublic("result", sportSlug);
-  revalidatePath("/admin");
+export async function confirmGroupStandings(_previousState: AdminActionState, formData: FormData): Promise<AdminActionState> {
+  try {
+    const groupId = String(formData.get("group_id") ?? "");
+    if (!groupId) throw new Error("Bảng đấu không hợp lệ");
+    const { supabase, tenantId } = await adminClient();
+    const { data: group, error: groupError } = await supabase.from("groups").select("tournament_id").eq("tenant_id", tenantId).eq("id", groupId).is("archived_at", null).maybeSingle();
+    const sportSlug = group && !groupError ? await sportSlugForTournament(supabase, tenantId, group.tournament_id) : null;
+    if (!sportSlug) throw new Error("Bảng đấu không hợp lệ");
+    const { error } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
+    if (error) throw new Error(error.message);
+    invalidatePublic("result", sportSlug);
+    revalidatePath("/admin");
+    return { ok: true, message: "Đã xác nhận bảng xếp hạng" };
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    return actionFailure(error);
+  }
 }
 
 export async function saveManualLeaderboard(formData: FormData) {
@@ -528,27 +550,45 @@ export async function saveManualLeaderboard(formData: FormData) {
   revalidatePath("/admin");
 }
 
+function resultAdminPath(slug: string, params: string) {
+  return `/admin/sports/${encodeURIComponent(slug)}?section=results${params ? `&${params}` : ""}#results`;
+}
+
 export async function previewFixtureReset(formData: FormData) {
   const fixtureId = String(formData.get("fixture_id") ?? "");
   const slug = String(formData.get("sport_slug") ?? "");
-  const { supabase } = await adminClient();
-  const { data, error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: false });
-  if (error) throw new Error(error.message);
-  const count = Array.isArray(data?.fixtures) ? data.fixtures.length : 0;
-  redirect(`/admin/sports/${encodeURIComponent(slug)}?section=results&reset=${encodeURIComponent(fixtureId)}&affected=${count}#results`);
+  try {
+    const { supabase } = await adminClient();
+    const { data, error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: false });
+    if (error) throw new Error(error.message);
+    const count = Array.isArray(data?.fixtures) ? data.fixtures.length : 0;
+    redirect(resultAdminPath(slug, `reset=${encodeURIComponent(fixtureId)}&affected=${count}`));
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    const message = error instanceof Error ? error.message : "Không thể xem ảnh hưởng vòng sau";
+    redirect(resultAdminPath(slug, `reset=${encodeURIComponent(fixtureId)}&error=${encodeURIComponent(message)}`));
+  }
 }
 
 export async function confirmFixtureReset(formData: FormData) {
   const fixtureId = String(formData.get("fixture_id") ?? "");
-  if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận đặt lại vòng sau");
-  const { supabase, tenantId } = await adminClient();
-  const { data: fixture, error: fixtureLookupError } = await supabase.from("fixtures").select("tournament_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).maybeSingle();
-  const sportSlug = fixture && !fixtureLookupError ? await sportSlugForTournament(supabase, tenantId, fixture.tournament_id) : null;
-  if (!sportSlug) throw new Error("Trận đấu không hợp lệ");
-  const { error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: true });
-  if (error) throw new Error(error.message);
-  invalidatePublic("result", sportSlug);
-  revalidatePath("/admin");
+  const slug = String(formData.get("sport_slug") ?? "");
+  try {
+    if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận đặt lại vòng sau");
+    const { supabase, tenantId } = await adminClient();
+    const { data: fixture, error: fixtureLookupError } = await supabase.from("fixtures").select("tournament_id").eq("tenant_id", tenantId).eq("id", fixtureId).is("archived_at", null).maybeSingle();
+    const sportSlug = fixture && !fixtureLookupError ? await sportSlugForTournament(supabase, tenantId, fixture.tournament_id) : null;
+    if (!sportSlug) throw new Error("Trận đấu không hợp lệ");
+    const { error } = await supabase.rpc("reset_fixture_dependents", { p_fixture_id: fixtureId, p_confirm: true });
+    if (error) throw new Error(error.message);
+    invalidatePublic("result", sportSlug);
+    revalidatePath("/admin");
+    redirect(resultAdminPath(sportSlug, ""));
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    const message = error instanceof Error ? error.message : "Không thể đặt lại dữ liệu vòng sau";
+    redirect(resultAdminPath(slug, `reset=${encodeURIComponent(fixtureId)}&error=${encodeURIComponent(message)}`));
+  }
 }
 
 export async function saveScoringRule(formData: FormData) {
