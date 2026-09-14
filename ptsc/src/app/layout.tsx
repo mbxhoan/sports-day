@@ -6,8 +6,8 @@ import "@fontsource-variable/lexend";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Hội thao Petrovietnam 2026", template: "%s | Petrovietnam 2026" },
-  description: "Hội thao Petrovietnam 2026 khu vực phía Nam",
+  title: { default: "Hội thao PTSC 2026", template: "%s | PTSC 2026" },
+  description: "Hội thao PTSC lần thứ 15",
 };
 
 export const dynamic = "force-dynamic";

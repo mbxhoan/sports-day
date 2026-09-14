@@ -165,7 +165,6 @@ test("sports with supplied artwork use dedicated image icons", () => {
   assert.equal(existsSync(xiangqiIcon), true);
   assert.match(competition, /'keo-co',[^\n]*'\/icons\/tug-of-war\.png'/);
   assert.match(competition, /'co-tuong',[^\n]*'\/icons\/xiangqi\.png'/);
-  assert.match(siteLib, /"co-tuong", "Cờ tướng", "Xiangqi", "\/icons\/xiangqi\.png"/);
   assert.match(migrations, /update public\.sports[\s\S]*set emoji = '\/icons\/xiangqi\.png'[\s\S]*where slug = 'co-tuong'/);
 });
 
@@ -766,7 +765,7 @@ test("manual competition keeps source order while ranked rows move first", () =>
   assert.doesNotMatch(sportTabs, /!manual && active === "brackets"/);
   assert.match(scheduleView, /availableSports/);
   assert.match(adminSportPage, /manual_mode/);
-  assert.match(adminSportPage, /name="lane"/);
+  assert.doesNotMatch(adminSportPage, /name="lane"/);
   assert.match(adminSportPage, /name="result_status"/);
   assert.match(adminActions, /p_status: "scheduled"/);
   assert.doesNotMatch(adminActions, /const ranks = new Map\(deriveRaceRanks/);
@@ -897,6 +896,10 @@ test("leaderboard ranks medal totals and resolves organization from entry", () =
 test("organization normalization keeps admin-edited names", () => {
   const rows = site.normalizeOrganizations([{ id: "pvgas", code: "PVGAS", name_vi: "Tổng công ty Khí Việt Nam đã sửa", name_en: "Updated Petrovietnam Gas", logo_path: null, sort_order: 1 }]);
   assert.equal(rows.find((row) => row.code === "PVGAS")?.name_vi, "Tổng công ty Khí Việt Nam đã sửa");
+});
+
+test("PTSC empty tenant does not fall back to legacy organizations", () => {
+  assert.deepEqual(site.normalizeOrganizations([]), []);
 });
 
 test("manual leaderboard keeps explicit rank and puts unranked units last", () => {

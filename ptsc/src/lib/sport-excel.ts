@@ -8,7 +8,7 @@ export const SPORT_EXCEL_MAX_UNCOMPRESSED_BYTES = 100 * 1024 * 1024;
 export const SPORT_EXCEL_MAX_ZIP_ENTRIES = 2_000;
 
 export const SPORT_EXCEL_SPORTS = [
-  "pickleball", "bong-ban", "cau-long", "boi-loi", "keo-co", "dien-kinh", "co-vua", "co-tuong",
+  "bong-ban", "cau-long", "tennis", "dien-kinh", "pickleball", "pickleball-lanh-dao", "boi-loi", "keo-co", "bong-da-nu", "bong-da-nam-a", "bong-da-nam-b",
 ] as const;
 
 function u16le(bytes: Uint8Array, offset: number) { return bytes[offset] | (bytes[offset + 1] << 8); }
@@ -69,14 +69,19 @@ const raceSheets = ["fixtures", "fixture_entries"] as const;
 
 export const sportExcelConfig = {
   pickleball: { sheets: [...commonSheets, ...bracketSheets] },
+  "pickleball-lanh-dao": { sheets: [...commonSheets, ...bracketSheets] },
   "bong-ban": { sheets: [...commonSheets, ...bracketSheets] },
   "cau-long": { sheets: [...commonSheets, ...bracketSheets] },
+  tennis: { sheets: [...commonSheets, ...bracketSheets] },
   "keo-co": { sheets: [...commonSheets, ...bracketSheets] },
+  "bong-da-nu": { sheets: [...commonSheets, ...bracketSheets] },
+  "bong-da-nam-a": { sheets: [...commonSheets, ...bracketSheets] },
+  "bong-da-nam-b": { sheets: [...commonSheets, ...bracketSheets] },
   "boi-loi": { sheets: [...commonSheets, ...raceSheets] },
   "dien-kinh": { sheets: [...commonSheets, ...raceSheets] },
   "co-vua": { sheets: [...commonSheets, "fixtures", "fixture_entries"] },
   "co-tuong": { sheets: [...commonSheets, "fixtures", "fixture_entries"] },
-} as const satisfies Record<(typeof SPORT_EXCEL_SPORTS)[number], { sheets: readonly SportExcelTable[] }>;
+} as const satisfies Record<(typeof SPORT_EXCEL_SPORTS)[number] | "co-vua" | "co-tuong", { sheets: readonly SportExcelTable[] }>;
 
 const sheetNames: Record<SportExcelTable, string> = {
   sports: "MÔN",
@@ -271,10 +276,10 @@ function configureDataSheet(sheet: ExcelJS.Worksheet, table: SportExcelTable, ro
   sheet.eachRow((row, rowNumber) => { if (rowNumber > 1 && rowNumber % 2 === 0) row.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF2F8FA" } }; });
 }
 
-export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: SportExcelMode, exportId: string, view: SportExcelView = "full") {
-  if (!SPORT_EXCEL_SPORTS.includes(snapshot.sport_slug as (typeof SPORT_EXCEL_SPORTS)[number])) throw new Error("Môn thể thao không được hỗ trợ");
+export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: SportExcelMode, exportId: string, view: SportExcelView = "full", tenantSlugValue = process.env.NEXT_PUBLIC_TENANT_SLUG?.trim() || "ptsc2026") {
+  if (!(snapshot.sport_slug in sportExcelConfig)) throw new Error("Môn thể thao không được hỗ trợ");
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "Petrovietnam Sports Day";
+  workbook.creator = "PTSC Sports Festival";
   workbook.created = new Date();
   workbook.modified = new Date();
   const refs = refsForSnapshot(snapshot);
@@ -282,7 +287,7 @@ export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: Spo
   const guide = workbook.addWorksheet("HƯỚNG_DẪN");
   guide.columns = [{ header: "Nội dung", key: "content", width: 110 }];
   guide.addRows([
-    ["Workbook quản trị Excel · Petrovietnam 2026"],
+    ["Workbook quản trị Excel · PTSC 2026"],
     [`Môn: ${snapshot.sport_slug} · Chế độ: ${mode === "current" ? "Dữ liệu hiện tại" : "Mẫu trống"}`],
     [view === "results" ? "Chỉ dùng file này để cập nhật kết quả." : "Sửa dữ liệu ở các sheet tiếng Việt. Cột kỹ thuật đặt cuối và đã ẩn, không cần điền."],
     [view === "results" && ["co-vua", "co-tuong"].includes(snapshot.sport_slug) ? "Sheet BXH: nhập Điểm và Hạng theo biên bản tổng hợp." : view === "results" ? "Sheet TRẬN_ĐẤU: đổi Trạng thái thành Hoàn tất khi trận đã có kết quả." : "Tên hạng mục, đơn vị, đội, bảng và trận hiển thị bằng tên dễ đọc; không cần nhớ mã."],
@@ -313,7 +318,7 @@ export async function buildSportWorkbook(snapshot: SportExcelSnapshot, mode: Spo
   const meta = workbook.addWorksheet("_META");
   meta.columns = [{ header: "Khóa / Key", key: "key", width: 28 }, { header: "Giá trị / Value", key: "value", width: 80 }];
   meta.addRows([
-    { key: "template_version", value: String(SPORT_EXCEL_VERSION) }, { key: "export_id", value: exportId }, { key: "tenant_slug", value: "petrovietnam2026" }, { key: "sport_slug", value: snapshot.sport_slug }, { key: "sport_id", value: snapshot.sport_id }, { key: "mode", value: mode }, { key: "view", value: view },
+    { key: "template_version", value: String(SPORT_EXCEL_VERSION) }, { key: "export_id", value: exportId }, { key: "tenant_slug", value: tenantSlugValue }, { key: "sport_slug", value: snapshot.sport_slug }, { key: "sport_id", value: snapshot.sport_id }, { key: "mode", value: mode }, { key: "view", value: view },
   ]);
   meta.views = [{ state: "frozen", ySplit: 1 }];
   meta.protect("sports-day-template", { selectLockedCells: true, selectUnlockedCells: true });

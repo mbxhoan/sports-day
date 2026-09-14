@@ -27,7 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   const { data, error } = await supabase.rpc("create_sport_excel_export", { p_sport_id: sport.id, p_mode: mode, p_template_version: SPORT_EXCEL_VERSION });
   if (error || !data) return new Response(error?.message ?? "Không thể tạo template Excel", { status: 422 });
   const result = data as { export_id?: string; snapshot?: SportExcelSnapshot };
-  if (!result.export_id || !result.snapshot || result.snapshot.sport_slug !== slug || result.snapshot.sport_id !== sport.id || tenantSlug !== "petrovietnam2026") return new Response("Snapshot Excel không hợp lệ", { status: 422 });
+  if (!result.export_id || !result.snapshot || result.snapshot.sport_slug !== slug || result.snapshot.sport_id !== sport.id || tenantSlug !== "ptsc2026") return new Response("Snapshot Excel không hợp lệ", { status: 422 });
   const workbook = await buildSportWorkbook(result.snapshot, mode, result.export_id, view);
   return new Response(workbook, { headers: { "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Content-Disposition": `attachment; filename="${slug}-${view === "results" ? "ket-qua" : mode}.xlsx"`, "Cache-Control": "private, no-store" } });
 }

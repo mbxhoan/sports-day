@@ -21,7 +21,7 @@ export function Header({ locale, autoRefreshUntil }: { locale: Locale; autoRefre
     <div className="header-inner">
       <Link href={prefix || "/"} className="brand" aria-label={t.home}>
         <Trophy size={23} aria-hidden="true" />
-        <span><b>PETROVIETNAM</b><small>SPORTS DAY 2026</small></span>
+        <span><b>PTSC</b><small>SPORTS FESTIVAL 2026</small></span>
       </Link>
       <nav className="desktop-nav" aria-label="Main navigation">
         {nav.map(([key, href]) => <Link key={key} href={`${prefix}${href}` || "/"}>{t[key]}</Link>)}

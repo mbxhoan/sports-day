@@ -137,6 +137,6 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
 
     {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} participants={participants} entryMembers={entryMembers} defaultVenue={venue}/>}
 
-    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} participants={participants} entryMembers={entryMembers} showTournamentSelector={false}/>} 
+    {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} organizations={organizations} participants={participants} entryMembers={entryMembers} showTournamentSelector={false}/>} 
   </>;
 }

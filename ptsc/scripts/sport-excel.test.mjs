@@ -22,8 +22,9 @@ const snapshot = {
   },
 };
 
-test("Excel export round-trips all eight sport configurations", async () => {
-  assert.equal(SPORT_EXCEL_SPORTS.length, 8);
+test("Excel export exposes the eleven PTSC sport configurations", async () => {
+  assert.equal(SPORT_EXCEL_SPORTS.length, 11);
+  assert.deepEqual([...SPORT_EXCEL_SPORTS], ["bong-ban", "cau-long", "tennis", "dien-kinh", "pickleball", "pickleball-lanh-dao", "boi-loi", "keo-co", "bong-da-nu", "bong-da-nam-a", "bong-da-nam-b"]);
   const buffer = await buildSportWorkbook(snapshot, "current", "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa");
   const parsed = await parseSportWorkbook(buffer);
   const operations = buildOperations(parsed, snapshot, sportId);

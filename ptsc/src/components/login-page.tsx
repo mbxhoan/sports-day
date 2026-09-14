@@ -13,7 +13,7 @@ export async function LoginPage({ locale, searchParams }: { locale: Locale; sear
   return <SiteShell locale={locale} shell={shell}><div className="login-wrap"><section className="login-card">
     <div className="login-icon"><Trophy/></div>
     <h1>{en ? "Administrator sign in" : "Đăng nhập quản trị"}</h1>
-    <p>{en ? "Manage Petrovietnam Sports Day 2026" : "Quản lý Hội thao Petrovietnam 2026"}</p>
+    <p>{en ? "Manage PTSC Sports Festival 2026" : "Quản lý Hội thao PTSC 2026"}</p>
     {error && <div className="form-error">{error === "required" ? (en ? "Enter email and password." : "Vui lòng nhập email và mật khẩu.") : error === "forbidden" ? (en ? "This account is not allowed to access the administrator area." : "Tài khoản chưa được cấp quyền quản trị.") : error === "session" ? (en ? "Your session expired. Please sign in again." : "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.") : (en ? "Incorrect email or password." : "Email hoặc mật khẩu không đúng.")}</div>}
     <form action={login} className="login-form">
       <input type="hidden" name="locale" value={locale}/>

@@ -149,6 +149,7 @@ function canonicalOrganizationCode(code: string) {
 }
 
 export function normalizeOrganizations(source: Organization[]) {
+  if (tenantSlug === "ptsc2026" || !source.length || source.every((organization) => organization.code.startsWith("PTSC-"))) return source;
   const grouped = new Map<string, Organization[]>();
   for (const organization of source) {
     const code = canonicalOrganizationCode(organization.code);
@@ -167,7 +168,7 @@ export const copy = {
     home: "Trang chủ", leaderboard: "Bảng xếp hạng", gallery: "Thư viện ảnh", sports: "Môn thể thao", schedule: "Lịch thi đấu", login: "Đăng nhập",
     countdown: "ĐẾM NGƯỢC ĐẾN NGÀY THI ĐẤU", days: "Ngày", hours: "Giờ", minutes: "Phút", seconds: "Giây",
     sportCount: "Môn thi đấu", dayCount: "Ngày thi đấu", unitCount: "Đơn vị", athleteCount: "Tổng VĐV", matchCount: "Trận đấu",
-    allSports: "Các môn thể thao", viewDetail: "Xem chi tiết", updating: "Đang cập nhật", teamsNotAssigned: "Chưa xếp đội", footer: "Hội thao Petrovietnam 2026",
+    allSports: "Các môn thể thao", viewDetail: "Xem chi tiết", updating: "Đang cập nhật", teamsNotAssigned: "Chưa xếp đội", footer: "Hội thao PTSC 2026",
     info: "Thông tin", teams: "Đội/VĐV", times: "Khung giờ", fixtures: "Lịch đấu", brackets: "Bảng đấu",
     description: "Mô tả", rules: "Thể lệ thi đấu", details: "Chi tiết", format: "Thể thức", categories: "Hạng mục", categoryUnit: "hạng mục", fixtureUnit: "trận", competitionDay: "Ngày thi đấu",
     empty: "Chưa có dữ liệu", galleryEmpty: "Hình ảnh sự kiện sẽ được cập nhật tại đây.", leaderboardEmpty: "Bảng xếp hạng sẽ được cập nhật sau khi có kết quả.",
@@ -179,7 +180,7 @@ export const copy = {
     home: "Home", leaderboard: "Leaderboard", gallery: "Gallery", sports: "Sports", schedule: "Schedule", login: "Sign in",
     countdown: "COUNTDOWN TO COMPETITION DAY", days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds",
     sportCount: "Sports", dayCount: "Competition days", unitCount: "Organizations", athleteCount: "Athletes", matchCount: "Matches",
-    allSports: "Sports", viewDetail: "View details", updating: "Updating", teamsNotAssigned: "Teams TBD", footer: "Petrovietnam Sports Day 2026",
+    allSports: "Sports", viewDetail: "View details", updating: "Updating", teamsNotAssigned: "Teams TBD", footer: "PTSC Sports Festival 2026",
     info: "Information", teams: "Teams/Athletes", times: "Time slots", fixtures: "Fixtures", brackets: "Brackets",
     description: "Description", rules: "Competition rules", details: "Details", format: "Format", categories: "Categories", categoryUnit: "categories", fixtureUnit: "matches", competitionDay: "Competition day",
     empty: "No data yet", galleryEmpty: "Event photos will be published here.", leaderboardEmpty: "The leaderboard will be updated when results are available.",
@@ -190,14 +191,17 @@ export const copy = {
 } as const;
 
 const sportRows: Sport[] = [
-  ["pickleball", "Pickleball", "Pickleball", "/icons/pickleball.png", "Thi đấu đôi theo nhóm tuổi.", "Doubles competition by age group.", "12 hạng mục đôi nam, đôi nữ và đôi nam nữ theo nhóm tuổi. Thi đấu theo vòng bảng và loại trực tiếp; lịch đấu, bảng đấu và kết quả cập nhật theo dữ liệu thực tế.", "12 men’s, women’s and mixed doubles age-group categories. Group and knockout stages; schedules, brackets and results follow the live competition data."],
-  ["bong-ban", "Bóng bàn", "Table Tennis", "🏓", "Thi đấu đôi nam, đôi nữ và đôi nam nữ.", "Men’s, women’s and mixed doubles.", "Thi đấu đôi nam, đôi nữ và đôi nam nữ theo các hạng mục tuổi. Vòng bảng và loại trực tiếp; đội thắng được xác định theo tỷ số trận.", "Men’s, women’s and mixed doubles by age category. Group and knockout stages; winners are determined by match score."],
-  ["cau-long", "Cầu lông", "Badminton", "🏸", "Thi đấu đôi theo giới tính và nhóm tuổi.", "Doubles competition by gender and age group.", "Thi đấu đôi theo giới tính và nhóm tuổi. Vận động viên thi đấu theo lịch và hạng mục đã đăng ký; kết quả được cập nhật sau từng trận.", "Doubles competition by gender and age group. Athletes compete in their registered category; results are updated after each match."],
-  ["boi-loi", "Bơi lội", "Swimming", "🏊", "Các cự ly tự do cá nhân và tiếp sức 4×50m.", "Individual freestyle and 4×50m relays.", "Gồm các nội dung 50m, 100m tự do và tiếp sức 4×50m. Xếp hạng theo thành tích thời gian được ghi nhận tại lượt thi.", "Includes 50m, 100m freestyle and 4×50m relay events. Ranking follows the recorded time in each heat."],
-  ["keo-co", "Kéo co", "Tug of War", "/icons/tug-of-war.png", "Thi đấu đồng đội nam và nữ.", "Men’s and women’s team competition.", "Thi đấu đồng đội nam và nữ theo hạng mục. Mỗi trận gồm các đội đối đầu trực tiếp; kết quả và lịch thi đấu do Ban Tổ chức cập nhật.", "Men’s and women’s team competition. Teams face each other directly; schedules and results are updated by the Organizing Committee."],
-  ["dien-kinh", "Điền kinh", "Athletics", "🏃", "Các cự ly 400m, 800m, 3.000m, 5.000m và tiếp sức 4×100m.", "400m, 800m, 3,000m, 5,000m and 4×100m relay events.", "Gồm các nội dung chạy cá nhân và tiếp sức 4×100m. Vận động viên xuất phát theo lượt; thành tích được tính bằng thời gian hoàn thành.", "Includes individual running and 4×100m relay events. Athletes start in heats; performance is measured by finishing time."],
-  ["co-vua", "Cờ vua", "Chess", "♟️", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system.", "Thi đấu cá nhân theo hệ Thụy Sĩ. Ghép cặp và xếp hạng căn cứ vào kết quả từng ván và các tiêu chí phụ theo điều lệ giải.", "Individual Swiss-system competition. Pairings and ranking follow game results and the tie-break criteria of the event rules."],
-  ["co-tuong", "Cờ tướng", "Xiangqi", "/icons/xiangqi.png", "Hệ Thụy Sĩ cá nhân.", "Individual Swiss system.", "Thi đấu cá nhân theo hệ Thụy Sĩ. Mỗi ván được ghi nhận thắng, hòa hoặc thua; bảng xếp hạng cập nhật theo kết quả thi đấu.", "Individual Swiss-system competition. Each game records a win, draw or loss; standings update from competition results."],
+  ["bong-ban", "Bóng bàn", "Table tennis", "🏓", "Năm hạng mục cá nhân, đôi và đôi nam nữ.", "Singles, doubles and mixed doubles.", "Thi đấu theo hạng mục PTSC 2026; kết quả được cập nhật theo nguồn Ban Tổ chức.", "Competition follows the PTSC 2026 categories and official results."],
+  ["cau-long", "Cầu lông", "Badminton", "🏸", "Bảy hạng mục đơn và đôi.", "Seven singles and doubles categories.", "Một số hạng mục vòng tròn được xếp hạng trực tiếp; các nhánh còn lại theo điều lệ nguồn.", "Round-robin categories are ranked directly; other brackets follow the source rules."],
+  ["tennis", "Tennis", "Tennis", "🎾", "Bốn hạng mục đơn và đôi nam.", "Four men's singles and doubles categories.", "Hạng mục đôi nam 46+ dùng mã TEN-DOI-NAM46 duy nhất.", "Men's doubles 46+ uses the single canonical code TEN-DOI-NAM46."],
+  ["dien-kinh", "Điền kinh", "Athletics", "🏃", "Chín cự ly chạy theo nhóm tuổi.", "Nine age-group running events.", "Chỉ hiển thị hạng, vận động viên và đơn vị, thành tích, trạng thái.", "Only rank, athlete and organization, performance and status are displayed."],
+  ["pickleball", "Pickleball", "Pickleball", "🏓", "Mười hạng mục đơn và đôi.", "Ten singles and doubles categories.", "Các nhánh theo bảng A-H, vòng bảng hoặc vòng tròn theo từng hạng mục.", "A-H brackets, group stages or round robin by category."],
+  ["pickleball-lanh-dao", "Pickleball lãnh đạo PTSC", "PTSC leadership pickleball", "🏓", "Hai hạng mục đôi lãnh đạo.", "Two leadership doubles categories.", "Tách biệt hoàn toàn với Pickleball PTSC.", "Kept separate from PTSC Pickleball."],
+  ["boi-loi", "Bơi lội", "Swimming", "🏊", "Ba nội dung cá nhân và một nội dung đồng đội.", "Three individual and one team event.", "Chỉ hiển thị hạng, vận động viên/đội và đơn vị, thành tích, trạng thái.", "Only rank, athlete/team and organization, performance and status are displayed."],
+  ["keo-co", "Kéo co", "Tug of war", "🤼", "Một hạng mục đồng đội.", "One team category.", "Thi đấu loại trực tiếp theo sơ đồ nguồn.", "Direct knockout follows the source bracket."],
+  ["bong-da-nu", "Bóng đá nữ", "Women's football", "⚽", "Một bảng năm đội.", "One five-team group.", "Mười trận vòng tròn; không tự tạo lịch khi nguồn chưa cung cấp đủ giờ và sân.", "Ten round-robin matches; do not invent missing times or venues."],
+  ["bong-da-nam-a", "Bóng đá nam A", "Men's football A", "⚽", "Một hạng mục sáu đội.", "One six-team category.", "Vòng bảng và loại trực tiếp theo nguồn PTSC.", "Group and knockout stages follow the PTSC source."],
+  ["bong-da-nam-b", "Bóng đá nam B", "Men's football B", "⚽", "Một hạng mục bảy đội.", "One seven-team category.", "Vòng bảng và loại trực tiếp theo nguồn PTSC.", "Group and knockout stages follow the PTSC source."],
 ].map(([slug, name_vi, name_en, emoji, description_vi, description_en, rules_vi, rules_en], index) => ({
   id: `sport-${index + 1}`, slug, name_vi, name_en, emoji, description_vi, description_en,
   rules_vi, rules_en, sort_order: index + 1,
@@ -206,14 +210,17 @@ const sportRows: Sport[] = [
 const defaultSportsBySlug = new Map(sportRows.map((sport) => [sport.slug, sport]));
 
 const tournamentNames: Record<string, Array<[string, string]>> = {
-  pickleball: [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nam từ 51 tuổi","Men’s Doubles 51+"],["Đôi nữ dưới 30 tuổi","Women’s Doubles Under 30"],["Đôi nữ 31–40 tuổi","Women’s Doubles 31–40"],["Đôi nữ 41–50 tuổi","Women’s Doubles 41–50"],["Đôi nữ từ 50 tuổi","Women’s Doubles 50+"],["Đôi nam nữ dưới 30 tuổi","Mixed Doubles Under 30"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"],["Đôi nam nữ từ 51 tuổi","Mixed Doubles 51+"]],
-  "bong-ban": [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nữ","Women’s Doubles"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"]],
-  "cau-long": [["Đôi nam dưới 30 tuổi","Men’s Doubles Under 30"],["Đôi nam 31–40 tuổi","Men’s Doubles 31–40"],["Đôi nam 41–50 tuổi","Men’s Doubles 41–50"],["Đôi nam từ 51 tuổi","Men’s Doubles 51+"],["Đôi nam nữ dưới 30 tuổi","Mixed Doubles Under 30"],["Đôi nam nữ 31–40 tuổi","Mixed Doubles 31–40"],["Đôi nam nữ 41–50 tuổi","Mixed Doubles 41–50"],["Đôi nữ dưới 30 tuổi","Women’s Doubles Under 30"],["Đôi nữ 31–40 tuổi","Women’s Doubles 31–40"]],
-  "boi-loi": [["50m tự do nam dưới 30 tuổi","Men’s 50m Freestyle Under 30"],["50m tự do nam 31–40 tuổi","Men’s 50m Freestyle 31–40"],["50m tự do nam 41–50 tuổi","Men’s 50m Freestyle 41–50"],["50m tự do nam trên 50 tuổi","Men’s 50m Freestyle 50+"],["50m tự do nữ dưới 30 tuổi","Women’s 50m Freestyle Under 30"],["50m tự do nữ 31–40 tuổi","Women’s 50m Freestyle 31–40"],["100m tự do nam dưới 30 tuổi","Men’s 100m Freestyle Under 30"],["100m tự do nam 41–50 tuổi","Men’s 100m Freestyle 41–50"],["100m tự do nữ","Women’s 100m Freestyle"],["Tiếp sức nam 4×50m","Men’s 4×50m Relay"],["Tiếp sức nữ 4×50m","Women’s 4×50m Relay"]],
-  "keo-co": [["Kéo co nam","Men’s Tug of War"],["Kéo co nữ","Women’s Tug of War"]],
-  "dien-kinh": [["400m nữ","Women’s 400m"],["800m nam","Men’s 800m"],["Tiếp sức nữ 4×100m","Women’s 4×100m Relay"],["Tiếp sức nam 4×100m","Men’s 4×100m Relay"],["3.000m nữ","Women’s 3,000m"],["5.000m nam","Men’s 5,000m"]],
-  "co-vua": [["Cờ vua nữ","Women’s Chess"],["Cờ vua nam dưới 45 tuổi","Men’s Chess Under 45"],["Cờ vua nam trên 45 tuổi","Men’s Chess Over 45"]],
-  "co-tuong": [["Cờ tướng nam dưới 45 tuổi","Men’s Xiangqi Under 45"],["Cờ tướng nam trên 45 tuổi","Men’s Xiangqi Over 45"]],
+  "bong-ban": [["Đơn nam từ 45 tuổi trở xuống","Men's singles 45 and under"],["Đơn nam từ 46 tuổi trở lên","Men's singles 46+"],["Đơn nữ từ 45 tuổi trở xuống","Women's singles 45 and under"],["Đôi nam từ 45 tuổi trở xuống","Men's doubles 45 and under"],["Đôi nam nữ từ 45 tuổi trở xuống","Mixed doubles 45 and under"]],
+  "cau-long": [["Đơn nam từ 45 tuổi trở xuống","Men's singles 45 and under"],["Đơn nam từ 46 tuổi trở lên","Men's singles 46+"],["Đơn nữ từ 45 tuổi trở xuống","Women's singles 45 and under"],["Đôi nam từ 45 tuổi trở xuống","Men's doubles 45 and under"],["Đôi nam từ 46 tuổi trở lên","Men's doubles 46+"],["Đôi nữ từ 45 tuổi trở xuống","Women's doubles 45 and under"],["Đôi nam nữ từ 45 tuổi trở xuống","Mixed doubles 45 and under"]],
+  tennis: [["Đơn nam từ 45 tuổi trở xuống","Men's singles 45 and under"],["Đơn nam từ 46 tuổi trở lên","Men's singles 46+"],["Đôi nam từ 45 tuổi trở xuống","Men's doubles 45 and under"],["Đôi nam từ 46 tuổi trở lên","Men's doubles 46+"]],
+  "dien-kinh": [["Nam từ 45 tuổi trở xuống - 5 km","Men's 5 km 45 and under"],["Nam từ 45 tuổi trở xuống - 10 km","Men's 10 km 45 and under"],["Nam từ 45 tuổi trở xuống - 21 km","Men's 21 km 45 and under"],["Nam từ 46 tuổi trở lên - 5 km","Men's 5 km 46+"],["Nam từ 46 tuổi trở lên - 10 km","Men's 10 km 46+"],["Nam từ 46 tuổi trở lên - 21 km","Men's 21 km 46+"],["Nữ từ 45 tuổi trở xuống - 5 km","Women's 5 km 45 and under"],["Nữ từ 45 tuổi trở xuống - 10 km","Women's 10 km 45 and under"],["Nữ từ 46 tuổi trở lên - 10 km","Women's 10 km 46+"]],
+  pickleball: [["Đơn nam từ 45 tuổi trở xuống","Men's singles 45 and under"],["Đơn nam từ 46 tuổi trở lên","Men's singles 46+"],["Đơn nữ từ 45 tuổi trở xuống","Women's singles 45 and under"],["Đơn nữ từ 46 tuổi trở lên","Women's singles 46+"],["Đôi nam từ 45 tuổi trở xuống","Men's doubles 45 and under"],["Đôi nam từ 46 tuổi trở lên","Men's doubles 46+"],["Đôi nữ từ 45 tuổi trở xuống","Women's doubles 45 and under"],["Đôi nữ từ 46 tuổi trở lên","Women's doubles 46+"],["Đôi nam nữ từ 45 tuổi trở xuống","Mixed doubles 45 and under"],["Đôi nam nữ từ 46 tuổi trở lên","Mixed doubles 46+"]],
+  "pickleball-lanh-dao": [["Đôi nam lãnh đạo","Leadership men's doubles"],["Đôi nam nữ lãnh đạo","Leadership mixed doubles"]],
+  "boi-loi": [["Nam từ 45 tuổi trở xuống","Men's 100 m 45 and under"],["Nam từ 46 tuổi trở lên","Men's 100 m 46+"],["Nữ từ 45 tuổi trở xuống","Women's 50 m 45 and under"],["Đồng đội nam","Men's relay"]],
+  "keo-co": [["Kéo co đồng đội","Team tug of war"]],
+  "bong-da-nu": [["Bóng đá nữ","Women's football"]],
+  "bong-da-nam-a": [["Bóng đá nam A","Men's football A"]],
+  "bong-da-nam-b": [["Bóng đá nam B","Men's football B"]],
 };
 
 const tournaments: Tournament[] = sportRows.flatMap((sport) => (tournamentNames[sport.slug] ?? []).map(([vi, en], index) => ({
@@ -230,17 +237,17 @@ const tournaments: Tournament[] = sportRows.flatMap((sport) => (tournamentNames[
 
 const fallback: SiteData = {
   event: {
-    event_name_vi: "Hội thao Petrovietnam 2026", event_name_en: "Petrovietnam Southern Sports Day 2026",
-    subtitle_vi: "Khu vực phía Nam", subtitle_en: "Southern Region",
-    about_vi: "Sân chơi thể thao gắn kết người lao động Petrovietnam khu vực phía Nam.",
-    about_en: "A sports festival connecting Petrovietnam employees in the Southern Region.",
+  event_name_vi: "Hội thao PTSC lần thứ 15", event_name_en: "PTSC 15th Sports Festival",
+    subtitle_vi: "PTSC 2026", subtitle_en: "PTSC 2026",
+    about_vi: "Sân chơi thể thao gắn kết người lao động PTSC.",
+    about_en: "A sports festival connecting PTSC employees.",
     venue_vi: "", venue_en: "", hero_path: "/kv.png", hero_mobile_path: "/kv-mobile.png",
-    start_at: "2026-09-04T00:00:00.000Z", end_at: "2026-09-06T11:00:00.000Z",
+    start_at: null, end_at: null,
     gallery_drive_url: "",
   },
   sports: sportRows,
   tournaments,
-  organizations: normalizeOrganizations([]),
+  organizations: [],
   participants: [],
   entries: [],
   entryMembers: [],
@@ -256,7 +263,7 @@ const fallback: SiteData = {
   media: [],
   contacts: [],
   footerLinks: [],
-  counts: { sports: 8, organizations: 24, participants: 0, fixtures: 10 },
+  counts: { sports: 11, organizations: 0, participants: 0, fixtures: 0 },
 };
 
 const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<SiteData> {

@@ -1,4 +1,4 @@
-# Hướng dẫn vận hành Hội thao Petrovietnam 2026
+# Hướng dẫn vận hành Hội thao PTSC 2026
 
 > Bản hướng dẫn dành cho người xem website và admin. Không cần biết kỹ thuật. Chỉ cần làm theo thứ tự: **mở đúng trang → chọn đúng môn/hạng mục → đọc hoặc nhập dữ liệu → kiểm tra → lưu**.
 
@@ -10,16 +10,20 @@
 - [2. Người xem: xem lịch đấu](#xem-lich)
 - [3. Người xem: xem kết quả và thứ hạng](#xem-ket-qua)
 - [4. Admin: quy trình chung](#admin-chung)
-- [5. Pickleball](#pickleball)
-- [6. Bóng bàn](#bong-ban)
-- [7. Cầu lông](#cau-long)
-- [8. Bơi lội](#boi-loi)
-- [9. Kéo co](#keo-co)
+- [5. Pickleball PTSC](#pickleball)
+- [6. Pickleball lãnh đạo PTSC](#pickleball-lanh-dao)
+- [7. Bóng bàn](#bong-ban)
+- [8. Cầu lông](#cau-long)
+- [9. Tennis](#tennis)
 - [10. Điền kinh](#dien-kinh)
-- [11. Cờ vua](#co-vua)
-- [12. Cờ tướng](#co-tuong)
-- [13. Checklist trước khi kết thúc](#checklist)
-- [14. Khi có vấn đề](#xu-ly-loi)
+- [11. Bơi lội](#boi-loi)
+- [12. Kéo co](#keo-co)
+- [13. Bóng đá nữ](#bong-da-nu)
+- [14. Bóng đá nam A](#bong-da-nam-a)
+- [15. Bóng đá nam B](#bong-da-nam-b)
+- [16. Import workbook tổng](#import-workbook)
+- [17. Checklist trước khi kết thúc](#checklist)
+- [18. Khi có vấn đề](#xu-ly-loi)
 
 <a id="hieu-nhanh"></a>
 
@@ -36,8 +40,8 @@
 
 ### Từ điển dễ hiểu
 
-- **Môn thể thao**: Pickleball, Bóng bàn, Bơi lội…
-- **Hạng mục**: nội dung thi đấu trong một môn, ví dụ “Đôi nam dưới 30 tuổi”.
+- **Môn thể thao**: Pickleball PTSC, Pickleball lãnh đạo PTSC, Bóng bàn, Cầu lông, Tennis, Điền kinh, Bơi lội, Kéo co, Bóng đá nữ, Bóng đá nam A hoặc B.
+- **Hạng mục**: nội dung thi đấu trong một môn, ví dụ “Đôi nam từ 46 tuổi trở lên”.
 - **Đội / cặp / VĐV**: người hoặc nhóm thực sự thi đấu.
 - **Trận đấu**: một lần hai đội/cặp gặp nhau.
 - **Bảng đấu**: nhiều đội/cặp thi đấu trong cùng một nhóm.
@@ -45,9 +49,9 @@
 - **Hạng**: vị trí xếp do ban tổ chức công bố.
 - **Đang cập nhật** hoặc dấu **—**: dữ liệu chưa được nhập, không phải lỗi website.
 
-### Bốn môn có cách hiển thị riêng
+### Hai môn có cách hiển thị riêng
 
-**Cờ vua, Cờ tướng, Bơi lội, Điền kinh** không dùng lịch trận đối đầu trên trang lịch chung. Người xem mở trang môn và xem **Bảng đấu**. Admin nhập kết quả theo bảng riêng của từng môn.
+**Điền kinh và Bơi lội** không dùng lịch trận đối đầu trên trang lịch chung. Người xem mở trang môn và xem **Bảng đấu**. Admin nhập **Hạng, VĐV/đội + Đơn vị, Thành tích, Trạng thái**.
 
 <a id="xem-lich"></a>
 
@@ -110,8 +114,7 @@ Nhánh đấu đọc từ trái sang phải. Bảng vòng tròn đọc các cộ
 ### Nhận biết loại kết quả
 
 - Môn đối đầu: xem đội/cặp, tỷ số, đội thắng và vòng tiếp theo.
-- Bơi lội/Điền kinh: xem **Hạng, VĐV, Làn, Thành tích, Trạng thái**.
-- Cờ vua/Cờ tướng: xem **Hạng, VĐV**. Website không tự dựng lịch ván cờ.
+- Bơi lội/Điền kinh: xem **Hạng, VĐV/đội + Đơn vị, Thành tích, Trạng thái**.
 
 <a id="admin-chung"></a>
 
@@ -160,15 +163,15 @@ Tổng được tính từ ba loại huy chương. Không nhập số âm. Đơn
 
 <a id="pickleball"></a>
 
-## 5. Pickleball
+## 5. Pickleball PTSC
 
 ### Thể thức
 
-Thi đấu **đôi**, chia theo giới tính và nhóm tuổi. Hạng mục có thể gồm vòng bảng và loại trực tiếp.
+Thi đấu **đơn và đôi**, chia theo giới tính và nhóm tuổi. Hạng mục có thể gồm vòng A–H, vòng bảng, vòng tròn hoặc loại trực tiếp theo nguồn.
 
 ### Người xem mở ở đâu?
 
-Mở [Môn thể thao](../sports) → **Pickleball**:
+Mở [Môn thể thao](../sports) → **Pickleball PTSC**:
 
 - **Lịch đấu**: xem giờ, địa điểm và các trận.
 - **Bảng đấu**: xem bảng vòng loại và nhánh loại trực tiếp.
@@ -178,7 +181,7 @@ Mở [Môn thể thao](../sports) → **Pickleball**:
 
 ### Admin cập nhật thế nào?
 
-1. Vào **Đội & VĐV**, kiểm tra đúng cặp và thành viên.
+1. Vào **Đội & VĐV**, kiểm tra đúng VĐV/cặp và thành viên.
 2. Vào **Lịch & trận**, kiểm tra hạng mục, bảng, đội và giờ.
 3. Vào **Kết quả**.
 4. Bấm trực tiếp vào thẻ trận cần sửa trên nhánh.
@@ -187,15 +190,21 @@ Mở [Môn thể thao](../sports) → **Pickleball**:
 7. Bấm **Lưu kết quả**.
 8. Kiểm tra lại trận sau trên nhánh.
 
-Kết quả hợp lệ sẽ đưa đội thắng vào ô trận sau. Chỉ sửa **Cấu trúc nhánh** trước khi hạng mục bắt đầu. Nếu sửa trận đã có trận sau, phải xem ảnh hưởng trước; không tự reset hàng loạt.
+Kết quả hợp lệ sẽ đưa đội thắng vào ô trận sau. Hạng mục **Đôi nam từ 46 tuổi trở lên** đang chờ xác nhận do sơ đồ nguồn trùng Seed 7; không tự sửa nhánh. Các ô Pickleball chưa có tên giữ trạng thái **Chờ nhập**, không xem là trùng dữ liệu.
+
+<a id="pickleball-lanh-dao"></a>
+
+## 6. Pickleball lãnh đạo PTSC
+
+Đây là môn riêng, không gộp với Pickleball PTSC. Gồm **Đôi nam lãnh đạo** và **Đôi nam nữ lãnh đạo**. Vào đúng tab **Pickleball lãnh đạo PTSC**, kiểm tra cặp, bảng, nhánh và kết quả theo biên bản. Không dùng danh sách hoặc nhánh của Pickleball PTSC.
 
 <a id="bong-ban"></a>
 
-## 6. Bóng bàn
+## 7. Bóng bàn
 
 ### Thể thức
 
-Thi đấu **đôi nam, đôi nữ và đôi nam nữ** theo hạng mục tuổi. Hạng mục dùng vòng bảng và loại trực tiếp.
+Thi đấu **đơn nam, đơn nữ, đôi nam và đôi nam nữ** theo hạng mục tuổi. Hạng mục dùng vòng bảng và loại trực tiếp.
 
 ### Người xem
 
@@ -205,7 +214,7 @@ Thi đấu **đôi nam, đôi nữ và đôi nam nữ** theo hạng mục tuổi
 
 ### Admin
 
-- Đầu tiên kiểm tra đúng **cặp** và **hạng mục tuổi**.
+- Đầu tiên kiểm tra đúng **VĐV/cặp** và **hạng mục tuổi**.
 - Trận loại trực tiếp: cập nhật như Pickleball — bấm thẻ trận, nhập hai tỷ số, trạng thái và đội thắng.
 - Trận vòng bảng: nhập kết quả theo biên bản, sau đó mở bảng kết quả và nhập **Hạng, Điểm**.
 - Bấm **Lưu bảng**; khi ban tổ chức chốt bảng, bấm **Xác nhận bảng**.
@@ -214,11 +223,11 @@ Không tự cộng điểm hoặc tự đổi thứ hạng nếu biên bản ch�
 
 <a id="cau-long"></a>
 
-## 7. Cầu lông
+## 8. Cầu lông
 
 ### Thể thức
 
-Thi đấu **đôi** theo giới tính và nhóm tuổi. Tùy hạng mục, hệ thống có thể dùng loại trực tiếp, vòng bảng hoặc vòng tròn.
+Thi đấu **đơn và đôi** theo giới tính và nhóm tuổi. Tùy hạng mục, hệ thống có thể dùng loại trực tiếp, vòng bảng hoặc vòng tròn.
 
 ### Người xem
 
@@ -235,17 +244,17 @@ Thi đấu **đôi** theo giới tính và nhóm tuổi. Tùy hạng mục, hệ
 
 <a id="boi-loi"></a>
 
-## 8. Bơi lội
+## 11. Bơi lội
 
 ### Thể thức
 
-Gồm nội dung cá nhân 50m, 100m và tiếp sức 4×50m. Kết quả xếp theo thành tích thời gian.
+Gồm ba nội dung cá nhân và một nội dung đồng đội theo workbook PTSC. Kết quả xếp theo thành tích nguồn.
 
 ### Người xem
 
 Mở **Bơi lội** → **Bảng đấu**. Đọc:
 
-**Hạng → VĐV → Làn → Thành tích → Trạng thái**.
+**Hạng → VĐV/đội + Đơn vị → Thành tích → Trạng thái**.
 
 ![Kết quả Bơi lội](../../screenshots/feedback/public-swimming-manual-vi-viewport.png)
 
@@ -253,9 +262,9 @@ Môn này không có lịch trận đối đầu trên trang lịch chung.
 
 ### Admin
 
-1. Vào **Đội & VĐV**, kiểm tra đúng VĐV hoặc đội tiếp sức.
+1. Vào **Đội & VĐV**, kiểm tra đúng VĐV hoặc đội.
 2. Vào **Kết quả**.
-3. Ở đúng hạng mục, nhập **Hạng, Làn, Thành tích, Trạng thái**.
+3. Ở đúng hạng mục, nhập **Hạng, Thành tích, Trạng thái**.
 4. Bấm **Lưu kết quả**.
 5. Mở trang public và kiểm tra lại bảng.
 
@@ -263,7 +272,7 @@ Không tự đổi thời gian thành điểm, không tự xếp hạng khi chư
 
 <a id="keo-co"></a>
 
-## 9. Kéo co
+## 12. Kéo co
 
 ### Thể thức
 
@@ -290,83 +299,75 @@ Không chọn nhầm đội nam/nữ và không sửa cấu trúc nhánh sau khi
 
 ### Thể thức
 
-Gồm các cự ly cá nhân và tiếp sức 4×100m. Xếp hạng theo thời gian hoàn thành.
+Gồm chín cự ly theo nhóm tuổi. Xếp hạng theo thành tích nguồn.
 
 ### Người xem
 
-Mở **Điền kinh** → **Bảng đấu**. Đọc năm cột:
+Mở **Điền kinh** → **Bảng đấu**. Đọc bốn trường:
 
-**Hạng → VĐV → Làn → Thành tích → Trạng thái**.
+**Hạng → VĐV + Đơn vị → Thành tích → Trạng thái**.
 
 Không tìm môn này trong lịch trận đối đầu.
 
 ### Admin
 
-1. Vào **Đội & VĐV**, kiểm tra đúng VĐV hoặc đội tiếp sức.
+1. Vào **Đội & VĐV**, kiểm tra đúng VĐV.
 2. Vào **Kết quả**.
-3. Nhập **Hạng, Làn, Thành tích, Trạng thái** theo biên bản.
+3. Nhập **Hạng, Thành tích, Trạng thái** theo biên bản.
 4. Bấm **Lưu kết quả**.
 5. Kiểm tra lại trang public.
 
 Không tự quy đổi thành tích thành điểm và không tự đổi hạng.
 
-<a id="co-vua"></a>
+<a id="tennis"></a>
 
-## 11. Cờ vua
+## 9. Tennis
 
-### Thể thức
+Tennis có bốn hạng mục đơn/đôi nam. Với hạng mục đôi nam 46+, dùng mã chuẩn **TEN-DOI-NAM46**; mã cũ `TEN-DOI-NAM46-CHECK` chỉ là alias import, không tạo hạng mục thứ hai.
 
-Thi đấu cá nhân theo **hệ Thụy Sĩ**, chia theo nữ, nam dưới 45 tuổi và nam trên 45 tuổi.
+Vào **Bảng đấu** để xem bảng/nhánh và vào **Kết quả** để nhập tỷ số, trạng thái và đội thắng theo biên bản. Không tự tạo lịch, sân hoặc kết quả.
 
-### Người xem
+<a id="bong-da-nu"></a>
 
-Mở **Cờ vua** → **Bảng đấu**. Trang public hiển thị **Hạng** và **VĐV**. Website không dựng lịch ván cờ đối đầu.
+## 13. Bóng đá nữ
 
-![Kết quả Cờ vua](../../screenshots/feedback/public-chess-manual-vi-viewport.png)
+Bóng đá nữ có một bảng năm đội. Vào **Bảng đấu** để xem vòng tròn và **Lịch đấu** để xem các trận đã có nguồn. Chỉ nhập lịch, địa điểm và kết quả khi Ban Tổ chức đã cung cấp.
 
-### Admin
+<a id="bong-da-nam-a"></a>
 
-1. Vào **Đội & VĐV**, kiểm tra danh sách VĐV và hạng mục tuổi/giới tính.
-2. Vào **Kết quả**.
-3. Nhập **Hạng** và **Điểm** theo biên bản tổng hợp.
-4. Bấm **Lưu bảng**.
-5. Kiểm tra public chỉ hiển thị đúng VĐV và Hạng.
+## 14. Bóng đá nam A
 
-Không tự ghép cặp, không tự tính hệ số phụ và không tự đổi hạng.
+Bóng đá nam A gồm vòng bảng và nhánh loại trực tiếp theo cấu hình nguồn. Kiểm tra đúng đội và bảng trước khi nhập tỷ số; không tự đoán giờ hoặc sân còn thiếu.
 
-<a id="co-tuong"></a>
+<a id="bong-da-nam-b"></a>
 
-## 12. Cờ tướng
+## 15. Bóng đá nam B
 
-### Thể thức
+Bóng đá nam B gồm vòng bảng và nhánh loại trực tiếp theo cấu hình nguồn. Kết quả vòng bảng được nhập theo biên bản và nhánh chỉ cập nhật khi có đội thắng hợp lệ.
 
-Thi đấu cá nhân theo **hệ Thụy Sĩ**, gồm nam dưới 45 tuổi và nam trên 45 tuổi.
+<a id="import-workbook"></a>
 
-### Người xem
+## 16. Import workbook tổng
 
-Mở **Cờ tướng** → **Bảng đấu**. Đọc **Hạng** và **VĐV**. Không tìm lịch trận đối đầu ở trang lịch chung.
+Admin mở **/admin/excel** và nạp workbook PTSC 13 sheet. Hệ thống chỉ nhận `.xlsx`, kiểm tra 11 môn, 45 hạng mục, 490 vị trí, khóa dòng, mã Tennis, loại entry, trùng dữ liệu và trạng thái trước khi ghi.
 
-### Admin
+1. Chọn file và bấm **Kiểm tra & xem trước**.
+2. Lọc diff theo mã hạng mục/trạng thái; tải CSV nếu cần.
+3. Chỉ bấm **Xác nhận ghi dữ liệu** khi không còn blocker.
+4. Nếu cần hoàn tác, dùng **Rollback batch** và chỉ tiếp tục khi phiên bản dữ liệu chưa bị sửa sau import.
 
-1. Kiểm tra đúng VĐV và hạng mục tuổi.
-2. Vào **Kết quả**.
-3. Nhập **Hạng** và **Điểm** theo biên bản.
-4. Bấm **Lưu bảng**.
-5. Tải lại trang và kiểm tra public.
-
-Không tự tính thắng–hòa–thua, hệ số phụ hoặc hạng cuối cùng.
+Ô Pickleball chưa có tên vẫn là **draft/Chờ nhập**. `PB-DOI-NAM46` là **Chờ xác nhận** vì nguồn có trùng Seed 7. Import cùng file/key được nhận diện idempotent; không xóa dòng thiếu khỏi nguồn.
 
 <a id="checklist"></a>
 
-## 13. Checklist trước khi kết thúc
+## 17. Checklist trước khi kết thúc
 
-- [ ] Đúng website **Petrovietnam 2026**.
+- [ ] Đúng website **PTSC 2026** và đúng tenant `ptsc2026`.
 - [ ] Đúng môn.
 - [ ] Đúng hạng mục.
 - [ ] Đúng đội/cặp/VĐV.
 - [ ] Tỷ số không âm và chọn đúng đội thắng.
-- [ ] Môn Bơi lội/Điền kinh đã nhập đủ Hạng, Làn, Thành tích, Trạng thái.
-- [ ] Môn Cờ vua/Cờ tướng đã nhập Hạng và Điểm theo biên bản.
+- [ ] Môn Bơi lội/Điền kinh đã nhập đủ Hạng, VĐV/đội + Đơn vị, Thành tích, Trạng thái.
 - [ ] Đã bấm nút **Lưu**.
 - [ ] Đã tải lại trang để kiểm tra.
 - [ ] Đã mở trang public để xác nhận.
@@ -374,12 +375,12 @@ Không tự tính thắng–hòa–thua, hệ số phụ hoặc hạng cuối c�
 
 <a id="xu-ly-loi"></a>
 
-## 14. Khi có vấn đề
+## 18. Khi có vấn đề
 
 | Hiện tượng | Việc cần làm |
 |---|---|
 | Không thấy môn/hạng mục | Đặt lại bộ lọc; kiểm tra đúng URL và tab |
-| Không thấy Lịch & trận | Có thể đang xem Bơi lội, Điền kinh, Cờ vua hoặc Cờ tướng |
+| Không thấy Lịch & trận | Có thể đang xem Bơi lội hoặc Điền kinh; hai môn này dùng bảng xếp hạng trực tiếp |
 | Có dấu “—” | Dữ liệu chưa được nhập hoặc chưa đủ điều kiện hiển thị |
 | Kết quả sai sau khi lưu | Dừng sửa tiếp, ghi lại môn/hạng mục/trận và báo người phụ trách |
 | Muốn sửa trận đã đẩy sang vòng sau | Xem ảnh hưởng trước; chỉ reset khi có xác nhận |

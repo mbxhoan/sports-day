@@ -8,7 +8,7 @@ import { initialAdminActionState, type AdminActionState } from "@/lib/admin-acti
 import { formatMatchResult, normalizeLegacyMatchResult, scoresFromMatchResult, standingDifference } from "@/lib/competition-display";
 import { orderManualStandings } from "@/lib/manual-competition";
 import { buildSearchSuggestions } from "@/lib/search";
-import { copy, localized, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Standing, type Tournament } from "@/lib/site";
+import { copy, localized, type Entry, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Organization, type Standing, type Tournament } from "@/lib/site";
 import { deriveStandings } from "@/lib/standings";
 import { SearchCombobox } from "./search-combobox";
 
@@ -32,6 +32,7 @@ type Props = {
   standingsAction?: PreviewAction;
   sportSlug?: string;
   showTournamentSelector?: boolean;
+  organizations?: Organization[];
   participants?: Array<{ id: string; full_name: string }>;
   entryMembers?: Array<{ entry_id: string; participant_id: string; sort_order?: number }>;
 };
@@ -135,13 +136,14 @@ function GroupStageResult({ fixture, rows, action, sportSlug }: { fixture: Fixtu
   </form>;
 }
 
-export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, standingsAction, sportSlug, showTournamentSelector = true, participants = [], entryMembers = [] }: Props) {
+export function CompetitionBoard({ locale, tournaments, entries, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, adminHref, resultAction, slotAction, previewAction, standingsAction, sportSlug, showTournamentSelector = true, organizations = [], participants = [], entryMembers = [] }: Props) {
   const t = copy[locale];
   const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
   const fixturesById = new Map(fixtures.map((fixture) => [fixture.id, fixture]));
   const fixturesByTournament = groupBy(fixtures, (fixture) => fixture.tournament_id);
   const entriesByTournament = groupBy(entries, (entry) => entry.tournament_id);
   const participantsById = new Map(participants.map((participant) => [participant.id, participant.full_name]));
+  const organizationsById = new Map(organizations.map((organization) => [organization.id, organization]));
   const membersByEntryId = new Map<string, string[]>();
   for (const member of entryMembers) membersByEntryId.set(member.entry_id, [...(membersByEntryId.get(member.entry_id) ?? []), member.participant_id]);
   const groupsByTournament = groupBy(groups, (group) => group.tournament_id);
@@ -175,7 +177,8 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
   const entryCell = (id: string) => {
     const entry = entriesById.get(id);
     const members = (membersByEntryId.get(id) ?? []).map((memberId) => participantsById.get(memberId)).filter(Boolean);
-    return <div className="entry-cell"><span className="entry-name">{entryName(id)}</span>{entry?.kind === "team" && members.length > 0 && <span className="entry-member-list">{members.join(" · ")}</span>}</div>;
+    const organization = entry?.organization_id ? organizationsById.get(entry.organization_id) : undefined;
+    return <div className="entry-cell"><span className="entry-name">{entryName(id)}</span>{organization && <span className="entry-member-list">{localized(organization, "name", locale)}</span>}{entry?.kind === "team" && members.length > 0 && <span className="entry-member-list">{members.join(" · ")}</span>}</div>;
   };
   const slotDisplayLabel = (slot: FixtureSlot) => {
     const group = slot.source_group_id ? groups.find((item) => item.id === slot.source_group_id) : undefined;
@@ -229,7 +232,8 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     const raceMode = tournament.competition_mode === "race";
     const fixturesForTournament = fixturesByTournament.get(tournament.id) ?? [];
     const sourceFixtures = fixturesForTournament.filter((fixture) => fixture.source_code?.startsWith(tournament.slug.toUpperCase())).sort((a, b) => (a.source_code ?? "").localeCompare(b.source_code ?? ""));
-    const sections = (sourceFixtures.length ? sourceFixtures : fixturesForTournament).map((fixture) => ({
+    const tableFixtures = sourceFixtures.length ? sourceFixtures : fixturesForTournament.length ? fixturesForTournament : [{ id: `tournament:${tournament.id}` } as Fixture];
+    const sections = tableFixtures.map((fixture) => ({
       fixture,
       rows: [...(fixtureRows.get(fixture.id) ?? [])].sort((a, b) => (a.seed_order ?? Number.MAX_SAFE_INTEGER) - (b.seed_order ?? Number.MAX_SAFE_INTEGER)),
     }));
@@ -237,7 +241,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       const raceByEntry = new Map(raceRows.map((row) => [row.entry_id, row]));
       const sourceIds = sourceFixtures.length ? [...new Set(raceRows.map((row) => row.entry_id))] : [...new Set([...standingRows.map((row) => row.entry_id), ...tournamentEntries.map((entry) => entry.id)])];
       const ids = orderManualStandings(sourceIds.map((id) => ({ entry_id: id, rank: (raceMode ? raceByEntry.get(id)?.rank : standingsByEntry.get(id)?.rank) ?? null })), sourceIds).map((row) => row.entry_id);
-      return <div className="panel table-scroll manual-results" key={fixture.id}>{sourceFixtures.length > 1 && <h3 className="table-title">{localized(fixture, "round", locale)}</h3>}<table><thead><tr><th>{t.rank}</th><th>{t.athlete}</th><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>+/-</th><th>{t.points}</th>{raceMode && <><th>{t.lane}</th><th>{t.performance}</th><th>{t.status}</th></>}</tr></thead><tbody>{ids.map((id) => { const standing = standingsByEntry.get(id); const race = raceByEntry.get(id); const stats = standing ?? { played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0 }; return <tr key={id}><td>{(raceMode ? race?.rank ?? standing?.rank : standing?.rank ?? race?.rank) ?? "—"}</td><td>{entryCell(id)}</td><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{standingDifference(stats)}</td><td><b>{stats.points}</b></td>{raceMode && <><td>{race?.lane ?? "—"}</td><td>{race?.score ?? "—"}</td><td>{race?.result_status?.toUpperCase() ?? t.updating}</td></>}</tr>; })}</tbody></table></div>;
+      return <div className="panel table-scroll manual-results" key={fixture.id}>{sourceFixtures.length > 1 && <h3 className="table-title">{localized(fixture, "round", locale)}</h3>}<table><thead><tr><th>{t.rank}</th><th>{t.athlete}</th>{raceMode ? <><th>{t.performance}</th><th>{t.status}</th></> : <><th>{t.played}</th><th>{t.wins}</th><th>{t.draws}</th><th>{t.losses}</th><th>+/-</th><th>{t.points}</th></>}</tr></thead><tbody>{ids.map((id) => { const standing = standingsByEntry.get(id); const race = raceByEntry.get(id); const stats = standing ?? { played: 0, won: 0, drawn: 0, lost: 0, score_for: 0, score_against: 0, points: 0 }; return <tr key={id}><td>{(raceMode ? race?.rank ?? standing?.rank : standing?.rank ?? race?.rank) ?? "—"}</td><td>{entryCell(id)}</td>{raceMode ? <><td>{race?.score ?? "—"}</td><td>{race?.result_status?.toUpperCase() ?? t.updating}</td></> : <><td>{stats.played}</td><td>{stats.won}</td><td>{stats.drawn}</td><td>{stats.lost}</td><td>{standingDifference(stats)}</td><td><b>{stats.points}</b></td></>}</tr>; })}</tbody></table></div>;
     };
     return <div className={sourceFixtures.length > 1 ? "manual-results-stack" : ""}>{sections.map(({ fixture, rows }) => tableFor(fixture, rows))}</div>;
   };

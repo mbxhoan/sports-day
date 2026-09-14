@@ -16,6 +16,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTenantId, tenantSlug } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
 import { buildOperations, parseSportWorkbook, previewOperations, SPORT_EXCEL_MAX_BYTES, SPORT_EXCEL_VERSION, type SportExcelSnapshot } from "@/lib/sport-excel";
+import { buildPtscImportPayload, parsePtscWorkbook } from "@/lib/ptsc-template-excel";
 import { fixtureSides } from "@/lib/brackets";
 import { invalidatePublic, publicDomainForEntity } from "@/lib/invalidate";
 import { isSafeHref } from "@/lib/safe-url";
@@ -318,20 +319,17 @@ export async function saveFixtureResult(_previousState: AdminActionState, formDa
 export async function saveRaceResult(formData: FormData) {
   const fixtureId = String(formData.get("fixture_id") ?? "");
   const entryIds = formData.getAll("entry_id").map(String);
-  const lanes = formData.getAll("lane").map(String);
   const ranks = formData.getAll("rank").map(String);
   const scores = formData.getAll("score").map(String);
   const statuses = formData.getAll("result_status").map(String);
-  if (!fixtureId || !entryIds.length || new Set(entryIds).size !== entryIds.length || lanes.length !== entryIds.length || ranks.length !== entryIds.length || scores.length !== entryIds.length || statuses.length !== entryIds.length) throw new Error("Danh sách thi đấu không hợp lệ");
+  if (!fixtureId || !entryIds.length || new Set(entryIds).size !== entryIds.length || ranks.length !== entryIds.length || scores.length !== entryIds.length || statuses.length !== entryIds.length) throw new Error("Danh sách thi đấu không hợp lệ");
   const raw = entryIds.map((entryId, index) => {
     const rank = ranks[index]?.trim() ?? "";
-    const lane = lanes[index]?.trim() ?? "";
     const score = scores[index]?.trim() ?? "";
     const rankNumber = rank ? Number(rank) : null;
-    const laneNumber = lane ? Number(lane) : null;
-    if ((rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) || (laneNumber !== null && (!Number.isInteger(laneNumber) || laneNumber < 1))) throw new Error("Hạng hoặc làn không hợp lệ");
+    if (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) throw new Error("Hạng không hợp lệ");
     const scoreNumeric = score && Number.isFinite(Number(score)) ? Number(score) : null;
-    return { entry_id: entryId, side: null, lane: laneNumber, score: score || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index]?.trim() || null };
+    return { entry_id: entryId, side: null, lane: null, score: score || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index]?.trim() || null };
   });
   const entries = raw.map((row) => ({ ...row, result_detail: {} }));
   const { supabase, tenantId } = await adminClient();
@@ -398,15 +396,24 @@ export async function saveManualStandings(formData: FormData) {
   const scoreAgainst = formData.getAll("score_against").map(String);
   const points = formData.getAll("points").map(String);
   const race = formData.get("manual_mode") === "race";
-  const lanes = formData.getAll("lane").map(String);
   const performances = formData.getAll("score").map(String);
   const statuses = formData.getAll("result_status").map(String);
-  if (!tournamentId || !entryIds.length || [played, won, drawn, lost, scoreFor, scoreAgainst, points].some((items) => items.length !== entryIds.length) || (race && [ranks, lanes, performances, statuses].some((items) => items.length !== entryIds.length))) throw new Error("Bảng xếp hạng không hợp lệ");
-  const integerValue = (value: string) => value.trim() ? Number(value) : 0;
-  const numericValue = (value: string) => value.trim() ? Number(value) : 0;
+  if (!tournamentId || !entryIds.length || (race ? [ranks, performances, statuses] : [played, won, drawn, lost, scoreFor, scoreAgainst, points]).some((items) => items.length !== entryIds.length)) throw new Error("Bảng xếp hạng không hợp lệ");
+  const integerValue = (value: string | undefined) => value?.trim() ? Number(value) : 0;
+  const numericValue = (value: string | undefined) => value?.trim() ? Number(value) : 0;
   const rows = entryIds.map((entryId, index) => {
     const rank = race ? ranks[index].trim() : "";
-    return {
+    return race ? {
+      entry_id: entryId,
+      played: 0,
+      won: 0,
+      drawn: 0,
+      lost: 0,
+      score_for: 0,
+      score_against: 0,
+      points: 0,
+      rank: rank ? Number(rank) : null,
+    } : {
       entry_id: entryId,
       played: integerValue(played[index]),
       won: integerValue(won[index]),
@@ -415,7 +422,7 @@ export async function saveManualStandings(formData: FormData) {
       score_for: numericValue(scoreFor[index]),
       score_against: numericValue(scoreAgainst[index]),
       points: numericValue(points[index]),
-      rank: rank ? Number(rank) : null,
+      rank: null,
     };
   });
   if (rows.some((row) => !row.entry_id || [row.played, row.won, row.drawn, row.lost].some((value) => !Number.isInteger(value) || value < 0) || [row.score_for, row.score_against, row.points].some((value) => !Number.isFinite(value) || value < 0) || (row.rank !== null && (!Number.isInteger(row.rank) || row.rank < 1)))) throw new Error("Hạng hoặc chỉ số bảng không hợp lệ");
@@ -436,7 +443,7 @@ export async function saveManualStandings(formData: FormData) {
   const persistedRows = race ? scoredRows : scoredRows.map((row) => ({ ...row, rank: automaticRanks.get(row.entry_id) ?? null }));
   const { error } = await supabase.rpc("save_manual_standings", { p_tournament_id: tournamentId, p_group_id: groupId, p_rows: persistedRows });
   if (error) throw new Error(error.message);
-  if (groupId) {
+  if (groupId && !race) {
     const { error: syncError } = await supabase.rpc("confirm_group_standings", { p_group_id: groupId });
     if (syncError) throw new Error(syncError.message);
   }
@@ -444,14 +451,12 @@ export async function saveManualStandings(formData: FormData) {
     const { data: fixture, error: fixtureError } = await supabase.from("fixtures").select("id").eq("tenant_id", tenantId).eq("tournament_id", tournamentId).is("archived_at", null).order("round_order").limit(1).maybeSingle();
     if (fixtureError || !fixture) throw new Error("Không tìm thấy lượt thi");
     const entries = entryIds.map((entryId, index) => {
-      const lane = lanes[index].trim();
       const performance = performances[index].trim();
       const rank = ranks[index].trim();
-      const laneNumber = lane ? Number(lane) : null;
       const rankNumber = rank ? Number(rank) : null;
       const scoreNumeric = performance && Number.isFinite(Number(performance)) ? Number(performance) : null;
-      if ((laneNumber !== null && (!Number.isInteger(laneNumber) || laneNumber < 1)) || (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1))) throw new Error("Hạng hoặc làn không hợp lệ");
-      return { entry_id: entryId, side: null, lane: laneNumber, score: performance || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index].trim() || null, result_detail: {} };
+      if (rankNumber !== null && (!Number.isInteger(rankNumber) || rankNumber < 1)) throw new Error("Hạng không hợp lệ");
+      return { entry_id: entryId, side: null, lane: null, score: performance || null, score_numeric: scoreNumeric, rank: rankNumber, result_status: statuses[index].trim() || null, result_detail: {} };
     });
     const { error: raceError } = await supabase.rpc("save_fixture_result", { p_fixture_id: fixture.id, p_status: "scheduled", p_winner_entry_id: null, p_result_summary_vi: "", p_result_summary_en: "", p_entries: entries, p_standings: null });
     if (raceError) throw new Error(raceError.message);
@@ -603,6 +608,96 @@ export async function rollbackSportExcelImport(formData: FormData) {
     redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}&error=${encodeURIComponent(message)}`));
   }
   redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}`));
+}
+
+function ptscExcelAdminPath(params: string) {
+  return `/admin/excel${params ? `?${params}` : ""}`;
+}
+
+function isRedirectError(error: unknown) {
+  return typeof error === "object" && error !== null && "digest" in error && String(error.digest).startsWith("NEXT_REDIRECT");
+}
+
+export async function preparePtscTemplateImport(formData: FormData) {
+  let target = "";
+  try {
+    const file = formData.get("file");
+    if (!(file instanceof File) || !file.size || file.size > SPORT_EXCEL_MAX_BYTES || !file.name.toLowerCase().endsWith(".xlsx")) throw new Error("Chỉ nhận file .xlsx từ 1 byte đến 10 MB");
+    const { supabase, tenantId } = await adminClient();
+    const { data: event, error: eventError } = await supabase.from("event_settings").select("id").eq("tenant_id", tenantId).eq("singleton_key", "main").is("archived_at", null).single();
+    if (eventError || !event) throw new Error("Không tìm thấy sự kiện PTSC");
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const parsed = await parsePtscWorkbook(buffer);
+    const payload = buildPtscImportPayload(parsed);
+    const { data: existingRows, error: existingError } = await supabase.from("group_entries").select("source_key,row_fingerprint").eq("tenant_id", tenantId).is("archived_at", null).not("source_key", "is", null);
+    if (existingError) throw new Error(existingError.message);
+    const existing = new Map((existingRows ?? []).map((row) => [String(row.source_key), String(row.row_fingerprint ?? "")]));
+    const previewRows = payload.positions.map((row) => ({
+      sheet: row.sheet,
+      row_number: row.row_number,
+      category_code: row.category_code,
+      natural_key: row.natural_key,
+      status: row.status,
+      action: existing.has(row.natural_key) ? (existing.get(row.natural_key) === row.fingerprint ? "unchanged" : "updated") : "created",
+    }));
+    const preview = { ...parsed.validation, stats: payload.stats, rows: previewRows };
+    const idempotencyKey = String(formData.get("idempotency_key") ?? "").trim() || randomUUID();
+    const fileSha256 = createHash("sha256").update(buffer).digest("hex");
+    const { data, error } = await supabase.rpc("prepare_ptsc_template_import", {
+      p_event_id: event.id,
+      p_template_version: payload.template_version,
+      p_parser_version: payload.parser_version,
+      p_idempotency_key: idempotencyKey,
+      p_file_sha256: fileSha256,
+      p_file_name: file.name,
+      p_payload: payload,
+      p_preview: preview,
+    });
+    if (error) throw new Error(error.message);
+    const importId = String((data as { import_id?: string } | null)?.import_id ?? "");
+    if (!importId) throw new Error("Không tạo được batch import PTSC");
+    target = ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`);
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    target = ptscExcelAdminPath(`error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể đọc file Excel")}`);
+  }
+  redirect(target);
+}
+
+export async function commitPtscTemplateImport(formData: FormData) {
+  const importId = String(formData.get("import_id") ?? "").trim();
+  try {
+    if (!importId) throw new Error("Batch import không hợp lệ");
+    const { supabase } = await adminClient();
+    const { error } = await supabase.rpc("commit_ptsc_template_import", { p_import_id: importId, p_confirm: formData.get("confirm") === "yes" });
+    if (error) throw new Error(error.message);
+    invalidatePublic("sport");
+    invalidatePublic("result");
+    revalidatePath("/");
+    revalidatePath("/admin");
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`));
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}&error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể commit import")}`));
+  }
+}
+
+export async function rollbackPtscTemplateImport(formData: FormData) {
+  const importId = String(formData.get("import_id") ?? "").trim();
+  try {
+    if (!importId) throw new Error("Batch import không hợp lệ");
+    const { supabase } = await adminClient();
+    const { error } = await supabase.rpc("rollback_ptsc_template_import", { p_import_id: importId });
+    if (error) throw new Error(error.message);
+    invalidatePublic("sport");
+    invalidatePublic("result");
+    revalidatePath("/");
+    revalidatePath("/admin");
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`));
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}&error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể rollback import")}`));
+  }
 }
 
 export async function logout() {

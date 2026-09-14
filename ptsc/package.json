@@ -1,7 +1,7 @@
 {
   "name": "sports-day",
   "version": "1.0.0",
-  "description": "Hội thao Petrovietnam 2026",
+  "description": "Hội thao PTSC 2026",
   "private": true,
   "type": "module",
   "engines": {
@@ -32,6 +32,7 @@
     "@supabase/supabase-js": "2.112.4",
     "@vercel/analytics": "^2.0.1",
     "exceljs": "4.4.0",
+    "jszip": "3.10.1",
     "lucide-react": "1.34.0",
     "next": "16.3.3",
     "react": "19.2.8",
