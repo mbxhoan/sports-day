@@ -40,7 +40,7 @@ export type SportData = {
   venues: Venue[];
   courts: Court[];
 };
-export type ScheduleData = Pick<SiteData, "sports" | "tournaments" | "entries" | "groups" | "groupEntries" | "fixtures" | "fixtureEntries" | "fixtureSlots" | "standings" | "venues" | "courts" | "participants" | "entryMembers">;
+export type ScheduleData = Pick<SiteData, "sports" | "tournaments" | "organizations" | "entries" | "groups" | "groupEntries" | "fixtures" | "fixtureEntries" | "fixtureSlots" | "standings" | "venues" | "courts" | "participants" | "entryMembers">;
 export type LeaderboardData = Pick<SiteData, "organizations" | "awards" | "entries" | "participants">;
 export type GalleryData = { gallery_drive_url: string };
 export type PageResult<T> = { shell: ShellData; data: T };
@@ -113,7 +113,7 @@ function legacyData<T extends PublicPage>(data: SiteData, page: T, slug?: string
   if (page === "gallery") return { gallery_drive_url: data.event.gallery_drive_url };
   if (page === "leaderboard") return { organizations: data.organizations, awards: data.awards, entries: data.entries, participants: data.participants };
   if (page === "schedule") return {
-    sports: data.sports, tournaments: data.tournaments, entries: data.entries, groups: data.groups, groupEntries: data.groupEntries,
+    sports: data.sports, tournaments: data.tournaments, organizations: data.organizations, entries: data.entries, groups: data.groups, groupEntries: data.groupEntries,
     fixtures: data.fixtures, fixtureEntries: data.fixtureEntries, fixtureSlots: data.fixtureSlots, standings: data.standings,
     venues: data.venues, courts: data.courts, participants: data.participants, entryMembers: data.entryMembers,
   };

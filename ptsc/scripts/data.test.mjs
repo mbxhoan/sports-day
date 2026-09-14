@@ -13,7 +13,7 @@ import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
 import { isManualSport, orderManualStandings, validateGalleryDriveUrl } from "../src/lib/manual-competition.ts";
-import { formatMatchResult, normalizeLegacyMatchResult, scoresFromMatchResult, standingDifference } from "../src/lib/competition-display.ts";
+import { formatMatchResult, isReserveRole, normalizeLegacyMatchResult, organizationShortName, scoresFromMatchResult, standingDifference } from "../src/lib/competition-display.ts";
 import { buildSearchSuggestions, matchesSearch } from "../src/lib/search.ts";
 
 const supabaseRoot = new URL("../../supabase/", import.meta.url);
@@ -55,9 +55,12 @@ const chessRosterSeed = readFileSync(new URL("../../supabase/seeds/025_chess_ros
 const customerFeedbackMigration = readFileSync(new URL("../../supabase/migrations/20260904100000_repair_chess_swimming_customer_feedback.sql", import.meta.url), "utf8");
 const relayRepairMigration = readFileSync(new URL("../../supabase/migrations/20260904230000_retry_athletics_relay_repairs.sql", import.meta.url), "utf8");
 const competitionBoard = readFileSync(new URL("../src/components/competition-board.tsx", import.meta.url), "utf8");
+const entryLabel = readFileSync(new URL("../src/components/entry-label.tsx", import.meta.url), "utf8");
 const refreshDataButton = readFileSync(new URL("../src/components/refresh-data-button.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 const publicDataMigration = readFileSync(new URL("../../supabase/migrations/20260913090000_public_data_read_models.sql", import.meta.url), "utf8");
+const competitionDisplayMigration = readFileSync(new URL("../../supabase/migrations/20260914074118_ptsc_competition_display.sql", import.meta.url), "utf8");
+const pdfBracketMigration = readFileSync(new URL("../../supabase/migrations/20260914110000_ptsc_pdf_brackets.sql", import.meta.url), "utf8");
 
 test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
@@ -116,6 +119,30 @@ test("non-bracket headings show entry and athlete counts", () => {
   assert.match(competitionBoard, /const sizeLabel = !isBracket \? tournamentSizeLabel\(tournament\) : ""/);
   assert.match(competitionBoard, /athleteCount \? ` · \$\{athleteCount\}/);
   assert.match(competitionBoard, /"VĐV" : "athletes"/);
+});
+
+test("competition display preserves technical organization codes and marks reserves", () => {
+  assert.equal(organizationShortName({ short_name: "PTSC M&C", code: "PTSC-ABC123" }), "PTSC M&C");
+  assert.equal(organizationShortName({ short_name: " ", code: "PTSC-ABC123" }), "PTSC-ABC123");
+  assert.equal(isReserveRole("Dự bị", "Reserve"), true);
+  assert.equal(isReserveRole("Vận động viên", "Athlete"), false);
+  assert.match(competitionDisplayMigration, /add column if not exists short_name/);
+  assert.match(competitionDisplayMigration, /tenant_id = '22222222-2222-2222-2222-222222222222'/);
+  assert.match(competitionDisplayMigration, /pg_get_functiondef\('public\.get_public_page/);
+  assert.match(siteLib, /db\.from\("organizations"\)\.select\("id,code,short_name/);
+  assert.match(competitionBoard, /<EntryLabel/);
+  assert.match(entryLabel, /entry-organization/);
+  assert.match(competitionBoard, /reserve-badge/);
+  assert.match(scheduleView, /organizations = \[\]/);
+});
+
+test("women's football migration contains the ten approved round-robin fixtures", () => {
+  const codes = [...competitionDisplayMigration.matchAll(/'BDNU-A-\d{2}'/g)].map(([code]) => code.slice(1, -1));
+  assert.deepEqual(codes, ["BDNU-A-01", "BDNU-A-02", "BDNU-A-03", "BDNU-A-04", "BDNU-A-05", "BDNU-A-06", "BDNU-A-07", "BDNU-A-08", "BDNU-A-09", "BDNU-A-10"]);
+  assert.match(competitionDisplayMigration, /'2026-09-20 06:30:00\+07', 2, 3/);
+  assert.match(competitionDisplayMigration, /'2026-09-20 06:30:00\+07', 4, 5/);
+  assert.match(pdfBracketMigration, /v_tenant_id uuid := '22222222-2222-2222-2222-222222222222'/);
+  assert.doesNotMatch(pdfBracketMigration, /v_tenant_id uuid := private\.seed_tenant_id\(\)/);
 });
 
 test("public pages refresh live competition data", () => {

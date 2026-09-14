@@ -19,6 +19,7 @@ import { buildOperations, parseSportWorkbook, previewOperations, SPORT_EXCEL_MAX
 import { buildPtscImportPayload, parsePtscWorkbook } from "@/lib/ptsc-template-excel";
 import { fixtureSides } from "@/lib/brackets";
 import { invalidatePublic, publicDomainForEntity } from "@/lib/invalidate";
+import { isReserveRole } from "@/lib/competition-display";
 import { isSafeHref } from "@/lib/safe-url";
 export type AdminActionState = import("@/lib/admin-action").AdminActionState;
 
@@ -98,16 +99,25 @@ async function saveRecordInternal(formData: FormData) {
   if (entity === "organizations") {
     const id = String(formData.get("id") ?? "").trim();
     const nameVi = String(formData.get("name_vi") ?? "").trim();
+    const shortName = String(formData.get("short_name") ?? "").trim();
     if (!id || !nameVi) throw new Error("Tên đầy đủ của đơn vị không được để trống");
     if (nameVi.length > 200) throw new Error("Tên đầy đủ của đơn vị quá dài");
-    const { error } = await supabase.from("organizations").update({ name_vi: nameVi }).eq("tenant_id", tenantId).eq("id", id).is("archived_at", null);
+    if (!shortName) throw new Error("Tên viết tắt của đơn vị không được để trống");
+    if (shortName.length > 160) throw new Error("Tên viết tắt của đơn vị quá dài");
+    const { error } = await supabase.from("organizations").update({ name_vi: nameVi, short_name: shortName }).eq("tenant_id", tenantId).eq("id", id).is("archived_at", null);
     if (error) throw new Error(error.message);
-    invalidatePublic("leaderboard");
+    invalidatePublic("event");
     revalidatePath("/admin");
     return;
   }
   const config = adminEntities[entity];
   const payload = Object.fromEntries(config.fields.map((field) => [field.name, valueOf(formData, field.name, "type" in field ? field.type : undefined)]));
+  if (entity === "entry_members") {
+    const reserve = isReserveRole(String(payload.role_vi ?? ""), String(payload.role_en ?? ""));
+    payload.role_vi = reserve ? "Dự bị" : "Vận động viên";
+    payload.role_en = reserve ? "Reserve" : "Athlete";
+    payload.sort_order = reserve ? 100 : 0;
+  }
   for (const field of ["href"]) if (field in payload && !isSafeHref(String(payload[field] ?? ""))) throw new Error("Liên kết không hợp lệ");
   if (entity === "tournaments") {
     if (!payload.sport_id) throw new Error("Vui lòng chọn môn thể thao");
@@ -159,6 +169,7 @@ export async function saveOrganizationName(formData: FormData) {
   request.set("entity", "organizations");
   request.set("id", String(formData.get("id") ?? ""));
   request.set("name_vi", String(formData.get("name_vi") ?? ""));
+  request.set("short_name", String(formData.get("short_name") ?? ""));
   return saveRecord(request);
 }
 

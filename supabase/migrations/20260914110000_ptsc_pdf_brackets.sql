@@ -2,7 +2,7 @@ set app.tenant_slug = 'ptsc2026';
 
 do $$
 declare
-  v_tenant_id uuid := private.seed_tenant_id();
+  v_tenant_id uuid := '22222222-2222-2222-2222-222222222222';
   v_tournament_id uuid;
   v_fixture_id uuid;
   v_group_id uuid;
@@ -17,7 +17,13 @@ declare
   v_fixture record;
   v_slot record;
 begin
-  if v_tenant_id is null then
+  if not exists (
+    select 1
+    from public.tenants
+    where id = v_tenant_id
+      and slug = 'ptsc2026'
+      and archived_at is null
+  ) then
     raise exception 'PTSC: không tìm thấy tenant';
   end if;
 

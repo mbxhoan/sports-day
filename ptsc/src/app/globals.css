@@ -159,6 +159,17 @@ tbody tr:last-child td { border: 0; }
 .schedule-match { min-width: 190px; }
 .schedule-match b { display: block; color: #fff; font-size: 12px; line-height: 1.45; }
 .schedule-match small, .schedule-venue small { display: block; margin-top: 3px; color: var(--muted-foreground); font-size: 10px; }
+.fixture-teams { display: grid; gap: 4px; }
+.fixture-side { display: block; min-width: 0; }
+.fixture-side + .fixture-side { padding-top: 4px; border-top: 1px solid #2f6681; }
+.entry-display { display: block; min-width: 0; line-height: 1.3; }
+.entry-display .entry-name { display: block; }
+.entry-organization { display: block; margin-top: 2px; color: var(--muted-foreground); font-size: 10px; font-weight: 400; line-height: 1.2; }
+.entry-member { display: inline; }
+.entry-member + .entry-member::before { content: " · "; }
+.reserve-badge { display: inline-block; margin-left: 5px; padding: 2px 5px; border-radius: 999px; background: #ffd92f; color: #082b61; font-size: 9px; font-weight: 800; line-height: 1.2; white-space: nowrap; }
+.schedule-match .entry-name { color: #fff; font-size: 12px; font-weight: 700; line-height: 1.45; }
+.schedule-match .entry-organization { margin-top: 1px; }
 .schedule-venue { min-width: 170px; }
 .schedule-venue b { display: inline-flex; align-items: center; gap: 4px; color: #fff; font-size: 11px; }
 .status { display: inline-flex; padding: 4px 9px; border-radius: 999px; background: var(--muted); font-size: 11px; }
@@ -226,6 +237,7 @@ tbody tr:last-child td { border: 0; }
 .entry-card b { color: #fff; font-size: 12px; line-height: 1.45; }
 .entry-card p { margin: 7px 0 0; color: var(--primary); font-size: 10px; }
 .entry-card > span { margin: 7px 0; color: var(--muted-foreground); font-size: 11px; }
+.entry-card-members { display: flex; flex-wrap: wrap; gap: 5px 10px; }
 .entry-cell { display: block; }
 .entry-name { display: block; }
 .entry-member-list { display: block; margin-top: 3px; color: var(--muted-foreground); font-size: 10px; font-weight: 400; line-height: 1.35; }
@@ -300,6 +312,9 @@ tbody tr:last-child td { border: 0; }
 .admin-bracket-match { height: 166px; padding: 8px; background: #07527f; }
 .source-bracket-match .bracket-team { min-height: 24px; padding: 4px 6px; font-size: 9px; }
 .source-bracket-match .bracket-team span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+.source-bracket-match .bracket-team .entry-display { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
+.source-bracket-match .bracket-team .entry-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.source-bracket-match .bracket-team .entry-organization { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bracket-candidates { display: -webkit-box; max-height: 26px; margin-top: 3px; overflow: hidden; color: #b8c9e4 !important; font-size: 8px !important; line-height: 1.25; white-space: normal !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .source-bracket-match > small { color: var(--muted-foreground); font-size: 9px; }
 .bracket-match-label { min-width: 0; padding-right: 26px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -747,7 +762,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .organization-identity > div { min-width: 0; display: grid; gap: 3px; }
 .organization-identity b { overflow-wrap: anywhere; color: #fff; font-size: 12px; line-height: 1.35; }
 .organization-identity small { color: #9eaab9; font-size: 10px; }
-.organization-name-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.organization-name-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; gap: 10px; align-items: end; }
 .organization-name-form label { min-width: 0; display: grid; gap: 6px; color: #c8d2e0; font-size: 10px; font-weight: 600; }
 .organization-name-form input { min-height: 42px; font-size: 12px; }
 .organization-name-form .gold-button { min-height: 42px; padding: 0 14px; font-size: 11px; }
@@ -871,6 +886,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .bracket-canvas .source-bracket-node { position: absolute; width: 288px; }
   .bracket-canvas .source-bracket-match { box-shadow: none; }
   .bracket-canvas .source-bracket-match .bracket-team span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bracket-canvas .source-bracket-match .bracket-team .entry-display, .bracket-canvas .source-bracket-match .bracket-team .entry-name, .bracket-canvas .source-bracket-match .bracket-team .entry-organization { white-space: normal; }
   .standings-inline-form { overflow-x: auto; }
   .standings-inline-form > table { min-width: 760px; }
   table, .schedule-day table, .fixture-day table, .group-grid table, .board-matches table, .board-race table, thead, tbody, tr, th, td { min-width: 0; max-width: 100%; }

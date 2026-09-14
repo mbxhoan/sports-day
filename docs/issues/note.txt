@@ -42,6 +42,9 @@ Cập nhật tiếp cho /ptsc:
 DONE
 ---------------------------
 Cập nhật tiếp cho /ptsc:
+1. check đảm bảo tính năng user có thể tự cập nhật điểm, cho từng bảng đấu của các hạng mục trong mỗi môn chạy và vận hành ok, không lỗi, nếu có lỗi thì cần thông báo lên màn hình, GUI chứ ko dump ra trang error server, đảm bảo khi cập nhật thứ hạng trong bảng đấu thì nhánh đấu tự động cập nhật data cho các trận vòng trong ổn định.
+2. check luôn đảm bảo khi cập nhật kết quả trận thắng của nhánh đấu thì nhánh đấu và trận tiếp theo cũng cần phải được cập nhật chính xác đội thắng vòng trước.
+3. đảm bảo luôn file excel nạp lên sẽ không lỗi khi bấm xác nhận dữ liệu, đảm bảo vận hành ổn, nếu có lỗi phải thông báo lên.
 ---------------------------
 Cập nhật tiếp cho /ptsc:
 ---------------------------

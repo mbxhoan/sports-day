@@ -112,7 +112,7 @@ const tableDefinitions: Record<SportExcelTable, readonly Column[]> = {
     { key: "rules_vi", header: "Thể lệ VI" }, { key: "rules_en", header: "Rules EN" }, { key: "competition_mode", header: "Kiểu thi / Mode", required: true }, { key: "source_metadata", header: "Nguồn / Source", type: "json" }, { key: "scoring_rule", header: "Quy tắc điểm / Scoring", type: "json" }, { key: "sort_order", header: "Thứ tự", type: "number" },
   ],
   organizations: [
-    { key: "code", header: "Mã đơn vị / Code", required: true }, { key: "name_vi", header: "Tên VI", required: true }, { key: "name_en", header: "Name EN" }, { key: "logo_path", header: "Logo path" }, { key: "leaderboard_rank", header: "Hạng BXH", type: "number" },
+    { key: "code", header: "Mã kỹ thuật / Technical code", required: true }, { key: "short_name", header: "Tên viết tắt hiển thị" }, { key: "name_vi", header: "Tên VI", required: true }, { key: "name_en", header: "Name EN" }, { key: "logo_path", header: "Logo path" }, { key: "leaderboard_rank", header: "Hạng BXH", type: "number" },
     { key: "gold_medals", header: "Vàng", type: "number" }, { key: "silver_medals", header: "Bạc", type: "number" }, { key: "bronze_medals", header: "Đồng", type: "number" }, { key: "sort_order", header: "Thứ tự", type: "number" },
   ],
   participants: [

@@ -4,6 +4,14 @@ export function standingDifference(row: { score_for: number | string | null | un
   return (Number.isFinite(scoreFor) ? scoreFor : 0) - (Number.isFinite(scoreAgainst) ? scoreAgainst : 0);
 }
 
+export function organizationShortName(organization: { short_name?: string | null; code?: string | null }) {
+  return organization.short_name?.trim() || organization.code?.trim() || "";
+}
+
+export function isReserveRole(roleVi?: string | null, roleEn?: string | null) {
+  return /dự bị|reserve/i.test(`${roleVi ?? ""} ${roleEn ?? ""}`);
+}
+
 type ScoreValue = string | number | null | undefined;
 
 export function formatMatchResult(homeName: string, homeScore: ScoreValue, awayScore: ScoreValue, awayName: string) {

@@ -11,6 +11,7 @@ import {
 } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
 import { groupBy } from "@/lib/brackets";
+import { isReserveRole } from "@/lib/competition-display";
 import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 import { ScheduleView } from "./schedule-view";
 import { CompetitionBoard } from "./competition-board";
@@ -119,12 +120,12 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     </div>}
 
     {active === "teams" && (sportEntries.length ? <section className="entry-grid">{sportEntries.map((entry, index) => {
-      const memberNames = (membersByEntryId.get(entry.id) ?? []).map((item) => participantsById.get(item.participant_id)?.full_name).filter(Boolean);
+      const memberNames = (membersByEntryId.get(entry.id) ?? []).map((item) => ({ member: item, name: participantsById.get(item.participant_id)?.full_name })).filter((item) => item.name);
       const organization = entry.organization_id ? organizationsById.get(entry.organization_id) : undefined;
       return <article className="entry-card" key={entry.id}>
         <div><span className="entry-number">{index + 1}</span><b>{localized(entry,"name",locale)}</b><small><Users size={14}/>{memberNames.length}</small></div>
         <p>{localized(tournamentsById.get(entry.tournament_id) ?? {},"name",locale)}</p>
-        {memberNames.length > 0 && <span>{memberNames.join(" · ")}</span>}
+        {memberNames.length > 0 && <span className="entry-card-members">{memberNames.map(({ member, name }) => <span key={member.participant_id}>{name}{isReserveRole(member.role_vi, member.role_en) && <small className="reserve-badge">Dự bị</small>}</span>)}</span>}
         <small>{organization ? localized(organization,"name",locale) : `${t.organization}: ${t.updating}`}</small>
       </article>;
     })}</section> : <section className="panel empty-state"><Users/><h2>{t.empty}</h2></section>)}
@@ -137,7 +138,9 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
       </article>)}</div>
     </section>)}</div> : <section className="panel empty-state"><CalendarDays/><h2>{t.empty}</h2></section>)}
 
-    {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} participants={participants} entryMembers={entryMembers} defaultVenue={venue}/>}
+    {active === "fixtures" && (
+      <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} organizations={organizations} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} participants={participants} entryMembers={entryMembers} defaultVenue={venue}/>
+    )}
 
     {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} organizations={organizations} participants={participants} entryMembers={entryMembers} showTournamentSelector={false}/>} 
     {active === "gallery" && (validateGalleryDriveUrl(sport.gallery_drive_url ?? "") ? <section className="panel drive-gallery sport-drive-gallery"><ImageIcon/><h2>{t.gallery}</h2><p>{locale === "vi" ? "Thư viện ảnh riêng của môn được quản lý trên Google Drive." : "This sport's photo library is managed in its Google Drive folder."}</p><a className="gold-button" href={sport.gallery_drive_url ?? ""} target="_blank" rel="noreferrer">{t.openDrive} ↗</a></section> : <section className="panel empty-state gallery-empty"><ImageIcon/><h2>{t.gallery}</h2><p>{t.updating}</p></section>)}
