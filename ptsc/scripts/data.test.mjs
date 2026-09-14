@@ -521,6 +521,15 @@ test("home renders separate desktop and mobile KV sources", () => {
   assert.equal(existsSync(new URL("../public/kv-mobile.webp", import.meta.url)), true);
 });
 
+test("home stats use real participants and hero previews preserve full images", () => {
+  assert.match(publicPages, /\[Users, data\.counts\.participants, t\.athleteCount\]/);
+  assert.doesNotMatch(publicPages, /\[Users, 1500,/);
+  assert.match(adminCss, /\.hero img \{ object-fit: contain; \}/);
+  assert.match(adminCss, /\.hero-upload-preview img \{ object-fit: contain; \}/);
+  assert.match(adminCss, /\.stats-grid \{[^}]*margin-top: 20px;/);
+  assert.doesNotMatch(adminCss, /\.hero img \{ object-fit: cover; \}/);
+});
+
 test("sport detail tabs keep untimed fixtures and bracket category filter", () => {
   assert.match(sportTabs, /useState/);
   assert.match(sportTabs, /\?tab=\$\{key\}/);

@@ -39,4 +39,22 @@ Cập nhật tiếp cho /ptsc:
 1. lỗi UI: ở trang chủ kv hiển thị bị dính với phần thống kê trang ở bên dưới 
 2. ô thống kê 1500 tổng vđv đưa về con số thật thay vì hardcode 1500
 3. hiện tại kv đang tỉ lệ 4:3 nên khi upload và hiện thị thì bị mất 2 mép trên dưới của KV, làm sao có thể thích nghi kv 16:9 và cả 4:3 mà không bị mất mép được khoong?
-4. 
+DONE
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:
+---------------------------
+Cập nhật tiếp cho /ptsc:

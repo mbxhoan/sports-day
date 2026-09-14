@@ -59,7 +59,7 @@ form[data-pending] button[data-pending]::after { content: ""; width: 13px; heigh
 .mobile-menu nav a:hover { background: var(--muted); color: var(--primary); }
 
 .hero { position: relative; width: 100%; aspect-ratio: 2.006 / 1; overflow: hidden; background: #0c9ead; }
-.hero img { object-fit: cover; }
+.hero img { object-fit: contain; }
 .hero-mobile { display: none !important; }
 .countdown { min-height: 280px; padding: 56px 24px; display: grid; place-content: center; text-align: center; background: radial-gradient(circle at 50% 0, #0a8da8, var(--background) 67%); }
 .countdown > p { margin: 0 0 20px; color: var(--primary); font-size: 12px; font-weight: 700; letter-spacing: .18em; }
@@ -69,7 +69,7 @@ form[data-pending] button[data-pending]::after { content: ""; width: 13px; heigh
 .count-unit b { width: 72px; height: 72px; display: grid; place-items: center; border: 1px solid #28c3d5; border-radius: var(--radius); background: #07527f; color: var(--primary); font-size: 27px; font-variant-numeric: tabular-nums; }
 .count-unit span { color: var(--muted-foreground); font-size: 12px; }
 .home-content { padding-bottom: 72px; }
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: -4px; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 20px; }
 .stat-card { min-height: 150px; padding: 24px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); }
 .stat-card svg { color: var(--primary); }
 .stat-card b { color: var(--primary); font-size: 27px; }
@@ -522,7 +522,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .hero-upload { min-width: 0; display: grid; gap: 9px; padding: 12px; border: 1px solid #2f6681; border-radius: var(--radius); background: #064a78; }
 .hero-upload b { color: #fff; font-size: 12px; }
 .hero-upload-preview { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 5px; background: #07365b; }
-.hero-upload-preview img { object-fit: cover; }
+.hero-upload-preview img { object-fit: contain; }
 .upload-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .upload-form input[type="file"], .upload-form button { grid-column: 1 / -1; }
 .upload-form input[type="file"] { padding: 9px; }
@@ -773,7 +773,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
   .mobile-menu { display: block; }
   .header-actions { gap: 8px; }
   .hero { aspect-ratio: 1.45 / 1; }
-  .hero img { object-fit: cover; }
+  .hero img { object-fit: contain; }
   .sport-info-layout { grid-template-columns: 1fr; }
   .sport-tabs { top: 70px; }
   .schedule-toolbar { flex-wrap: wrap; }
