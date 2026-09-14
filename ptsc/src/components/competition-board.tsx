@@ -180,6 +180,15 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     const organization = entry?.organization_id ? organizationsById.get(entry.organization_id) : undefined;
     return <div className="entry-cell"><span className="entry-name">{entryName(id)}</span>{organization && <span className="entry-member-list">{localized(organization, "name", locale)}</span>}{entry?.kind === "team" && members.length > 0 && <span className="entry-member-list">{members.join(" · ")}</span>}</div>;
   };
+  const tournamentSizeLabel = (tournament: Tournament) => {
+    const tournamentEntries = entriesByTournament.get(tournament.id) ?? [];
+    const groupedEntries = tournamentEntries.filter((entry) => entry.kind !== "individual");
+    const athleteCount = tournamentEntries.reduce((count, entry) => count + (entry.kind === "individual" ? 1 : membersByEntryId.get(entry.id)?.length ?? 0), 0);
+    if (!tournamentEntries.length) return "";
+    const groupKinds = new Set(groupedEntries.map((entry) => entry.kind));
+    const groupLabel = locale === "vi" ? groupKinds.size === 1 ? groupedEntries[0]?.kind === "pair" ? "cặp" : "đội" : "đội/cặp" : groupKinds.size === 1 ? groupedEntries[0]?.kind === "pair" ? "pairs" : "teams" : "teams/pairs";
+    return groupedEntries.length ? `${groupedEntries.length} ${groupLabel}${athleteCount ? ` · ${athleteCount} ${locale === "vi" ? "VĐV" : "athletes"}` : ""}` : `${athleteCount} ${locale === "vi" ? "VĐV" : "athletes"}`;
+  };
   const slotDisplayLabel = (slot: FixtureSlot) => {
     const group = slot.source_group_id ? groups.find((item) => item.id === slot.source_group_id) : undefined;
     return slotSourceLabel(slot, group ? localized(group, "name", locale) : "", locale) || slotLabel(slot, undefined, locale);
@@ -255,8 +264,9 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     const tournamentGroups = groupsByTournament.get(tournament.id) ?? [];
     const knockout = tournamentFixtures.filter((fixture) => fixture.round_order !== null && fixture.bracket_position !== null);
     const isBracket = tournament.competition_mode === "knockout" || tournament.competition_mode === "group_knockout";
+    const sizeLabel = !isBracket ? tournamentSizeLabel(tournament) : "";
     return <section className="tournament-block" id={`tournament-${tournament.id}`} key={tournament.id} style={{ contentVisibility: "auto", containIntrinsicSize: "0 560px" }}>
-      <header className="board-heading"><div><h2>{localized(tournament, "name", locale)}</h2>{sourceNote(tournament, locale)}</div><span>{localized(tournament, "format", locale)}</span></header>
+      <header className="board-heading"><div><h2>{localized(tournament, "name", locale)}{sizeLabel && ` · ${sizeLabel}`}</h2>{sourceNote(tournament, locale)}</div><span>{localized(tournament, "format", locale)}</span></header>
       {isBracket && knockout.length > 0 && (() => {
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
         const layout = layoutBracket(knockout, slots, resultAction ? 166 : 84, resultAction ? undefined : 100);

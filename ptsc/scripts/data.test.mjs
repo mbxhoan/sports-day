@@ -110,6 +110,14 @@ test("competition board keeps the all-category option aligned with the schedule 
   assert.match(competitionBoard, /selectedTournamentId === "all" \? available : available\.filter/);
 });
 
+test("non-bracket headings show entry and athlete counts", () => {
+  assert.match(competitionBoard, /const tournamentSizeLabel =/);
+  assert.match(competitionBoard, /entry\.kind === "individual" \? 1 : membersByEntryId\.get\(entry\.id\)/);
+  assert.match(competitionBoard, /const sizeLabel = !isBracket \? tournamentSizeLabel\(tournament\) : ""/);
+  assert.match(competitionBoard, /athleteCount \? ` · \$\{athleteCount\}/);
+  assert.match(competitionBoard, /"VĐV" : "athletes"/);
+});
+
 test("public pages refresh live competition data", () => {
   assert.match(refreshDataButton, /router\.refresh\(\)/);
   assert.match(refreshDataButton, /visibilityState === "visible"/);
