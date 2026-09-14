@@ -4,7 +4,7 @@ insert into public.event_settings (
 ) values (
   '00000000-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222', 'main',
   'Hội Thao Tổng Công Ty Cổ Phần Dịch Vụ Kỹ Thuật Dầu Khí Việt Nam Lần Thứ 15', 'PTSC 15th Sports Festival',
-  '', '', '', '', '', '', '', '', null, null
+  '', '', '', '', '/kv-ptsc-placeholder.png', '/kv-ptsc-mobile-placeholder.png', null, null
 ) on conflict (tenant_id, singleton_key) do update set
   event_name_vi = excluded.event_name_vi,
   event_name_en = excluded.event_name_en,

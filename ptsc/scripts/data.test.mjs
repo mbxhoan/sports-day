@@ -104,6 +104,12 @@ test("public bracket shows source rank labels without candidate predictions", ()
   assert.match(competitionBoard, /item\.candidateLabel \? `Có thể: \$\{item\.candidateLabel\}`/);
 });
 
+test("competition board keeps the all-category option aligned with the schedule filter", () => {
+  assert.match(competitionBoard, /useState\("all"\)/);
+  assert.match(competitionBoard, /<option value="all">\{t\.filterCategory\}<\/option>/);
+  assert.match(competitionBoard, /selectedTournamentId === "all" \? available : available\.filter/);
+});
+
 test("public pages refresh live competition data", () => {
   assert.match(refreshDataButton, /router\.refresh\(\)/);
   assert.match(refreshDataButton, /visibilityState === "visible"/);
@@ -516,9 +522,9 @@ test("home renders separate desktop and mobile KV sources", () => {
   assert.match(publicPages, /<picture>/);
   assert.match(publicPages, /media=\"\(max-width: 767px\)\"/);
   assert.match(publicPages, /hero_mobile_path/);
-  assert.match(publicPages, /kv\.webp/);
-  assert.equal(existsSync(new URL("../public/kv.webp", import.meta.url)), true);
-  assert.equal(existsSync(new URL("../public/kv-mobile.webp", import.meta.url)), true);
+  assert.match(publicPages, /kv-ptsc-placeholder\.png/);
+  assert.equal(existsSync(new URL("../public/kv-ptsc-placeholder.png", import.meta.url)), true);
+  assert.equal(existsSync(new URL("../public/kv-ptsc-mobile-placeholder.png", import.meta.url)), true);
 });
 
 test("home stats use real participants and hero previews preserve full images", () => {

@@ -34,8 +34,8 @@ function SportCard({ locale, sport, tournaments, fixtureCount }: { locale: Local
 export async function HomePage({ locale }: { locale: Locale }) {
   const { shell, data } = await getHomeData();
   const t = copy[locale];
-  const desktopHero = shell.event.hero_path === "/kv.png" ? "/kv.webp" : shell.event.hero_path;
-  const mobileHero = shell.event.hero_mobile_path === "/kv-mobile.png" ? "/kv-mobile.webp" : shell.event.hero_mobile_path;
+  const desktopHero = shell.event.hero_path || "/kv-ptsc-placeholder.png";
+  const mobileHero = shell.event.hero_mobile_path || "/kv-ptsc-mobile-placeholder.png";
   const dayCount = shell.event.start_at && shell.event.end_at ? Math.max(1, Math.ceil((Date.parse(shell.event.end_at) - Date.parse(shell.event.start_at)) / 86_400_000)) : 0;
   const stats = [
     [Trophy, data.counts.sports, t.sportCount],
