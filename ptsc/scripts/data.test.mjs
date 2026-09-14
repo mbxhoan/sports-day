@@ -533,10 +533,11 @@ test("hero upload paths keep desktop and mobile files separate", () => {
   assert.throws(() => heroStoragePath("wide", "image/png", "fixed"), /Hero không hợp lệ/);
 });
 
-test("sport gallery keeps legacy media but removes new uploads", () => {
+test("sport gallery supports admin uploads and keeps public media Drive-only", () => {
   const gallery = readFileSync(new URL("../src/app/admin/sports/[slug]/page.tsx", import.meta.url), "utf8");
-  assert.doesNotMatch(gallery, /MediaUploadForm/);
-  assert.match(gallery, /Media cũ \/ Legacy media/);
+  assert.match(gallery, /MediaUploadForm/);
+  assert.match(gallery, /uploadMedia/);
+  assert.match(gallery, /saveSportGalleryDriveUrl/);
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(2 * 1024 * 1024)], "ok.png", { type: "image/png" }), 2 * 1024 * 1024));
   assert.doesNotThrow(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024)], "large.png", { type: "image/png" }), 10 * 1024 * 1024));
   assert.throws(() => assertImageFile(new File([new Uint8Array(10 * 1024 * 1024 + 1)], "too-large.png", { type: "image/png" }), 10 * 1024 * 1024), /tối đa 10MB/);

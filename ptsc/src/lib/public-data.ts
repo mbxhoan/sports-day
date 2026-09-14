@@ -89,6 +89,19 @@ async function readPublicPage(page: PublicPage, sportSlug?: string | null) {
   }
 }
 
+async function readPublicSportGallery(sportSlug: string) {
+  const id = correlationId();
+  try {
+    const { data, error } = await supabaseClient().rpc("get_public_sport_gallery", { p_sport_slug: sportSlug });
+    if (error) throw error;
+    if (!data || typeof data !== "object") throw new Error("Invalid public sport gallery payload");
+    return data as { gallery_drive_url?: string };
+  } catch (error) {
+    if (error instanceof PublicDataError) throw error;
+    throw new PublicDataError(`Unable to load public sport gallery '${sportSlug}'`, id, { cause: error });
+  }
+}
+
 function shellFromSite(data: SiteData): ShellData {
   return { event: data.event, contacts: data.contacts, footerLinks: data.footerLinks };
 }
@@ -141,7 +154,11 @@ async function loadPage<T extends PublicPage>(page: T, slug?: string): Promise<P
   if (page === "shell") return { shell: shell as unknown as ShellData, data: shell };
   const tag = page === "sport" ? `sport:${slug ?? ""}` : page === "sports-index" ? PUBLIC_ROUTE_TAGS.sportsIndex : page;
   const revalidate = ["sports-index", "gallery"].includes(page) ? 3600 : activeCompetition(shell as unknown as ShellData) ? 60 : 3600;
-  const data = await cachedRpc(page, slug ?? null, tag, revalidate);
+  let data = await cachedRpc(page, slug ?? null, tag, revalidate);
+  if (page === "sport" && slug) {
+    const gallery = await unstable_cache(() => readPublicSportGallery(slug), ["public-sport-gallery", tenantSlug || "missing", slug], { revalidate, tags: [tag] })();
+    data = { ...data, sport: data.sport && typeof data.sport === "object" ? { ...(data.sport as Record<string, unknown>), gallery_drive_url: gallery.gallery_drive_url ?? "" } : data.sport };
+  }
   return { shell: shell as unknown as ShellData, data };
 }
 

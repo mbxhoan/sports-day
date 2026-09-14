@@ -66,7 +66,7 @@ export async function SportPage({ locale, slug, tab = "info", tournamentSlug }: 
   const { shell, data } = await getSportData(slug);
   const sport = data.sport;
   if (!sport) notFound();
-  const allowedTabs = ["info", "teams", "times", "fixtures", "brackets"] as TabKey[];
+  const allowedTabs = ["info", "teams", "times", "fixtures", "brackets", "gallery"] as TabKey[];
   const active = allowedTabs.includes(tab as TabKey) ? tab as TabKey : "info";
   const hrefBase = `${locale === "en" ? "/en" : ""}/sports/${sport.slug}`;
   return <SiteShell locale={locale} shell={shell}><div className="container page-container sport-page"><PageTitle emoji={sport.emoji} title={localized(sport,"name",locale)} subtitle={localized(sport,"description",locale)}/><SportTabs locale={locale} sport={sport} venue={localized(shell.event,"venue",locale)} active={active} hrefBase={hrefBase} tournaments={data.tournaments} initialTournamentSlug={tournamentSlug} organizations={data.organizations} participants={data.participants} entries={data.entries} entryMembers={data.entryMembers} groups={data.groups} groupEntries={data.groupEntries} fixtures={data.fixtures} fixtureEntries={data.fixtureEntries} fixtureSlots={data.fixtureSlots} standings={data.standings} venues={data.venues} courts={data.courts}/></div></SiteShell>;

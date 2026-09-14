@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarDays, Clock3, GitBranch, Info, MapPin, Trophy, Users } from "lucide-react";
+import { CalendarDays, Clock3, GitBranch, Image as ImageIcon, Info, MapPin, Trophy, Users } from "lucide-react";
 import type { ComponentType } from "react";
 import { useState } from "react";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
 import { groupBy } from "@/lib/brackets";
+import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 import { ScheduleView } from "./schedule-view";
 import { CompetitionBoard } from "./competition-board";
 
@@ -36,7 +37,7 @@ type Props = {
   courts: Court[];
 };
 
-export type TabKey = "info" | "teams" | "times" | "fixtures" | "brackets";
+export type TabKey = "info" | "teams" | "times" | "fixtures" | "brackets" | "gallery";
 type SportTab = [TabKey, string, ComponentType<{ size?: number }>];
 
 export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments, initialTournamentSlug, organizations, participants, entries, entryMembers, groups, groupEntries, fixtures, fixtureEntries, fixtureSlots, standings, venues, courts }: Props) {
@@ -81,6 +82,7 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     ["teams", `${t.teams} (${sportEntries.length})`, Users],
     ["times", t.times, CalendarDays], ["fixtures", `${t.fixtures} (${sportFixtures.length})`, Clock3],
     ["brackets", t.brackets, GitBranch],
+    ["gallery", t.gallery, ImageIcon],
   ];
   const timeSlots = [...new Map(datedFixtures.map((fixture) => [`${fixture.tournament_id}|${fixture.starts_at}|${localized(fixture, "round", locale)}`, fixture])).values()];
   const slotsByDay = groupBy(timeSlots, (fixture) => dateParts(fixture.starts_at).day);
@@ -138,5 +140,6 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
     {active === "fixtures" && <ScheduleView locale={locale} sports={[sport]} sportId={sport.id} tournaments={tournaments} entries={entries} groups={groups} groupEntries={groupEntries} fixtures={fixtures} fixtureEntries={fixtureEntries} fixtureSlots={fixtureSlots} standings={standings} venues={venues} courts={courts} participants={participants} entryMembers={entryMembers} defaultVenue={venue}/>}
 
     {active === "brackets" && <CompetitionBoard locale={locale} tournaments={boardTournaments} entries={boardEntries} groups={boardGroups} groupEntries={boardGroupEntries} fixtures={boardFixtures} fixtureEntries={boardFixtureEntries} fixtureSlots={boardFixtureSlots} standings={boardStandings} organizations={organizations} participants={participants} entryMembers={entryMembers} showTournamentSelector={false}/>} 
+    {active === "gallery" && (validateGalleryDriveUrl(sport.gallery_drive_url ?? "") ? <section className="panel drive-gallery sport-drive-gallery"><ImageIcon/><h2>{t.gallery}</h2><p>{locale === "vi" ? "Thư viện ảnh riêng của môn được quản lý trên Google Drive." : "This sport's photo library is managed in its Google Drive folder."}</p><a className="gold-button" href={sport.gallery_drive_url ?? ""} target="_blank" rel="noreferrer">{t.openDrive} ↗</a></section> : <section className="panel empty-state gallery-empty"><ImageIcon/><h2>{t.gallery}</h2><p>{t.updating}</p></section>)}
   </>;
 }

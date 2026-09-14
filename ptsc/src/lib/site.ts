@@ -16,6 +16,7 @@ export type Sport = {
   rules_vi: string;
   rules_en: string;
   sort_order: number;
+  gallery_drive_url?: string | null;
 };
 export type Tournament = {
   id: string;
@@ -241,7 +242,7 @@ const fallback: SiteData = {
     subtitle_vi: "PTSC 2026", subtitle_en: "PTSC 2026",
     about_vi: "Sân chơi thể thao gắn kết người lao động PTSC.",
     about_en: "A sports festival connecting PTSC employees.",
-    venue_vi: "", venue_en: "", hero_path: "/kv.png", hero_mobile_path: "/kv-mobile.png",
+    venue_vi: "", venue_en: "", hero_path: "/kv-ptsc-placeholder.png", hero_mobile_path: "/kv-ptsc-mobile-placeholder.png",
     start_at: null, end_at: null,
     gallery_drive_url: "",
   },
@@ -277,7 +278,7 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
   const tenantId = tenant.id;
   const [event, sports, tournamentsResult, organizations, participants, entries, entryMembers, groups, groupEntries, venues, courts, fixtures, fixtureSlots, standings, awards, media, contacts, footerLinks] = await Promise.all([
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
-    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order,gallery_drive_url").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("organizations").select("id,code,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).is("archived_at", null).order("full_name"),

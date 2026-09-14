@@ -60,10 +60,33 @@ async function sportSlugForTournament(supabase: Awaited<ReturnType<typeof adminC
 export async function saveEvent(formData: FormData) {
   const { supabase, tenantId } = await adminClient();
   const payload = Object.fromEntries(eventFieldNames.map((name) => [name, valueOf(formData, name, name.endsWith("_at") ? "datetime-local" : undefined)]));
-  if (!validateGalleryDriveUrl(String(payload.gallery_drive_url ?? "")) || !isSafeHref(String(payload.gallery_drive_url ?? ""))) throw new Error("URL Google Drive không hợp lệ");
   const { error } = await supabase.from("event_settings").update(payload).eq("tenant_id", tenantId).eq("singleton_key", "main");
   if (error) throw new Error(error.message);
   invalidatePublic("event");
+}
+
+export async function saveGalleryDriveUrl(formData: FormData) {
+  const galleryDriveUrl = String(formData.get("gallery_drive_url") ?? "").trim();
+  if (!validateGalleryDriveUrl(galleryDriveUrl) || (galleryDriveUrl && !isSafeHref(galleryDriveUrl))) throw new Error("URL Google Drive không hợp lệ");
+  const { supabase, tenantId } = await adminClient();
+  const { error } = await supabase.from("event_settings").update({ gallery_drive_url: galleryDriveUrl }).eq("tenant_id", tenantId).eq("singleton_key", "main");
+  if (error) throw new Error(error.message);
+  invalidatePublic("event");
+  revalidatePath("/admin");
+}
+
+export async function saveSportGalleryDriveUrl(formData: FormData) {
+  const sportId = String(formData.get("sport_id") ?? "").trim();
+  const galleryDriveUrl = String(formData.get("gallery_drive_url") ?? "").trim();
+  if (!sportId || !validateGalleryDriveUrl(galleryDriveUrl) || (galleryDriveUrl && !isSafeHref(galleryDriveUrl))) throw new Error("URL Google Drive không hợp lệ");
+  const { supabase, tenantId } = await adminClient();
+  const { data: sport, error: sportError } = await supabase.from("sports").select("slug").eq("tenant_id", tenantId).eq("id", sportId).is("archived_at", null).maybeSingle();
+  if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
+  const { error } = await supabase.from("sports").update({ gallery_drive_url: galleryDriveUrl }).eq("tenant_id", tenantId).eq("id", sportId).is("archived_at", null);
+  if (error) throw new Error(error.message);
+  invalidatePublic("sport", sport.slug);
+  revalidatePath(`/admin/sports/${sport.slug}`);
+  revalidatePath("/admin");
 }
 
 async function saveRecordInternal(formData: FormData) {
@@ -610,8 +633,8 @@ export async function rollbackSportExcelImport(formData: FormData) {
   redirect(excelAdminPath(slug, `import=${encodeURIComponent(importId)}`));
 }
 
-function ptscExcelAdminPath(params: string) {
-  return `/admin/excel${params ? `?${params}` : ""}`;
+function ptscExcelAdminPath(params: string, hash = "") {
+  return `/admin/excel${params ? `?${params}` : ""}${hash ? `#${hash}` : ""}`;
 }
 
 function isRedirectError(error: unknown) {
@@ -656,10 +679,10 @@ export async function preparePtscTemplateImport(formData: FormData) {
     if (error) throw new Error(error.message);
     const importId = String((data as { import_id?: string } | null)?.import_id ?? "");
     if (!importId) throw new Error("Không tạo được batch import PTSC");
-    target = ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`);
+    target = ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`, "review");
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    target = ptscExcelAdminPath(`error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể đọc file Excel")}`);
+    target = ptscExcelAdminPath(`error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể đọc file Excel")}`, "upload");
   }
   redirect(target);
 }
@@ -675,10 +698,10 @@ export async function commitPtscTemplateImport(formData: FormData) {
     invalidatePublic("result");
     revalidatePath("/");
     revalidatePath("/admin");
-    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`));
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`, "review"));
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}&error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể commit import")}`));
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}&error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể commit import")}`, "review"));
   }
 }
 
@@ -693,10 +716,10 @@ export async function rollbackPtscTemplateImport(formData: FormData) {
     invalidatePublic("result");
     revalidatePath("/");
     revalidatePath("/admin");
-    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`));
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}`, "review"));
   } catch (error) {
     if (isRedirectError(error)) throw error;
-    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}&error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể rollback import")}`));
+    redirect(ptscExcelAdminPath(`batch=${encodeURIComponent(importId)}&error=${encodeURIComponent(error instanceof Error ? error.message : "Không thể rollback import")}`, "review"));
   }
 }
 
