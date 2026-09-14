@@ -49,6 +49,7 @@ Cập nhật tiếp cho /ptsc:
 Cập nhật tiếp cho /ptsc:
 1. tất cả các ô select đều có tính năng select tìm kiếm, nghĩa là có thể nhập vào và auto suggest trên admin GUI @3.png.
 2. vẫn chưa thấy tên vđv trong các hạng mục thi đấu Pickleball thường, vẫn là "Chờ nhập", làm sao sửa đây? @4.png.
+DONE
 ---------------------------
 Cập nhật tiếp cho /ptsc:
 ---------------------------
