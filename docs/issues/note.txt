@@ -47,6 +47,8 @@ Cập nhật tiếp cho /ptsc:
 3. đảm bảo luôn file excel nạp lên sẽ không lỗi khi bấm xác nhận dữ liệu, đảm bảo vận hành ổn, nếu có lỗi phải thông báo lên.
 ---------------------------
 Cập nhật tiếp cho /ptsc:
+1. tất cả các ô select đều có tính năng select tìm kiếm, nghĩa là có thể nhập vào và auto suggest trên admin GUI @3.png.
+2. vẫn chưa thấy tên vđv trong các hạng mục thi đấu Pickleball thường, vẫn là "Chờ nhập", làm sao sửa đây? @4.png.
 ---------------------------
 Cập nhật tiếp cho /ptsc:
 ---------------------------

@@ -13,7 +13,7 @@ import { relationEntity } from "../src/lib/admin-relations.ts";
 import { adminEntities } from "../src/lib/admin-config.ts";
 import { deriveStandings, headToHeadRule } from "../src/lib/standings.ts";
 import { isManualSport, orderManualStandings, validateGalleryDriveUrl } from "../src/lib/manual-competition.ts";
-import { formatMatchResult, isReserveRole, normalizeLegacyMatchResult, organizationShortName, scoresFromMatchResult, standingDifference } from "../src/lib/competition-display.ts";
+import { entryDisplayName, formatMatchResult, isReserveRole, normalizeLegacyMatchResult, organizationShortName, scoresFromMatchResult, standingDifference } from "../src/lib/competition-display.ts";
 import { buildSearchSuggestions, matchesSearch } from "../src/lib/search.ts";
 
 const supabaseRoot = new URL("../../supabase/", import.meta.url);
@@ -58,6 +58,7 @@ const competitionBoard = readFileSync(new URL("../src/components/competition-boa
 const entryLabel = readFileSync(new URL("../src/components/entry-label.tsx", import.meta.url), "utf8");
 const refreshDataButton = readFileSync(new URL("../src/components/refresh-data-button.tsx", import.meta.url), "utf8");
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
+const searchableSelect = readFileSync(new URL("../src/components/searchable-select.tsx", import.meta.url), "utf8");
 const publicDataMigration = readFileSync(new URL("../../supabase/migrations/20260913090000_public_data_read_models.sql", import.meta.url), "utf8");
 const competitionDisplayMigration = readFileSync(new URL("../../supabase/migrations/20260914074118_ptsc_competition_display.sql", import.meta.url), "utf8");
 const pdfBracketMigration = readFileSync(new URL("../../supabase/migrations/20260914110000_ptsc_pdf_brackets.sql", import.meta.url), "utf8");
@@ -111,8 +112,18 @@ test("public bracket shows source rank labels without candidate predictions", ()
 
 test("competition board keeps the all-category option aligned with the schedule filter", () => {
   assert.match(competitionBoard, /useState\("all"\)/);
-  assert.match(competitionBoard, /<option value="all">\{t\.filterCategory\}<\/option>/);
+  assert.match(competitionBoard, /value=\{selectedTournamentId\}/);
+  assert.match(competitionBoard, /placeholder=\{t\.filterCategory\}/);
   assert.match(competitionBoard, /selectedTournamentId === "all" \? available : available\.filter/);
+});
+
+test("admin selects support searchable suggestions and preserve real athlete names", () => {
+  assert.match(searchableSelect, /role="combobox"/);
+  assert.match(searchableSelect, /matchesSearch/);
+  assert.match(searchableSelect, /name=\{name\}/);
+  assert.match(adminSportPage, /<SearchableSelect/);
+  assert.equal(entryDisplayName({ name_vi: "Chờ nhập · PB-DON-NAM45 · A-1", name_en: "" }, [{ participant_id: "p1", sort_order: 1 }], [{ id: "p1", full_name: "Phạm Đức Dũng" }]), "Phạm Đức Dũng");
+  assert.equal(entryDisplayName({ name_vi: "Đội PTSC", name_en: "PTSC Team" }, [{ participant_id: "p1", sort_order: 1 }], [{ id: "p1", full_name: "Phạm Đức Dũng" }]), "Đội PTSC");
 });
 
 test("non-bracket headings show entry and athlete counts", () => {

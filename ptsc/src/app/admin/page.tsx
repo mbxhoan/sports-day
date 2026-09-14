@@ -9,6 +9,7 @@ import { toVietnamLocalInput } from "@/lib/datetime";
 import { relationEntity } from "@/lib/admin-relations";
 import { SubmitButton } from "@/components/submit-button";
 import { AdminRecordForm } from "@/components/admin-record-form";
+import { SearchableSelect } from "@/components/searchable-select";
 import { getTenantId } from "@/lib/tenant";
 import { withTimeout } from "@/lib/auth-timeout";
 import { logout, saveEvent, saveGalleryDriveUrl, saveManualLeaderboard, saveOrganizationName, saveRecordAction, setArchived, uploadHero } from "./actions";
@@ -27,7 +28,7 @@ function Fields({ fields, row = {}, rows }: { fields: readonly AdminField[]; row
   return <div className="admin-fields">{fields.map((field) => {
     const relation = relationEntity(field.name);
     const options = relation ? rows[relation].filter((item) => !item.archived_at) : [];
-    return <label key={field.name}><span>{field.label}</span>{field.type === "textarea" ? <MarkdownInput name={field.name} defaultValue={String(row[field.name] ?? "")}/> : relation || field.options ? <select name={field.name} defaultValue={String(row[field.name] ?? "")} required={field.required}><option value="">Chọn / Select</option>{relation ? options.map((item) => <option value={item.id} key={item.id}>{summary(item)}</option>) : field.options?.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select> : <input name={field.name} type={field.type ?? "text"} defaultValue={String(row[field.name] ?? "")} required={field.required}/>}</label>;
+    return <label key={field.name}><span>{field.label}</span>{field.type === "textarea" ? <MarkdownInput name={field.name} defaultValue={String(row[field.name] ?? "")}/> : relation || field.options ? <SearchableSelect name={field.name} value={String(row[field.name] ?? "")} options={relation ? options.map((item) => ({ value: item.id, label: summary(item) })) : field.options ?? []} placeholder="Chọn / Select" required={field.required}/> : <input name={field.name} type={field.type ?? "text"} defaultValue={String(row[field.name] ?? "")} required={field.required}/>}</label>;
   })}</div>;
 }
 

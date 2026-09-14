@@ -714,6 +714,13 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary); box-sh
 .searchable-select select { min-width: 0; }
 .roster-create-card form, .roster-edit-card form, .roster-form-grid, .assign-member-form, .roster-form-grid > label, .assign-member-form > label { min-width: 0; max-width: 100%; }
 .roster-form-grid select, .assign-member-form select, .searchable-select select { display: block; width: 100%; min-width: 0 !important; max-width: 100%; }
+.searchable-select { position: relative; }
+.searchable-select-options { inset: 46px 0 auto; }
+.searchable-select-clear { min-height: 28px; padding: 0 3px; display: grid; place-items: center; border: 0; background: transparent; color: var(--muted-foreground); }
+.searchable-select-native { position: absolute !important; width: 1px !important; height: 1px !important; min-height: 1px !important; margin: -1px; padding: 0 !important; overflow: hidden; opacity: 0; pointer-events: none; border: 0; }
+.bracket-inline-winner .searchable-select { gap: 0; }
+.bracket-inline-winner .searchable-select .search-input-wrap { min-height: 25px; padding: 0 5px; }
+.bracket-inline-winner .searchable-select .search-input-wrap input { min-height: 21px; font-size: 9px; }
 .roster-create-card .gold-button, .roster-edit-card .gold-button { min-height: 42px; padding: 0 15px; font-size: 12px; }
 .roster-grid { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 16px; }
 .roster-list-panel, .roster-detail-panel { border-radius: 7px; }

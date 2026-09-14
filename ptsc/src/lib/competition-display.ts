@@ -12,6 +12,17 @@ export function isReserveRole(roleVi?: string | null, roleEn?: string | null) {
   return /dự bị|reserve/i.test(`${roleVi ?? ""} ${roleEn ?? ""}`);
 }
 
+export function entryDisplayName(entry: Pick<Entry, "name_vi" | "name_en"> | undefined, members: Array<Pick<EntryMember, "participant_id" | "sort_order">> = [], participants: Array<Pick<Participant, "id" | "full_name"> & { full_name_en?: string | null}> = [], locale: "vi" | "en" = "vi") {
+  const label = String(entry?.[`name_${locale}`] ?? entry?.name_vi ?? "").trim();
+  if (label && !/^Chờ nhập(?:\s·|$)/i.test(label)) return label;
+  const participantsById = new Map(participants.map((participant) => [participant.id, participant]));
+  const names = [...members].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map((member) => {
+    const participant = participantsById.get(member.participant_id);
+    return locale === "en" ? participant?.full_name_en?.trim() || participant?.full_name : participant?.full_name;
+  }).filter((name): name is string => Boolean(name));
+  return names.join(" / ") || label;
+}
+
 type ScoreValue = string | number | null | undefined;
 
 export function formatMatchResult(homeName: string, homeScore: ScoreValue, awayScore: ScoreValue, awayName: string) {
@@ -41,3 +52,4 @@ export function scoresFromMatchResult(summary: string, homeName: string, awayNam
   const scores = normalized.slice(home.length, normalized.length - away.length).match(/^\s*(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\s*$/);
   return scores ? [scores[1], scores[2]] : null;
 }
+import type { Entry, EntryMember, Participant } from "./site";

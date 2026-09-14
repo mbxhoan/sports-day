@@ -11,7 +11,7 @@ import {
 } from "@/lib/site";
 import { formatVietnamDateTime } from "@/lib/datetime";
 import { groupBy } from "@/lib/brackets";
-import { isReserveRole } from "@/lib/competition-display";
+import { entryDisplayName, isReserveRole } from "@/lib/competition-display";
 import { validateGalleryDriveUrl } from "@/lib/manual-competition";
 import { ScheduleView } from "./schedule-view";
 import { CompetitionBoard } from "./competition-board";
@@ -123,7 +123,7 @@ export function SportTabs({ locale, sport, venue, active, hrefBase, tournaments,
       const memberNames = (membersByEntryId.get(entry.id) ?? []).map((item) => ({ member: item, name: participantsById.get(item.participant_id)?.full_name })).filter((item) => item.name);
       const organization = entry.organization_id ? organizationsById.get(entry.organization_id) : undefined;
       return <article className="entry-card" key={entry.id}>
-        <div><span className="entry-number">{index + 1}</span><b>{localized(entry,"name",locale)}</b><small><Users size={14}/>{memberNames.length}</small></div>
+        <div><span className="entry-number">{index + 1}</span><b>{entryDisplayName(entry, membersByEntryId.get(entry.id), participants, locale)}</b><small><Users size={14}/>{memberNames.length}</small></div>
         <p>{localized(tournamentsById.get(entry.tournament_id) ?? {},"name",locale)}</p>
         {memberNames.length > 0 && <span className="entry-card-members">{memberNames.map(({ member, name }) => <span key={member.participant_id}>{name}{isReserveRole(member.role_vi, member.role_en) && <small className="reserve-badge">Dự bị</small>}</span>)}</span>}
         <small>{organization ? localized(organization,"name",locale) : `${t.organization}: ${t.updating}`}</small>
