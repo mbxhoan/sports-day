@@ -1,4 +1,4 @@
-# THÔNG TIN 11 MÔN THI ĐẤU PTSC 2026 - BẢN CẬP NHẬT 13/09/2026
+# THÔNG TIN 11 MÔN THI ĐẤU PTSC 2026 - BẢN CẬP NHẬT 14/09/2026
 
 Nguồn đối chiếu: 11 PDF, tổng cộng 75 trang, trong tệp ZIP mới do người dùng cung cấp ngày 13/09/2026. Khi nội dung PDF và xác nhận trực tiếp của Ban tổ chức khác nhau, template ưu tiên xác nhận trực tiếp và ghi chú rõ phần chưa đồng bộ trong PDF.
 
@@ -15,6 +15,7 @@ Nguồn đối chiếu: 11 PDF, tổng cộng 75 trang, trong tệp ZIP mới do
    - Nhánh Đơn nam ≤45 và Đôi nam ≤45 đã sử dụng đủ bảng A-H.
    - “Trên 46 tuổi” được chuẩn hóa và hiểu là **từ 46 tuổi trở lên**, bao gồm người đúng 46 tuổi.
    - Mục 3.10 bên dưới đã được cập nhật theo sơ đồ mới.
+   - Đôi nam 46+ đã xác nhận nhánh hạt giống: TK1 1-8, TK2 4-5, TK3 **2-7**, TK4 6-3.
 6. **Tennis**: trang 6 đã sửa tiêu đề thành **Đôi nam từ 46 tuổi trở lên**. Mã hạng mục chuẩn là `TEN-DOI-NAM46`; mã cũ `TEN-DOI-NAM46-CHECK` chỉ dùng làm alias khi chuyển dữ liệu cũ.
 
 ## 2. Tổng quan
@@ -115,7 +116,7 @@ Không chia bảng; tất cả xếp hạng theo thời gian trực tiếp.
 | Nữ ≤45 - 10 km | 4 |
 | Nữ 46+ - 10 km | 7 |
 
-Hà Thị Thảo Trinh được đặt ở Nữ ≤45 - 5 km trong template theo xác nhận trực tiếp của Ban tổ chức. Xem điểm chưa đồng bộ ở mục 4.
+Hà Thị Thảo Trinh được đặt ở Nữ ≤45 - 5 km trong template theo xác nhận trực tiếp của Ban tổ chức. PDF trang 8 vẫn hiển thị tên ở Nữ ≤45 - 10 km; dữ liệu PTSC runtime đã ưu tiên xác nhận trực tiếp.
 
 ### 3.8. Kéo co
 

@@ -190,7 +190,7 @@ Mở [Môn thể thao](../sports) → **Pickleball PTSC**:
 7. Bấm **Lưu kết quả**.
 8. Kiểm tra lại trận sau trên nhánh.
 
-Kết quả hợp lệ sẽ đưa đội thắng vào ô trận sau. Hạng mục **Đôi nam từ 46 tuổi trở lên** đang chờ xác nhận do sơ đồ nguồn trùng Seed 7; không tự sửa nhánh. Các ô Pickleball chưa có tên giữ trạng thái **Chờ nhập**, không xem là trùng dữ liệu.
+Kết quả hợp lệ sẽ đưa đội thắng vào ô trận sau. Hạng mục **Đôi nam từ 46 tuổi trở lên** đã xác nhận nhánh TK3 là **Seed 2 - Seed 7**. Các ô Pickleball chưa có tên giữ trạng thái **Chờ nhập**, không xem là trùng dữ liệu.
 
 <a id="pickleball-lanh-dao"></a>
 
@@ -356,7 +356,7 @@ Admin mở **/admin/excel** và nạp workbook PTSC 13 sheet. Hệ thống chỉ
 3. Chỉ bấm **Xác nhận ghi dữ liệu** khi không còn blocker.
 4. Nếu cần hoàn tác, dùng **Rollback batch** và chỉ tiếp tục khi phiên bản dữ liệu chưa bị sửa sau import.
 
-Ô Pickleball chưa có tên vẫn là **draft/Chờ nhập**. `PB-DOI-NAM46` là **Chờ xác nhận** vì nguồn có trùng Seed 7. Import cùng file/key được nhận diện idempotent; không xóa dòng thiếu khỏi nguồn.
+Ô Pickleball chưa có tên vẫn là **draft/Chờ nhập**. `PB-DOI-NAM46` đã được xác nhận cấu trúc nhánh: TK1 1-8, TK2 4-5, TK3 2-7, TK4 6-3. Import cùng file/key được nhận diện idempotent; không xóa dòng thiếu khỏi nguồn.
 
 <a id="checklist"></a>
 

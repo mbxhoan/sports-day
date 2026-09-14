@@ -31,7 +31,9 @@ test("parses the PTSC workbook without trusting formatted rows or formula text",
   assert.equal(payload.stats.sports, 11);
   assert.equal(payload.stats.positions, 490);
   assert.ok(parsed.positions.filter((row) => row.sport_slug === "pickleball").every((row) => ["draft", "pending_confirmation"].includes(row.status)));
-  assert.ok(parsed.categories.some((row) => row.code === "PB-DOI-NAM46" && row.status === "pending_confirmation"));
+  const trinhCategories = parsed.positions.filter((row) => row.members.includes("Hà Thị Thảo Trinh")).map((row) => row.category_code);
+  assert.deepEqual(trinhCategories, ["DK-NU45-5K"]);
+  assert.ok(parsed.categories.some((row) => row.code === "PB-DOI-NAM46" && row.status === "active" && row.format_branch.includes("TK 1-8, 4-5, 2-7, 6-3")));
 });
 
 test("normalizes PTSC natural keys and Tennis aliases", () => {
