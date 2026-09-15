@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CalendarDays, ImageIcon, ListOrdered, LogIn, Menu, Trophy, X } from "lucide-react";
 import { copy, localized, type Locale } from "@/lib/site";
 import type { ShellData } from "@/lib/public-data";
@@ -20,8 +21,7 @@ export function Header({ locale, autoRefreshUntil }: { locale: Locale; autoRefre
   return <header className="site-header">
     <div className="header-inner">
       <Link href={prefix || "/"} className="brand" aria-label={t.home}>
-        <Trophy size={23} aria-hidden="true" />
-        <span><b>PTSC</b><small>SPORTS FESTIVAL 2026</small></span>
+        <Image src="/logo-ptsc.jpg" alt="PTSC Sports Festival 2026" width={124} height={59} priority />
       </Link>
       <nav className="desktop-nav" aria-label="Main navigation">
         {nav.map(([key, href]) => <Link key={key} href={`${prefix}${href}` || "/"}>{t[key]}</Link>)}
