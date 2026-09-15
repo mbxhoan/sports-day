@@ -39,9 +39,9 @@ export async function HomePage({ locale }: { locale: Locale }) {
   const mobileHero = shell.event.hero_mobile_path || "/kv-ptsc-mobile-placeholder.png";
   const dayCount = shell.event.start_at && shell.event.end_at ? Math.max(1, Math.ceil((Date.parse(shell.event.end_at) - Date.parse(shell.event.start_at)) / 86_400_000)) : 0;
   const stats = [
-    [Trophy, data.counts.sports, t.sportCount],
+    [Trophy, 8, t.sportCount],
     [CalendarDays, dayCount, t.dayCount],
-    [Medal, data.counts.organizations, t.unitCount],
+    [Medal, 18, t.unitCount],
     [Users, data.counts.participants, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale} shell={shell}>

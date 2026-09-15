@@ -52,6 +52,8 @@ Cập nhật tiếp cho /ptsc:
 DONE
 ---------------------------
 Cập nhật tiếp cho /ptsc:
+1. @1.png trên trang home hardcode số môn thi đấu từ 11 về 8, hardcode số lượng đơn vị về 18.
+2. 
 ---------------------------
 Cập nhật tiếp cho /ptsc:
 ---------------------------
