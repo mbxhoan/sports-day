@@ -331,9 +331,9 @@ tbody tr:last-child td { border: 0; }
 .source-bracket-node > a { display: block; color: inherit; }
 .bracket-round-headings { position: absolute; inset: 0 0 auto; z-index: 2; height: 34px; pointer-events: none; }
 .bracket-round-heading { position: absolute; top: 4px; color: var(--primary-strong); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
-.source-bracket-match { position: relative; height: 84px; padding: 7px; display: grid; align-content: center; gap: 4px; overflow: hidden; border: 1px solid var(--border); border-radius: 4px; background: var(--card); box-shadow: 0 5px 18px var(--shadow-color); box-sizing: border-box; }
+.source-bracket-match { position: relative; height: 100px; padding: 7px; display: grid; align-content: center; gap: 4px; overflow: hidden; border: 1px solid var(--border); border-radius: 4px; background: var(--card); box-shadow: 0 5px 18px var(--shadow-color); box-sizing: border-box; }
 .admin-bracket-match { height: 166px; padding: 8px; background: var(--surface-sky); }
-.source-bracket-match .bracket-team { min-height: 24px; padding: 4px 6px; font-size: 9px; }
+.source-bracket-match .bracket-team { min-height: 30px; padding: 4px 6px; font-size: 9px; }
 .source-bracket-match .bracket-team span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
 .source-bracket-match .bracket-team .entry-display { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
 .source-bracket-match .bracket-team .entry-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

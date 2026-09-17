@@ -279,7 +279,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
       <header className="board-heading"><div><h2>{localized(tournament, "name", locale)}{sizeLabel && ` · ${sizeLabel}`}</h2>{sourceNote(tournament, locale)}</div><span>{localized(tournament, "format", locale)}</span></header>
       {isBracket && knockout.length > 0 && (() => {
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
-        const layout = layoutBracket(knockout, slots, resultAction ? 166 : 84, resultAction ? undefined : 100);
+        const layout = layoutBracket(knockout, slots, resultAction ? 166 : 100, resultAction ? undefined : 116);
         const roundCount = Math.max(1, ...knockout.map((fixture) => fixture.round_order ?? 1));
         const roundLabels = new Map<number, string>();
         knockout.forEach((fixture) => { if (fixture.round_order !== null && !roundLabels.has(fixture.round_order)) roundLabels.set(fixture.round_order, localized(fixture, "round", locale) || `${locale === "vi" ? "Vòng" : "Round"} ${fixture.round_order}`); });
