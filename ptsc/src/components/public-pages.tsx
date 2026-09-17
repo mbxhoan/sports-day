@@ -42,7 +42,8 @@ export async function HomePage({ locale }: { locale: Locale }) {
     [Trophy, 8, t.sportCount],
     [CalendarDays, dayCount, t.dayCount],
     [Medal, 18, t.unitCount],
-    [Users, data.counts.participants, t.athleteCount],
+    // [Users, data.counts.participants, t.athleteCount],
+    [Users, 826, t.athleteCount],
   ] as const;
   return <SiteShell locale={locale} shell={shell}>
     {(desktopHero || mobileHero) && <section className="hero"><picture>{mobileHero && <source media="(max-width: 767px)" srcSet={mobileHero}/>}<Image src={desktopHero || mobileHero} alt={localized(shell.event,"event_name",locale)} fill sizes="100vw" priority /></picture></section>}
