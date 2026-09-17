@@ -64,6 +64,7 @@ const competitionDisplayMigration = readFileSync(new URL("../../supabase/migrati
 const pdfBracketMigration = readFileSync(new URL("../../supabase/migrations/20260914110000_ptsc_pdf_brackets.sql", import.meta.url), "utf8");
 const ptscPropagationMigration = readFileSync(new URL("../../supabase/migrations/20260914140000_ptsc_result_propagation.sql", import.meta.url), "utf8");
 const ptscExcelOrderMigration = readFileSync(new URL("../../supabase/migrations/20260914140100_ptsc_excel_result_order.sql", import.meta.url), "utf8");
+const ptscManualSeedMigration = readFileSync(new URL("../../supabase/migrations/20260917100000_ptsc_manual_seed_brackets.sql", import.meta.url), "utf8");
 
 test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /competition_mode text not null default 'round_robin'/);
@@ -102,6 +103,17 @@ test("admin bracket exposes mapped names and inline score editing", () => {
   assert.match(competitionBoard, /bracket-round-headings/);
   assert.match(competitionBoard, /bracket-round-heading/);
   assert.match(competitionBoard, /auto-winner-note/);
+});
+
+test("PTSC seeded bracket supports manual first-round assignment", () => {
+  assert.match(competitionBoard, /isManualSeedSlot/);
+  assert.match(competitionBoard, /usedSeedEntryIds/);
+  assert.match(competitionBoard, /bracket-seed-editor/);
+  assert.match(competitionBoard, /source_kind.*entry.*bye/);
+  assert.match(ptscManualSeedMigration, /pg_advisory_xact_lock/);
+  assert.match(ptscManualSeedMigration, /Đội đã được chọn ở ô khác trong vòng đầu bracket/);
+  assert.match(ptscManualSeedMigration, /target_bracket_position is not null/);
+  assert.match(ptscManualSeedMigration, /fixture.bracket_position is not null/);
 });
 
 test("public bracket shows source rank labels without candidate predictions", () => {

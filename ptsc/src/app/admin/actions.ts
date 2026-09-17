@@ -283,6 +283,10 @@ function actionFailure(error: unknown): AdminActionState {
   const dependent = /phụ thuộc|reset|vòng sau/i.test(rawMessage);
   const message = dependent
     ? "Vòng sau đã có kết quả; hãy xem ảnh hưởng và xác nhận reset trước khi sửa."
+    : /đã được chọn ở ô khác trong vòng đầu bracket/i.test(rawMessage)
+    ? "Đội này đã được chọn ở vị trí khác trong vòng đầu bracket."
+    : /cấu trúc đã khóa vì hạng mục đã có kết quả/i.test(rawMessage)
+      ? "Bracket đã có kết quả; không thể đổi đội seed."
     : /entry_members.*unique|duplicate key.*entry_members/i.test(rawMessage)
     ? "VĐV này đã được gán vào đội / cặp này"
     : /tournaments_gender_check/i.test(rawMessage)

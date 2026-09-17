@@ -333,6 +333,8 @@ tbody tr:last-child td { border: 0; }
 .bracket-round-heading { position: absolute; top: 4px; color: var(--primary-strong); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-align: center; text-transform: uppercase; }
 .source-bracket-match { position: relative; height: 100px; padding: 7px; display: grid; align-content: center; gap: 4px; overflow: hidden; border: 1px solid var(--border); border-radius: 4px; background: var(--card); box-shadow: 0 5px 18px var(--shadow-color); box-sizing: border-box; }
 .admin-bracket-match { height: 166px; padding: 8px; background: var(--surface-sky); }
+.admin-bracket-match.has-seed-editors { height: 242px; }
+.source-bracket-match.has-seed-editors { overflow: visible; }
 .source-bracket-match .bracket-team { min-height: 30px; padding: 4px 6px; font-size: 9px; }
 .source-bracket-match .bracket-team span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
 .source-bracket-match .bracket-team .entry-display { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: normal; }
@@ -343,6 +345,15 @@ tbody tr:last-child td { border: 0; }
 .bracket-match-label { min-width: 0; padding-right: 26px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bracket-edit-button { position: absolute; top: 7px; right: 7px; z-index: 2; min-height: 24px; height: 24px; padding: 0 6px; display: inline-flex; align-items: center; gap: 3px; border: 1px solid var(--primary); border-radius: 3px; background: var(--surface-strong); color: var(--primary-strong); font-size: 8px; font-weight: 700; pointer-events: auto; }
 .bracket-edit-button:hover, .bracket-edit-button:focus-visible { background: var(--primary); color: var(--primary-foreground); }
+.bracket-seed-editors { min-width: 0; display: grid; gap: 3px; }
+.bracket-seed-editor { min-width: 0; display: grid; grid-template-columns: 52px minmax(0, 1fr) 34px; align-items: center; gap: 3px; }
+.bracket-seed-editor > span { min-width: 0; overflow: hidden; color: var(--muted-foreground); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.bracket-seed-editor .searchable-select { min-width: 0; gap: 0; }
+.bracket-seed-editor .search-input-wrap { min-height: 25px; padding: 0 4px; border-color: var(--border-strong); border-radius: 3px; }
+.bracket-seed-editor .search-input-wrap input { min-height: 21px; padding: 0 3px; font-size: 8px; }
+.bracket-seed-editor .searchable-select-options { inset: 30px 0 auto; }
+.bracket-seed-editor .gold-button { min-height: 25px; height: 25px; padding: 0 4px; border-radius: 3px; font-size: 8px; justify-content: center; }
+.bracket-seed-editor > .slot-candidates, .bracket-seed-editor > .form-error { grid-column: 1 / -1; min-width: 0; margin: 0; overflow: hidden; font-size: 8px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
 .bracket-inline-result { min-width: 0; display: grid; gap: 3px; }
 .bracket-inline-score { min-width: 0; min-height: 27px; display: grid; grid-template-columns: minmax(0, 1fr) 44px; align-items: center; gap: 4px; padding: 2px 4px; border: 1px solid var(--border-strong); border-radius: 2px; background: var(--surface-strong); color: var(--foreground); font-size: 9px; }
 .bracket-inline-score > span { min-width: 0; display: -webkit-box; overflow: hidden; line-height: 1.15; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }

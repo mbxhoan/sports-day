@@ -57,6 +57,15 @@ test("slot resolution replaces group rank with the mapped entry", () => {
   assert.equal(resolved?.name_vi, "Đội A / Đội B");
 });
 
+test("manual seed source resolves directly to its selected entry", () => {
+  const entry = { id: "seed-1", tournament_id: "tournament-1", organization_id: null, kind: "pair", name_vi: "Đội Seed 1", name_en: "Seed 1 Team" };
+  const resolved = resolveSlotEntry(
+    { source_kind: "entry", source_entry_id: "seed-1", source_group_id: null, source_rank: null, source_fixture_id: null },
+    { entries: [entry], standings: [], fixtures: [], fixtureEntries: [] },
+  );
+  assert.equal(resolved?.id, "seed-1");
+});
+
 test("source slots override stale legacy fixture rows", () => {
   const resolved = bracketHelpers.resolveMatchEntry(
     { source_kind: "fixture_winner", source_fixture_id: "semi-1", source_group_id: null, source_entry_id: null, source_rank: null },
