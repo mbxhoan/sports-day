@@ -595,6 +595,20 @@ export async function confirmFixtureReset(formData: FormData) {
   }
 }
 
+export async function resetPtscResults(formData: FormData) {
+  if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận reset kết quả PTSC");
+  const { supabase, tenantId } = await adminClient();
+  if (tenantSlug !== "ptsc2026" || tenantId !== "22222222-2222-2222-2222-222222222222") throw new Error("Chỉ được reset tenant PTSC");
+  const { data: sports, error: sportsError } = await supabase.from("sports").select("slug").eq("tenant_id", tenantId).is("archived_at", null);
+  if (sportsError) throw new Error(sportsError.message);
+  const { error } = await supabase.rpc("reset_ptsc_results", { p_confirm: true });
+  if (error) throw new Error(error.message);
+  invalidatePublic("event");
+  for (const sport of sports ?? []) invalidatePublic("result", sport.slug);
+  revalidatePath("/admin");
+  redirect("/admin?reset=success");
+}
+
 export async function saveScoringRule(formData: FormData) {
   const tournamentId = String(formData.get("tournament_id") ?? "");
   if (!tournamentId) throw new Error("Hạng mục không hợp lệ");
