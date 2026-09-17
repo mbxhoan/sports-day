@@ -43,8 +43,10 @@ export function Header({ locale, autoRefreshUntil }: { locale: Locale; autoRefre
 }
 
 export function Footer({ locale, shell }: { locale: Locale; shell: ShellData }) {
+  const eventName = localized(shell.event, "event_name", locale) || copy[locale].footer;
+  const vietnameseTitle = locale === "vi" ? eventName.match(/^hội\s+thao\s+(.+?)\s+lần\s+thứ\s+15$/i) : null;
   return <footer className="site-footer">
-    <div className="footer-mark"><Trophy size={19}/><b>{localized(shell.event, "event_name", locale) || copy[locale].footer}</b></div>
+    <div className="footer-mark"><Trophy size={19}/><b className="footer-event-name">{vietnameseTitle ? <><span>HỘI THAO</span><span>{vietnameseTitle[1].toLocaleUpperCase("vi-VN")}</span><span>LẦN THỨ 15</span></> : eventName}</b></div>
     <p>{locale === "vi" ? "Tập đoàn Công nghiệp - Năng lượng Quốc gia Việt Nam" : "Vietnam National Industry - Energy Group"}</p>
     <p>{localized(shell.event, "subtitle", locale)}</p>
     {shell.contacts.map((item) => <p key={item.id}><a href={isSafeHref(item.href) ? item.href : "#"}>{localized(item, "label", locale)}: {item.value}</a></p>)}

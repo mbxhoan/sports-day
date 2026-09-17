@@ -811,6 +811,8 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary-strong);
 
 .site-footer { min-height: 230px; padding: 48px 24px; border-top: 1px solid var(--border); background: var(--card); color: var(--muted-foreground); text-align: center; }
 .footer-mark { width: fit-content; margin: 0 auto 18px; padding-bottom: 14px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border); color: var(--primary-strong); }
+.footer-event-name { max-width: 100%; display: grid; gap: 2px; line-height: 1.25; text-align: center; }
+.footer-event-name span { display: block; }
 .site-footer p { margin: 7px 0; font-size: 12px; }
 .footer-links { margin-top: 15px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
 .footer-links a { color: var(--muted-foreground); }
