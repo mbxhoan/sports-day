@@ -428,7 +428,7 @@ tbody tr:last-child td { border: 0; }
 .standings-difference { display: block; margin-top: 4px; color: var(--foreground); font-size: 10px; }
 .standings-inline-form > .gold-button { margin: 12px; }
 .board-matches { margin-top: 14px; }
-.board-matches table, .board-race table { min-width: 660px; }
+.board-matches table, .board-race table { min-width: 760px; }
 .group-stage-results { margin-top: 18px; display: grid; gap: 12px; }
 .group-stage-results > h3 { margin: 0; color: var(--primary-strong); font-size: 14px; }
 .group-stage-results-group { display: grid; gap: 7px; }
@@ -437,7 +437,8 @@ tbody tr:last-child td { border: 0; }
 .group-stage-result label { min-width: 0; display: grid; gap: 4px; }
 .group-stage-result label > span { overflow: hidden; color: var(--foreground); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .group-stage-result input { min-width: 0; min-height: 36px; padding: 0 8px; }
-.group-stage-match-label { color: var(--primary-strong); font-size: 10px; font-weight: 700; }
+.group-stage-match-label { display: grid; gap: 3px; color: var(--primary-strong); font-size: 10px; font-weight: 700; }
+.group-stage-match-time { color: var(--muted-foreground); font-size: 9px; font-weight: 500; }
 .group-stage-result small { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 4px 6px; overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .group-stage-result .gold-button { min-height: 36px; justify-content: center; white-space: nowrap; }
 .board-empty { color: var(--muted-foreground); }
@@ -946,9 +947,10 @@ input:focus, textarea:focus, select:focus { border-color: var(--primary-strong);
   .table-scroll > table > tbody > tr > td::before { flex: 0 0 auto; color: var(--muted-foreground); font-size: 10px; text-align: left; }
   .ptsc-import-table td::before { content: attr(data-label); }
   .board-matches td:nth-child(1)::before { content: "Trận"; }
-  .board-matches td:nth-child(2)::before { content: "Vòng"; }
-  .board-matches td:nth-child(3)::before { content: "Đội / VĐV"; }
-  .board-matches td:nth-child(4)::before { content: "Tỷ số"; }
+  .board-matches td:nth-child(2)::before { content: "Ngày, giờ"; }
+  .board-matches td:nth-child(3)::before { content: "Vòng"; }
+  .board-matches td:nth-child(4)::before { content: "Đội / VĐV"; }
+  .board-matches td:nth-child(5)::before { content: "Tỷ số"; }
   .board-race td:nth-child(1)::before { content: "Hạng"; }
   .board-race td:nth-child(2)::before { content: "Làn"; }
   .board-race td:nth-child(3)::before { content: "Đội / VĐV"; }

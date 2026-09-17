@@ -10,6 +10,7 @@ import { orderManualStandings } from "@/lib/manual-competition";
 import { buildSearchSuggestions } from "@/lib/search";
 import { copy, localized, type Entry, type EntryMember, type Fixture, type FixtureEntry, type FixtureSlot, type Group, type GroupEntry, type Locale, type Organization, type Participant, type Standing, type Tournament } from "@/lib/site";
 import { deriveStandings } from "@/lib/standings";
+import { formatVietnamDateTime } from "@/lib/datetime";
 import { AdminRecordForm } from "./admin-record-form";
 import { SearchCombobox } from "./search-combobox";
 import { SearchableSelect } from "./searchable-select";
@@ -152,14 +153,14 @@ function InlineBracketResult({ fixture, rows, action, manualWinner, sportSlug }:
   </form>;
 }
 
-function GroupStageResult({ fixture, rows, action, sportSlug }: { fixture: Fixture; rows: MatchRow[]; action: AdminAction; sportSlug?: string }) {
+function GroupStageResult({ fixture, rows, action, sportSlug, label, locale }: { fixture: Fixture; rows: MatchRow[]; action: AdminAction; sportSlug?: string; label: string; locale: Locale }) {
   const [state, formAction, pending] = useActionState(action, initialAdminActionState);
   const ready = Boolean(rows[0]?.entry && rows[1]?.entry && rows[0].entry.id !== rows[1].entry.id);
   return <form className="group-stage-result" action={formAction}>
     <input type="hidden" name="fixture_id" value={fixture.id}/>
     <input type="hidden" name="status" value="completed"/>
     {sportSlug && <input type="hidden" name="sport_slug" value={sportSlug}/>}
-    <span className="group-stage-match-label">{fixture.source_code ?? "Trận"}</span>
+    <span className="group-stage-match-label"><b>{label}</b>{fixture.starts_at && <time className="group-stage-match-time" dateTime={fixture.starts_at}>{formatVietnamDateTime(fixture.starts_at, locale)}</time>}</span>
     {rows.map((item, index) => <label key={item.row?.id ?? index}><span title={item.label}><EntryLabel name={item.label} organization={item.organizationLabel}/></span><input name={`score_${index + 1}`} type="number" min="0" step="any" defaultValue={scoreValue(item.row)} aria-label={`Tỷ số ${item.label}`} disabled={!item.entry || !ready}/></label>)}
     {state.message && <small className={state.ok ? "form-success" : "form-error"} role={state.ok ? "status" : "alert"}>{state.message}</small>}
     <button className="gold-button" type="submit" disabled={pending || !ready}>{pending ? "Đang lưu..." : <><Save size={13} aria-hidden="true"/>Lưu điểm</>}</button>
@@ -295,7 +296,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
     return <div className={sourceFixtures.length > 1 ? "manual-results-stack" : ""}>{sections.map(({ fixture, rows }) => tableFor(fixture, rows))}</div>;
   };
 
-  const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); const summary = localized(fixture, "result_summary", locale); const result = formatMatchResult(rows[0]?.label ?? "", scoreValue(rows[0]?.row), scoreValue(rows[1]?.row), rows[1]?.label ?? "") || normalizeLegacyMatchResult(summary, rows[0]?.label ?? "", rows[1]?.label ?? "") || summary; return <tr key={fixture.id}><td>{matchLabel(fixture)}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td><div className="fixture-teams">{rows.map((row, index) => <span className="fixture-side" key={`${row.entry?.id ?? row.label}-${index}`}><EntryLabel name={row.label} organization={row.organizationLabel}/></span>)}</div></td><td>{result || rows.map((row) => scoreLabel(row.row)).join(" : ")}</td></tr>; })}</tbody></table></div>;
+  const matchesTable = (items: Fixture[]) => <div className="panel table-scroll board-matches"><table><thead><tr><th>{t.match}</th><th>{locale === "vi" ? "Ngày, giờ" : "Date & time"}</th><th>{t.round}</th><th>{t.teams}</th><th>{t.result}</th></tr></thead><tbody>{items.map((fixture) => { const rows = matchRows(fixture); const summary = localized(fixture, "result_summary", locale); const result = formatMatchResult(rows[0]?.label ?? "", scoreValue(rows[0]?.row), scoreValue(rows[1]?.row), rows[1]?.label ?? "") || normalizeLegacyMatchResult(summary, rows[0]?.label ?? "", rows[1]?.label ?? "") || summary; return <tr key={fixture.id}><td>{matchLabel(fixture)}</td><td>{fixture.starts_at ? <time dateTime={fixture.starts_at}>{formatVietnamDateTime(fixture.starts_at, locale)}</time> : "—"}</td><td>{localized(fixture, "round", locale) || t.updating}</td><td><div className="fixture-teams">{rows.map((row, index) => <span className="fixture-side" key={`${row.entry?.id ?? row.label}-${index}`}><EntryLabel name={row.label} organization={row.organizationLabel}/></span>)}</div></td><td>{result || rows.map((row) => scoreLabel(row.row)).join(" : ")}</td></tr>; })}</tbody></table></div>;
 
   if (!available.length) return <section className="panel empty-state"><h2>{t.empty}</h2></section>;
   const selectedTournaments = selectedTournamentId === "all" ? available : available.filter((tournament) => tournament.id === selectedTournamentId);
@@ -340,10 +341,10 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         return <section className="group-stage-results"><h3>{locale === "vi" ? "Kết quả vòng bảng" : "Group-stage results"}</h3>{tournamentGroups.map((group) => {
           const items = groupFixtures.filter((fixture) => fixture.group_id === group.id);
           if (!items.length) return null;
-          return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{resultAction ? items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} rows={matchRows(fixture)} action={resultAction} sportSlug={sportSlug}/>) : matchesTable(items)}</div>;
+          return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{resultAction ? items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} label={matchLabel(fixture)} locale={locale} rows={matchRows(fixture)} action={resultAction} sportSlug={sportSlug}/>) : matchesTable(items)}</div>;
         })}</section>;
       })()}
-      {tournament.competition_mode === "round_robin" && <>{table(tournament, tournamentGroups)}{resultAction ? <section className="group-stage-results"><h3>{locale === "vi" ? "Kết quả vòng bảng" : "Group-stage results"}</h3>{tournamentGroups.map((group) => { const items = tournamentFixtures.filter((fixture) => fixture.group_id === group.id); if (!items.length) return null; return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} rows={matchRows(fixture)} action={resultAction} sportSlug={sportSlug}/>)}</div>; })}</section> : matchesTable(tournamentFixtures)}</>}
+      {tournament.competition_mode === "round_robin" && <>{table(tournament, tournamentGroups)}{resultAction ? <section className="group-stage-results"><h3>{locale === "vi" ? "Kết quả vòng bảng" : "Group-stage results"}</h3>{tournamentGroups.map((group) => { const items = tournamentFixtures.filter((fixture) => fixture.group_id === group.id); if (!items.length) return null; return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} label={matchLabel(fixture)} locale={locale} rows={matchRows(fixture)} action={resultAction} sportSlug={sportSlug}/>)}</div>; })}</section> : matchesTable(tournamentFixtures)}</>}
       {(tournament.competition_mode === "race" || tournament.competition_mode === "swiss") && manualTable(tournament)}
       {!tournamentFixtures.length && !tournamentGroups.length && !entriesByTournament.get(tournament.id)?.length && <div className="panel board-empty">{t.empty}</div>}
     </section>;

@@ -359,6 +359,13 @@ test("round-robin group matches expose the result editor in admin", () => {
   assert.match(competitionBoard, /items\.map\(\(fixture\) => <GroupStageResult/);
 });
 
+test("football result rows expose source code and Vietnam-local match time", () => {
+  assert.match(competitionBoard, /formatVietnamDateTime\(fixture\.starts_at, locale\)/);
+  assert.match(competitionBoard, /<th>\{locale === "vi" \? "Ngày, giờ" : "Date & time"\}<\/th>/);
+  assert.match(competitionBoard, /<time dateTime=\{fixture\.starts_at\}>/);
+  assert.match(competitionBoard, /<span className="group-stage-match-label"><b>\{label\}<\/b>/);
+});
+
 test("result editor accepts teams resolved from bracket slots", () => {
   assert.match(competitionBoard, /const editingReady = Boolean\(editingRows\[0\]\?\.entry && editingRows\[1\]\?\.entry/);
   assert.match(competitionBoard, /disabled=\{resultPending \|\| !editingReady\}/);
