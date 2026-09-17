@@ -21,7 +21,7 @@ export function Header({ locale, autoRefreshUntil }: { locale: Locale; autoRefre
   return <header className="site-header">
     <div className="header-inner">
       <Link href={prefix || "/"} className="brand" aria-label={t.home}>
-        <Image src="/logo-ptsc.jpg" alt="PTSC Sports Festival 2026" width={124} height={59} priority />
+        <Image src="/logo-ptsc.png" alt="PTSC Sports Festival 2026" width={124} height={41} priority />
       </Link>
       <nav className="desktop-nav" aria-label="Main navigation">
         {nav.map(([key, href]) => <Link key={key} href={`${prefix}${href}` || "/"}>{t[key]}</Link>)}
