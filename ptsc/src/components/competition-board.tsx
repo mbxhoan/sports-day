@@ -343,7 +343,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
           return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{resultAction ? items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} rows={matchRows(fixture)} action={resultAction} sportSlug={sportSlug}/>) : matchesTable(items)}</div>;
         })}</section>;
       })()}
-      {tournament.competition_mode === "round_robin" && <>{table(tournament, tournamentGroups)}{matchesTable(tournamentFixtures)}</>}
+      {tournament.competition_mode === "round_robin" && <>{table(tournament, tournamentGroups)}{resultAction ? <section className="group-stage-results"><h3>{locale === "vi" ? "Kết quả vòng bảng" : "Group-stage results"}</h3>{tournamentGroups.map((group) => { const items = tournamentFixtures.filter((fixture) => fixture.group_id === group.id); if (!items.length) return null; return <div className="group-stage-results-group" key={group.id}><h4>{localized(group, "name", locale)}</h4>{items.map((fixture) => <GroupStageResult key={fixture.id} fixture={fixture} rows={matchRows(fixture)} action={resultAction} sportSlug={sportSlug}/>)}</div>; })}</section> : matchesTable(tournamentFixtures)}</>}
       {(tournament.competition_mode === "race" || tournament.competition_mode === "swiss") && manualTable(tournament)}
       {!tournamentFixtures.length && !tournamentGroups.length && !entriesByTournament.get(tournament.id)?.length && <div className="panel board-empty">{t.empty}</div>}
     </section>;

@@ -353,6 +353,12 @@ test("admin bracket opens an inline result editor", () => {
   assert.match(competitionBoard, /slots\.length > 0 \? \(entry \? rows\.find/);
 });
 
+test("round-robin group matches expose the result editor in admin", () => {
+  assert.match(competitionBoard, /competition_mode === "round_robin"/);
+  assert.match(competitionBoard, /competition_mode === "round_robin"[\s\S]*resultAction \? <section className="group-stage-results"/);
+  assert.match(competitionBoard, /items\.map\(\(fixture\) => <GroupStageResult/);
+});
+
 test("result editor accepts teams resolved from bracket slots", () => {
   assert.match(competitionBoard, /const editingReady = Boolean\(editingRows\[0\]\?\.entry && editingRows\[1\]\?\.entry/);
   assert.match(competitionBoard, /disabled=\{resultPending \|\| !editingReady\}/);
