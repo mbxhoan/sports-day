@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
 
 export type PublicDomain = "event" | "sport" | "roster" | "schedule" | "result" | "leaderboard" | "scoring" | "media" | "excel";
 
@@ -11,7 +11,8 @@ const pathsByTag: Record<string, string[]> = {
 };
 
 export function invalidatePublic(domain: PublicDomain, sportSlug?: string) {
-  revalidateTag("site-data", "max");
+  if (domain === "leaderboard") updateTag("site-data");
+  else revalidateTag("site-data", "max");
   const tags = new Set<string>();
   if (domain === "event") ["shell", "home", "sports-index", "schedule", "leaderboard", "gallery"].forEach((tag) => tags.add(tag));
   if (domain === "sport") ["home", "sports-index", "schedule"].forEach((tag) => tags.add(tag));
@@ -25,7 +26,8 @@ export function invalidatePublic(domain: PublicDomain, sportSlug?: string) {
   if (sportSlug) tags.add(`sport:${sportSlug}`);
   const paths = new Set<string>();
   for (const tag of tags) {
-    revalidateTag(tag, "max");
+    if (domain === "leaderboard" && tag === "leaderboard") updateTag(tag);
+    else revalidateTag(tag, "max");
     for (const path of pathsByTag[tag] ?? []) paths.add(path);
   }
   for (const path of paths) revalidatePath(path);
