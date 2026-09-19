@@ -605,7 +605,7 @@ export async function resetSportResults(formData: FormData) {
     if (tenantSlug !== "ptsc2026" || tenantId !== "22222222-2222-2222-2222-222222222222") throw new Error("Chỉ được reset môn thể thao của tenant PTSC");
     const { data: sport, error: sportError } = await supabase.from("sports").select("id,slug").eq("tenant_id", tenantId).eq("id", sportId).eq("slug", requestedSlug).is("archived_at", null).maybeSingle();
     if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
-    const { error } = await supabase.rpc("reset_sport_results", { p_sport_id: sport.id, p_confirm: true });
+    const { error } = await supabase.rpc("reset_sport_results_and_awards", { p_sport_id: sport.id, p_confirm: true });
     if (error) throw new Error(error.message);
     invalidatePublic("result", sport.slug);
     revalidatePath("/admin");

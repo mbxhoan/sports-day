@@ -20,6 +20,12 @@ insert into public.entries (id, tenant_id, tournament_id, kind, name_vi, name_en
   ('75000000-0000-0000-0000-000000000025', '11111111-1111-1111-1111-111111111111', '75000000-0000-0000-0000-000000000012', 'pair', 'Legacy A', 'Legacy A'),
   ('75000000-0000-0000-0000-000000000026', '11111111-1111-1111-1111-111111111111', '75000000-0000-0000-0000-000000000012', 'pair', 'Legacy B', 'Legacy B');
 
+insert into public.participants (id, tenant_id, full_name, full_name_en) values
+  ('75000000-0000-0000-0000-000000000061', '22222222-2222-2222-2222-222222222222', 'VĐV PBLD', 'PBLD athlete');
+
+insert into public.entry_members (tenant_id, entry_id, participant_id) values
+  ('22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000021', '75000000-0000-0000-0000-000000000061');
+
 insert into public.groups (id, tenant_id, tournament_id, name_vi, name_en, standings_confirmed_at)
 values ('75000000-0000-0000-0000-000000000030', '22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000010', 'Bảng A', 'Group A', now());
 
@@ -56,8 +62,13 @@ insert into public.standings (tenant_id, tournament_id, group_id, entry_id, play
   ('22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000010', '75000000-0000-0000-0000-000000000030', '75000000-0000-0000-0000-000000000022', 1, 0, 7, 11, 0, 2, 'Giữ ghi chú'),
   ('22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000011', null, '75000000-0000-0000-0000-000000000023', 1, 1, 8, 6, 3, 1, 'Control');
 
-insert into public.awards (tenant_id, sport_id, tournament_id, entry_id, medal, title_vi, title_en)
-values ('22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000001', '75000000-0000-0000-0000-000000000010', '75000000-0000-0000-0000-000000000021', 'gold', 'Giải giữ lại', 'Preserved award');
+insert into public.awards (tenant_id, sport_id, tournament_id, entry_id, participant_id, medal, title_vi, title_en) values
+  ('22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000001', '75000000-0000-0000-0000-000000000010', '75000000-0000-0000-0000-000000000021', null, 'gold', 'Giải PBLD', 'PBLD direct award'),
+  ('22222222-2222-2222-2222-222222222222', null, '75000000-0000-0000-0000-000000000010', '75000000-0000-0000-0000-000000000021', null, 'silver', 'Giải theo hạng mục', 'PBLD tournament award'),
+  ('22222222-2222-2222-2222-222222222222', null, null, '75000000-0000-0000-0000-000000000021', null, 'special', 'Giải theo đội', 'PBLD entry award'),
+  ('22222222-2222-2222-2222-222222222222', null, null, null, '75000000-0000-0000-0000-000000000061', 'special', 'Giải theo VĐV', 'PBLD participant award'),
+  ('22222222-2222-2222-2222-222222222222', '75000000-0000-0000-0000-000000000002', '75000000-0000-0000-0000-000000000011', '75000000-0000-0000-0000-000000000023', null, 'gold', 'Giải môn khác', 'Control award'),
+  ('11111111-1111-1111-1111-111111111111', '75000000-0000-0000-0000-000000000003', '75000000-0000-0000-0000-000000000012', '75000000-0000-0000-0000-000000000025', null, 'gold', 'Giải legacy', 'Legacy award');
 
 set local request.headers = '{"x-tenant-slug":"ptsc2026"}';
 set local request.jwt.claim.sub = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
@@ -67,8 +78,8 @@ set local role authenticated;
 do $$
 declare preview jsonb;
 begin
-  preview := public.reset_sport_results('75000000-0000-0000-0000-000000000001');
-  if preview ->> 'fixtures' <> '2' or preview ->> 'fixture_entries' <> '3' or preview ->> 'standings' <> '2' or preview ->> 'confirmed_groups' <> '1' then
+  preview := public.reset_sport_results_and_awards('75000000-0000-0000-0000-000000000001');
+  if preview ->> 'fixtures' <> '2' or preview ->> 'fixture_entries' <> '3' or preview ->> 'standings' <> '2' or preview ->> 'confirmed_groups' <> '1' or coalesce(preview ->> 'awards', '') <> '4' then
     raise exception 'sport reset preview counts are wrong: %', preview;
   end if;
   if not exists (select 1 from public.fixtures where id = '75000000-0000-0000-0000-000000000041' and status = 'completed' and winner_entry_id = '75000000-0000-0000-0000-000000000021') then
@@ -83,12 +94,15 @@ begin
   if not exists (select 1 from public.groups where id = '75000000-0000-0000-0000-000000000030' and standings_confirmed_at is not null) then
     raise exception 'preview mutated group confirmation';
   end if;
+  if (select count(*) from public.awards where title_en in ('PBLD direct award', 'PBLD tournament award', 'PBLD entry award', 'PBLD participant award') and archived_at is null) <> 4 then
+    raise exception 'preview mutated PBLD awards';
+  end if;
 end $$;
 
 do $$
 begin
   begin
-    perform public.reset_sport_results('75000000-0000-0000-0000-000000000003', true);
+    perform public.reset_sport_results_and_awards('75000000-0000-0000-0000-000000000003', true);
     raise exception 'reset accepted a sport from another tenant';
   exception when others then
     if sqlerrm not like '%Môn thể thao không hợp lệ%' then raise; end if;
@@ -101,7 +115,7 @@ set local request.jwt.claims = '{"sub":"cccccccc-cccc-cccc-cccc-cccccccccccc","r
 do $$
 begin
   begin
-    perform public.reset_sport_results('75000000-0000-0000-0000-000000000001', true);
+    perform public.reset_sport_results_and_awards('75000000-0000-0000-0000-000000000001', true);
     raise exception 'reset accepted a non-admin user';
   exception when others then
     if sqlerrm not like '%Không có quyền quản trị%' then raise; end if;
@@ -114,7 +128,7 @@ set local request.jwt.claims = '{"sub":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","r
 do $$
 begin
   begin
-    perform public.reset_sport_results('75000000-0000-0000-0000-000000000003', true);
+    perform public.reset_sport_results_and_awards('75000000-0000-0000-0000-000000000003', true);
     raise exception 'reset accepted a legacy tenant';
   exception when others then
     if sqlerrm not like '%Chỉ được reset môn thể thao của tenant PTSC%' then raise; end if;
@@ -125,7 +139,7 @@ set local request.headers = '{"x-tenant-slug":"ptsc2026"}';
 set local request.jwt.claim.sub = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
 set local request.jwt.claims = '{"sub":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb","role":"authenticated"}';
 
-select public.reset_sport_results('75000000-0000-0000-0000-000000000001', true);
+select public.reset_sport_results_and_awards('75000000-0000-0000-0000-000000000001', true);
 
 do $$
 begin
@@ -153,21 +167,33 @@ begin
   if not exists (select 1 from public.groups where id = '75000000-0000-0000-0000-000000000030' and standings_confirmed_at is null) then
     raise exception 'PBLD group confirmation was not cleared';
   end if;
-  if not exists (select 1 from public.awards where sport_id = '75000000-0000-0000-0000-000000000001' and title_en = 'Preserved award') then
-    raise exception 'PBLD award was changed';
+  if exists (select 1 from public.awards where tenant_id = '22222222-2222-2222-2222-222222222222' and archived_at is null and (sport_id = '75000000-0000-0000-0000-000000000001' or tournament_id = '75000000-0000-0000-0000-000000000010' or entry_id = '75000000-0000-0000-0000-000000000021')) then
+    raise exception 'PBLD awards were not archived';
+  end if;
+  if not exists (select 1 from public.awards where title_en = 'PBLD direct award' and archived_at is not null)
+    or not exists (select 1 from public.awards where title_en = 'PBLD tournament award' and archived_at is not null)
+    or not exists (select 1 from public.awards where title_en = 'PBLD entry award' and archived_at is not null)
+    or not exists (select 1 from public.awards where title_en = 'PBLD participant award' and archived_at is not null) then
+    raise exception 'PBLD award history was not preserved';
+  end if;
+  if not exists (select 1 from public.awards where title_en = 'Control award' and archived_at is null) then
+    raise exception 'another PTSC sport awards were changed';
   end if;
   if not exists (select 1 from public.fixtures where id = '75000000-0000-0000-0000-000000000043' and status = 'completed' and winner_entry_id = '75000000-0000-0000-0000-000000000023') then
     raise exception 'another PTSC sport was changed';
   end if;
 end $$;
 
-select public.reset_sport_results('75000000-0000-0000-0000-000000000001', true);
+select public.reset_sport_results_and_awards('75000000-0000-0000-0000-000000000001', true);
 
 set local role postgres;
 do $$
 begin
   if not exists (select 1 from public.fixtures where id = '75000000-0000-0000-0000-000000000044' and status = 'completed' and winner_entry_id = '75000000-0000-0000-0000-000000000025') then
     raise exception 'legacy tenant data was changed';
+  end if;
+  if not exists (select 1 from public.awards where title_en = 'Legacy award' and archived_at is null) then
+    raise exception 'legacy tenant awards were changed';
   end if;
 end $$;
 
