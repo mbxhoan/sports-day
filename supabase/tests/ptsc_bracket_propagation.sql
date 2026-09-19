@@ -12,7 +12,9 @@ insert into public.entries (id, tenant_id, tournament_id, kind, name_vi, name_en
   ('74000000-0000-0000-0000-000000000021', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'A', 'A'),
   ('74000000-0000-0000-0000-000000000022', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'B', 'B'),
   ('74000000-0000-0000-0000-000000000023', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'C', 'C'),
-  ('74000000-0000-0000-0000-000000000024', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'D', 'D');
+  ('74000000-0000-0000-0000-000000000024', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'D', 'D'),
+  ('74000000-0000-0000-0000-000000000025', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'E', 'E'),
+  ('74000000-0000-0000-0000-000000000026', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'individual', 'F', 'F');
 
 insert into public.groups (id, tenant_id, tournament_id, name_vi, name_en)
 values ('74000000-0000-0000-0000-000000000030', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'Bảng A', 'Group A');
@@ -28,7 +30,8 @@ insert into public.standings (tenant_id, tournament_id, group_id, entry_id, rank
 insert into public.fixtures (id, tenant_id, tournament_id, status, round_vi, round_en, round_order, bracket_position) values
   ('74000000-0000-0000-0000-000000000031', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'scheduled', 'Tứ kết', 'Quarterfinal', 1, 1),
   ('74000000-0000-0000-0000-000000000032', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'scheduled', 'Bán kết', 'Semifinal', 2, 1),
-  ('74000000-0000-0000-0000-000000000033', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'scheduled', 'Chung kết', 'Final', 3, 1);
+  ('74000000-0000-0000-0000-000000000033', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'scheduled', 'Chung kết', 'Final', 3, 1),
+  ('74000000-0000-0000-0000-000000000034', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000010', 'scheduled', 'Tứ kết', 'Quarterfinal', 1, 2);
 
 insert into public.fixture_entries (tenant_id, fixture_id, entry_id, side) values
   ('22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000031', '74000000-0000-0000-0000-000000000023', 'away'),
@@ -40,6 +43,9 @@ insert into public.fixture_slots (id, tenant_id, fixture_id, side, source_kind, 
 insert into public.fixture_slots (id, tenant_id, fixture_id, side, source_kind, source_fixture_id, label_vi, label_en) values
   ('74000000-0000-0000-0000-000000000042', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000032', 'home', 'fixture_winner', '74000000-0000-0000-0000-000000000031', 'Thắng TK', 'Quarterfinal winner'),
   ('74000000-0000-0000-0000-000000000043', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000033', 'home', 'fixture_winner', '74000000-0000-0000-0000-000000000032', 'Thắng BK', 'Semifinal winner');
+insert into public.fixture_slots (id, tenant_id, fixture_id, side, source_kind, source_entry_id, label_vi, label_en) values
+  ('74000000-0000-0000-0000-000000000044', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000034', 'home', 'entry', '74000000-0000-0000-0000-000000000025', 'Seed 1', 'Seed 1'),
+  ('74000000-0000-0000-0000-000000000045', '22222222-2222-2222-2222-222222222222', '74000000-0000-0000-0000-000000000034', 'away', 'entry', '74000000-0000-0000-0000-000000000026', 'Seed 2', 'Seed 2');
 
 set local request.headers = '{"x-tenant-slug":"ptsc2026"}';
 set local request.jwt.claim.sub = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
@@ -52,6 +58,27 @@ do $$
 begin
   if not exists (select 1 from public.fixture_entries where fixture_id = '74000000-0000-0000-0000-000000000031' and side = 'home' and entry_id = '74000000-0000-0000-0000-000000000021' and archived_at is null) then
     raise exception 'group rank did not populate PTSC bracket';
+  end if;
+end $$;
+
+select public.save_fixture_slot_and_sync(
+  '74000000-0000-0000-0000-000000000044', 'entry',
+  '74000000-0000-0000-0000-000000000026', null, null, null, 'Seed 1', 'Seed 1'
+);
+
+do $$
+begin
+  if not exists (select 1 from public.fixture_slots where id = '74000000-0000-0000-0000-000000000044' and source_entry_id = '74000000-0000-0000-0000-000000000026' and archived_at is null) then
+    raise exception 'manual seed assignment did not save';
+  end if;
+  if not exists (select 1 from public.fixture_slots where id = '74000000-0000-0000-0000-000000000045' and source_entry_id = '74000000-0000-0000-0000-000000000025' and archived_at is null) then
+    raise exception 'manual seed assignment did not swap the previous seed';
+  end if;
+  if not exists (select 1 from public.fixture_entries where fixture_id = '74000000-0000-0000-0000-000000000034' and side = 'home' and entry_id = '74000000-0000-0000-0000-000000000026' and archived_at is null) then
+    raise exception 'manual seed assignment did not sync the bracket entry';
+  end if;
+  if not exists (select 1 from public.fixture_entries where fixture_id = '74000000-0000-0000-0000-000000000034' and side = 'away' and entry_id = '74000000-0000-0000-0000-000000000025' and archived_at is null) then
+    raise exception 'manual seed swap did not sync the other bracket entry';
   end if;
 end $$;
 

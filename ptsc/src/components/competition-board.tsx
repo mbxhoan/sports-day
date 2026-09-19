@@ -116,8 +116,9 @@ function SlotEditor({ slot, fixture, entries, groups, groupEntries, fixtures, ac
 
 function SeedBracketSlotEditor({ slot, options, action, sportSlug, locked = false }: { slot: FixtureSlot; options: readonly { value: string; label: string }[]; action: AdminAction; sportSlug?: string; locked?: boolean }) {
   const [state, formAction, pending] = useActionState(action, initialAdminActionState);
-  const [entryId, setEntryId] = useState(slot.source_kind === "entry" ? slot.source_entry_id ?? "" : "");
   const originalEntryId = slot.source_kind === "entry" ? slot.source_entry_id ?? "" : "";
+  const [entryId, setEntryId] = useState(originalEntryId);
+  useEffect(() => setEntryId(originalEntryId), [originalEntryId]);
   const dirty = entryId !== originalEntryId;
   return <form className="bracket-seed-editor" action={formAction}>
     <input type="hidden" name="slot_id" value={slot.id}/>
@@ -312,7 +313,6 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
         const slots = fixtureSlots.filter((slot) => fixturesById.get(slot.fixture_id)?.tournament_id === tournament.id);
         const tournamentEntries = entriesByTournament.get(tournament.id) ?? [];
         const manualSeedSlots = knockout.flatMap((fixture) => (fixtureSlotsById.get(fixture.id) ?? []).filter((slot) => isManualSeedSlot(fixture, slot)));
-        const usedSeedEntryIds = new Set(manualSeedSlots.map((slot) => slot.source_kind === "entry" ? slot.source_entry_id : null).filter((entryId): entryId is string => Boolean(entryId)));
         const layout = layoutBracket(knockout, slots, resultAction ? manualSeedSlots.length > 0 && slotAction ? 242 : 166 : 100, resultAction ? undefined : 116);
         const roundCount = Math.max(1, ...knockout.map((fixture) => fixture.round_order ?? 1));
         const roundLabels = new Map<number, string>();
@@ -326,7 +326,7 @@ export function CompetitionBoard({ locale, tournaments, entries, groups, groupEn
             {resultAction && <button type="button" className="bracket-edit-button" aria-label={`Mở form sửa kết quả ${matchLabel(fixture)}`} title="Mở form sửa kết quả" onClick={() => { setSubmittedFixtureId(null); setEditingFixture(fixture); }}><Pencil size={13} aria-hidden="true"/><span>Sửa</span></button>}
             <small className="bracket-match-label">{[matchLabel(fixture), localized(fixture, "round", locale)].filter(Boolean).join(" · ") || t.updating}</small>
             {resultAction && slotAction && seedRows.length > 0 && <div className="bracket-seed-editors">{seedRows.map((slot) => {
-              const options = tournamentEntries.filter((entry) => entry.id === slot.source_entry_id || !usedSeedEntryIds.has(entry.id)).map((entry) => ({ value: entry.id, label: entryName(entry.id) }));
+              const options = tournamentEntries.map((entry) => ({ value: entry.id, label: entryName(entry.id) }));
               return <SeedBracketSlotEditor key={slot.id} slot={slot} options={options} action={slotAction} sportSlug={sportSlug} locked={tournamentBracketHasResults(tournament.id)}/>;
             })}</div>}
             {resultAction ? <InlineBracketResult fixture={fixture} rows={rows} action={resultAction} manualWinner={sportSlug === "keo-co"} sportSlug={sportSlug}/> : <div className="bracket-teams">{(() => { const fallbackScores = scoresFromMatchResult(localized(fixture, "result_summary", locale), rows[0]?.label ?? "", rows[1]?.label ?? ""); return rows.map(({ row, entry, label, organizationLabel }, index) => <div className={`bracket-team${entry?.id === fixture.winner_entry_id ? " winner" : ""}`} key={row?.id ?? index}><EntryLabel name={label} organization={organizationLabel}/><b>{scoreLabel(row, fallbackScores?.[index] ?? "—")}</b></div>); })()}</div>}
