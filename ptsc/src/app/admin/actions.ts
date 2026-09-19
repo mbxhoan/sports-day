@@ -173,6 +173,22 @@ export async function saveOrganizationName(formData: FormData) {
   return saveRecord(request);
 }
 
+export async function setOrganizationLeaderboardVisibility(formData: FormData) {
+  if (tenantSlug !== "ptsc2026") throw new Error("Thao tác chỉ khả dụng cho PTSC");
+  const id = valueOf(formData, "id");
+  const hiddenValue = formData.get("hidden");
+  if (!id || (hiddenValue !== "true" && hiddenValue !== "false")) throw new Error("Yêu cầu không hợp lệ");
+
+  const { supabase, tenantId } = await adminClient();
+  const { data, error } = await supabase.from("organizations").update({ leaderboard_hidden: hiddenValue === "true" })
+    .eq("id", id).eq("tenant_id", tenantId).is("archived_at", null).select("id").maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Không tìm thấy đơn vị trong PTSC");
+
+  invalidatePublic("leaderboard");
+  revalidatePath("/admin");
+}
+
 export async function setArchived(formData: FormData) {
   const entity = String(formData.get("entity")) as AdminEntity;
   const id = String(formData.get("id") ?? "");

@@ -60,6 +60,7 @@ const refreshDataButton = readFileSync(new URL("../src/components/refresh-data-b
 const searchCombobox = existsSync(new URL("../src/components/search-combobox.tsx", import.meta.url)) ? readFileSync(new URL("../src/components/search-combobox.tsx", import.meta.url), "utf8") : "";
 const searchableSelect = readFileSync(new URL("../src/components/searchable-select.tsx", import.meta.url), "utf8");
 const publicDataMigration = readFileSync(new URL("../../supabase/migrations/20260913090000_public_data_read_models.sql", import.meta.url), "utf8");
+const organizationVisibilityMigration = readFileSync(new URL("../../supabase/migrations/20260919150235_ptsc_organization_leaderboard_visibility.sql", import.meta.url), "utf8");
 const competitionDisplayMigration = readFileSync(new URL("../../supabase/migrations/20260914074118_ptsc_competition_display.sql", import.meta.url), "utf8");
 const pdfBracketMigration = readFileSync(new URL("../../supabase/migrations/20260914110000_ptsc_pdf_brackets.sql", import.meta.url), "utf8");
 const ptscPropagationMigration = readFileSync(new URL("../../supabase/migrations/20260914140000_ptsc_result_propagation.sql", import.meta.url), "utf8");
@@ -74,6 +75,32 @@ test("database models source-driven competition slots", () => {
   assert.match(bracketMigration, /source_kind in \('entry', 'group_rank', 'fixture_winner', 'fixture_loser', 'bye'\)/);
   assert.match(bracketMigration, /result_status text/);
   assert.match(bracketMigration, /fixture_slots_public_read/);
+});
+
+test("organization leaderboard visibility only filters hidden rows", () => {
+  const organizations = [
+    { id: "visible", code: "VISIBLE", name_vi: "Visible", name_en: "Visible", logo_path: null, sort_order: 1, leaderboard_rank: 1, gold_medals: 1, silver_medals: 0, bronze_medals: 0 },
+    { id: "hidden", code: "HIDDEN", name_vi: "Hidden", name_en: "Hidden", logo_path: null, sort_order: 2, leaderboard_rank: 2, leaderboard_hidden: true, gold_medals: 2, silver_medals: 3, bronze_medals: 4 },
+    { id: "zero", code: "ZERO", name_vi: "Zero", name_en: "Zero", logo_path: null, sort_order: 3, leaderboard_rank: 3, gold_medals: 0, silver_medals: 0, bronze_medals: 0 },
+  ];
+  const manualRows = rankOrganizations([], organizations, []);
+  assert.deepEqual(manualRows.map((row) => row.organization.id), ["visible", "zero"]);
+  assert.deepEqual([manualRows[0].gold, manualRows[1].total], [1, 0]);
+  assert.deepEqual([organizations[1].gold_medals, organizations[1].silver_medals, organizations[1].bronze_medals], [2, 3, 4]);
+
+  const awardOrganizations = organizations.map((organization) => ({ ...organization, leaderboard_rank: undefined, gold_medals: undefined, silver_medals: undefined, bronze_medals: undefined }));
+  const awardRows = rankOrganizations([{ id: "award", organization_id: "visible", entry_id: null, participant_id: null, medal: "gold", title_vi: "", title_en: "" }], awardOrganizations, []);
+  assert.deepEqual(awardRows.map((row) => row.organization.id), ["visible"]);
+});
+
+test("organization visibility migration defaults visible and scopes only the leaderboard RPC", () => {
+  assert.match(organizationVisibilityMigration, /add column if not exists leaderboard_hidden boolean not null default false/i);
+  assert.doesNotMatch(organizationVisibilityMigration, /update\s+public\.organizations/i);
+  assert.match(organizationVisibilityMigration, /from organizations where tenant_id = v_tenant_id and archived_at is null and leaderboard_hidden = false\), '\[\]'::jsonb\),\s*'awards'/);
+  assert.doesNotMatch(organizationVisibilityMigration, /from organizations where tenant_id = v_tenant_id and archived_at is null and leaderboard_hidden = false\), '\[\]'::jsonb\),\s*'entries'/);
+  assert.match(adminActions, /tenantSlug !== "ptsc2026"/);
+  assert.match(adminActions, /update\(\{ leaderboard_hidden:/);
+  assert.match(adminActions, /invalidatePublic\("leaderboard"\)/);
 });
 
 test("result RPC propagates and previews dependent reset", () => {

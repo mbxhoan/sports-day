@@ -54,7 +54,7 @@ export type Fixture = {
   winner_entry_id: string | null;
   source_code: string | null;
 };
-export type Organization = { id: string; code: string; short_name?: string | null; name_vi: string; name_en: string; logo_path: string | null; sort_order: number; leaderboard_rank?: number | null; gold_medals?: number; silver_medals?: number; bronze_medals?: number };
+export type Organization = { id: string; code: string; short_name?: string | null; name_vi: string; name_en: string; logo_path: string | null; sort_order: number; leaderboard_rank?: number | null; leaderboard_hidden?: boolean; gold_medals?: number; silver_medals?: number; bronze_medals?: number };
 export type Participant = { id: string; organization_id: string | null; full_name: string; full_name_en: string | null };
 export type Entry = { id: string; tournament_id: string; organization_id: string | null; kind: string; name_vi: string; name_en: string };
 export type EntryMember = { id: string; entry_id: string; participant_id: string; role_vi: string; role_en: string; sort_order: number };
@@ -280,7 +280,7 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
     db.from("event_settings").select("event_name_vi,event_name_en,subtitle_vi,subtitle_en,about_vi,about_en,venue_vi,venue_en,hero_path,hero_mobile_path,start_at,end_at,gallery_drive_url").eq("tenant_id", tenantId).eq("singleton_key", "main").maybeSingle(),
     db.from("sports").select("id,slug,name_vi,name_en,emoji,description_vi,description_en,rules_vi,rules_en,sort_order,gallery_drive_url").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("tournaments").select("id,sport_id,slug,name_vi,name_en,category_vi,category_en,format_vi,format_en,rules_vi,rules_en,competition_mode,scoring_rule,source_metadata,sort_order").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
-    db.from("organizations").select("id,code,short_name,name_vi,name_en,logo_path,sort_order,leaderboard_rank,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
+    db.from("organizations").select("id,code,short_name,name_vi,name_en,logo_path,sort_order,leaderboard_rank,leaderboard_hidden,gold_medals,silver_medals,bronze_medals").eq("tenant_id", tenantId).is("archived_at", null).order("sort_order"),
     db.from("participants").select("id,organization_id,full_name,full_name_en").eq("tenant_id", tenantId).is("archived_at", null).order("full_name"),
     db.from("entries").select("id,tournament_id,organization_id,kind,name_vi,name_en").eq("tenant_id", tenantId).is("archived_at", null).order("name_vi"),
     db.from("entry_members").select("id,entry_id,participant_id,role_vi,role_en,sort_order,entries!inner(kind)").eq("tenant_id", tenantId).eq("entries.kind", "team").is("archived_at", null).order("sort_order"),
@@ -350,14 +350,15 @@ const getCachedSiteData = unstable_cache(async function getSiteData(): Promise<S
 export const getSiteData = cache(getCachedSiteData);
 
 export function rankOrganizations(awards: Award[], organizations: Organization[], entries: Entry[], participants: Participant[] = []): LeaderboardRow[] {
+  const visibleOrganizations = organizations.filter((organization) => !organization.leaderboard_hidden);
   if (organizations.some((organization) => organization.gold_medals !== undefined || organization.leaderboard_rank !== undefined)) {
-    return [...organizations]
+    return [...visibleOrganizations]
       .map((organization) => ({ organization, gold: organization.gold_medals ?? 0, silver: organization.silver_medals ?? 0, bronze: organization.bronze_medals ?? 0, special: 0, total: (organization.gold_medals ?? 0) + (organization.silver_medals ?? 0) + (organization.bronze_medals ?? 0) }))
       .sort((a, b) => (a.organization.leaderboard_rank ?? Number.MAX_SAFE_INTEGER) - (b.organization.leaderboard_rank ?? Number.MAX_SAFE_INTEGER) || b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze || a.organization.sort_order - b.organization.sort_order);
   }
   const entriesById = new Map(entries.map((entry) => [entry.id, entry.organization_id]));
   const participantsById = new Map(participants.map((participant) => [participant.id, participant.organization_id]));
-  const rows = new Map(organizations.map((organization) => [organization.id, { organization, gold: 0, silver: 0, bronze: 0, special: 0 }]));
+  const rows = new Map(visibleOrganizations.map((organization) => [organization.id, { organization, gold: 0, silver: 0, bronze: 0, special: 0 }]));
   for (const award of awards) {
     const organizationId = award.organization_id ?? entriesById.get(award.entry_id ?? "") ?? participantsById.get(award.participant_id ?? "");
     const row = organizationId ? rows.get(organizationId) : undefined;
