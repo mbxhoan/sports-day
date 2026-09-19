@@ -595,6 +595,28 @@ export async function confirmFixtureReset(formData: FormData) {
   }
 }
 
+export async function resetSportResults(formData: FormData) {
+  const sportId = String(formData.get("sport_id") ?? "").trim();
+  const requestedSlug = String(formData.get("sport_slug") ?? "").trim();
+  try {
+    if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận reset kết quả môn đang chọn");
+    if (!sportId || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(requestedSlug)) throw new Error("Môn thể thao không hợp lệ");
+    const { supabase, tenantId } = await adminClient();
+    if (tenantSlug !== "ptsc2026" || tenantId !== "22222222-2222-2222-2222-222222222222") throw new Error("Chỉ được reset môn thể thao của tenant PTSC");
+    const { data: sport, error: sportError } = await supabase.from("sports").select("id,slug").eq("tenant_id", tenantId).eq("id", sportId).eq("slug", requestedSlug).is("archived_at", null).maybeSingle();
+    if (sportError || !sport) throw new Error("Môn thể thao không hợp lệ");
+    const { error } = await supabase.rpc("reset_sport_results_and_awards", { p_sport_id: sport.id, p_confirm: true });
+    if (error) throw new Error(error.message);
+    invalidatePublic("result", sport.slug);
+    revalidatePath("/admin");
+    redirect(resultAdminPath(sport.slug, "reset_done=1"));
+  } catch (error) {
+    if (isRedirectError(error)) throw error;
+    const message = error instanceof Error ? error.message : "Không thể reset kết quả môn đang chọn";
+    redirect(resultAdminPath(requestedSlug, `reset_sport=${encodeURIComponent(sportId)}&reset_error=${encodeURIComponent(message)}`));
+  }
+}
+
 export async function resetPtscResults(formData: FormData) {
   if (formData.get("confirm") !== "yes") throw new Error("Cần xác nhận reset kết quả PTSC");
   const { supabase, tenantId } = await adminClient();
