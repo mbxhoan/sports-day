@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { LoadingFeedback } from "@/components/loading-feedback";
+import { Analytics } from "@vercel/analytics/next";
 import "@fontsource-variable/lexend";
 import "./globals.css";
 
